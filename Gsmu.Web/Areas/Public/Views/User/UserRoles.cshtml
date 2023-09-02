@@ -1,0 +1,194 @@
+﻿@using Gsmu.Api.Data;
+@using Gsmu.Api.Data.School.User;
+@using Gsmu.Api.Data.School.Terminology;
+@model UserModel
+
+@{
+    string cmd = ViewBag.cmd;
+
+}
+<script type="text/javascript">
+    //destroy first main panel if exist for the edit mode to prevent duplicate
+    var rolesCmp = Ext.getCmp('UserDashboardRoles');
+    if (rolesCmp != null) { rolesCmp.destroy(); }
+
+    var UserRolespanel = Ext.create('Ext.panel.Panel', {
+        border: false,
+        layout: 'column',
+        items: [
+                {
+                    columnWidth: 1 / 2,
+                    baseCls: 'x-plain',
+                    bodyStyle: 'padding:5px 0 15px 5px',
+                    layout: 'vbox',
+                    items: [
+							{
+							    id: 'UserWidgetRoleStudent',
+							    xtype: 'checkbox',
+							    boxLabel: 'Student',
+							    height: 10,
+							    margin: '5 5 5 5',
+							    listeners: {
+							        click: {
+							            element: 'el',
+							            fn: function () {
+							                var roleActvControl = Ext.getCmp("UserWidgetRoleStudent")
+							                var ActiveUID = Ext.getCmp('UserDashboardIDnumber').getValue();
+							                self.executeCommandUserWidgetRoles('user-grid-check-role', roleActvControl, ActiveUID, 'ST');
+							            }
+							        }
+							    }
+							},
+							{
+							    id: 'UserWidgetRoleSupervisor',
+							    xtype: 'checkbox',
+							    boxLabel: Terminology.capital('supervisor'),
+							    height: 10,
+							    margin: '5 5 5 5',
+							    listeners: {
+							        click: {
+							            element: 'el',
+							            fn: function () {
+							                var roleActvControl = Ext.getCmp("UserWidgetRoleSupervisor")
+							                var ActiveUID = Ext.getCmp('UserDashboardIDnumber').getValue();
+							                self.executeCommandUserWidgetRoles('user-grid-check-role', roleActvControl, ActiveUID, 'SV');
+							            }
+							        }
+							    }
+							},
+							{
+							    id: 'UserWidgetRoleInstructor',
+							    xtype: 'checkbox',
+							    boxLabel: Terminology.capital('instructor'),
+							    height: 10,
+							    margin: '5 5 5 5',
+							    listeners: {
+							        click: {
+							            element: 'el',
+							            fn: function () {
+							                var roleActvControl = Ext.getCmp("UserWidgetRoleInstructor")
+							                var ActiveUID = Ext.getCmp('UserDashboardIDnumber').getValue();
+							                self.executeCommandUserWidgetRoles('user-grid-check-role', roleActvControl, ActiveUID, 'IT');
+							            }
+							        }
+							    }
+							},
+							{
+							    id: 'UserWidgetRoleSubAdmin',
+							    xtype: 'checkboxfield',
+							    boxLabel: 'Sub-Admin',
+							    height: 10,
+							    margin: '5 5 5 5',
+							    listeners: {
+							        click: {
+							            element: 'el',
+							            fn: function () {
+							                var roleActvControl = Ext.getCmp("UserWidgetRoleSubAdmin")
+							                var ActiveUID = Ext.getCmp('UserDashboardIDnumber').getValue();
+							                self.executeCommandUserWidgetRoles('user-grid-check-role', roleActvControl, ActiveUID, 'SA');
+							            }
+							        }
+							    }
+							},
+							{
+							    id: 'UserWidgetRoleAdmin',
+							    xtype: 'checkboxfield',
+							    boxLabel: 'Admin',
+							    height: 12,
+							    margin: '5 5 10 5',
+							    listeners: {
+							        click: {
+							            element: 'el',
+							            fn: function () {
+							                var roleActvControl = Ext.getCmp("UserWidgetRoleAdmin")
+							                var ActiveUID = Ext.getCmp('UserDashboardIDnumber').getValue();
+							                self.executeCommandUserWidgetRoles('user-grid-check-role', roleActvControl, ActiveUID, 'AD');
+							            }
+							        }
+							    }
+							}
+                    ]
+                },
+                {
+                    columnWidth: 1 / 2,
+                    baseCls: 'x-plain',
+                    layout: 'vbox',
+                    bodyStyle: 'padding:5px 0 5px 5px',
+                    items: [
+							{
+							    xtype: 'label',
+							    id: 'UserWidgetRoleStudentlabel',
+							    text: '-',
+							    style: 'font-size: 9px; vertical-align:bottom;',
+							    height: 10,
+							    margin: '10 5 0 5'
+							},
+							{
+							    xtype: 'label',
+							    id: 'UserWidgetRoleSupervisorlabel',
+							    text: '-',
+							    style: 'font-size: 9px; vertical-align:bottom;',
+							    height: 10,
+							    margin: '10 5 0 5'
+							},
+							{
+							    xtype: 'label',
+							    id: 'UserWidgetRoleInstructorlabel',
+							    text: '-',
+							    style: 'font-size: 9px; vertical-align:bottom;',
+							    height: 10,
+							    margin: '10 5 0 5'
+							},
+							{
+							    xtype: 'label',
+							    id: 'UserWidgetRoleSubAdminlabel',
+							    text: '-',
+							    style: 'font-size: 9px; vertical-align:bottom;',
+							    height: 10,
+							    margin: '10 5 0 5'
+							},
+							{
+							    xtype: 'label',
+							    id: 'UserWidgetRoleAdminlabel',
+							    text: '-',
+							    style: 'font-size: 9px; vertical-align:bottom;',
+							    height: 12,
+							    margin: '10 5 0 5'
+							}
+                    ]
+                }
+
+        ]
+    });
+
+
+Ext.onReady(function () {
+
+
+    Ext.create('Ext.Panel', {
+        id:'UserDashboardRoles',
+        renderTo: Ext.get('UserRolesContainerPanel'),
+        frame: true,
+        autoScroll: false,
+        title: 'Roles',
+        tools: [
+            {
+                hidden: (dasboardadminmode ? false : true),
+                type: 'cross',
+                tooltip: 'Delete this widget ',
+                handler: function (e, toolEl, panel, tc) {
+                    DeleteUserWidget(GetwidgetColIDbyPlID('UserDashboardRoles'), GetwidgetIDbyPlID('UserDashboardRoles'));
+                }
+            }
+            ],
+        
+        items: [UserRolespanel]
+    });
+
+
+});
+</script>
+
+<div id="UserRolesContainerPanel" style="position:relative;min-height:100px; padding-bottom:20px"></div>
+
+

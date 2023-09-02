@@ -1,0 +1,22 @@
+@{
+    ViewBag.Title = "Confirmation";
+}
+<br />
+   <input type="hidden" value="@Html.Raw(ViewBag.OrderNumber)" id="OrderNumber" style="width:530px;" class="textbox-cc" />
+   <input type="hidden" value="@Html.Raw(ViewBag.OrderTotal)" id="OrderTotal" style="width:530px;" class="textbox-cc" />
+
+
+@if(ViewBag.Error==0){
+<div id="confirmationprint">
+    Processing Receipt...
+</div>
+ @Html.Raw(ViewBag.GoogleAnalyticsSetUpScript != null || ViewBag.GoogleAnalyticsSetUpScript != "" ? ViewBag.GoogleAnalyticsSetUpScript : "")
+<br />
+<script>
+    Cart.prototype.ShowConfirmationReceipt('@ViewBag.OrderNumber');
+</script>
+}
+else
+{
+    <div style="color:red; font-weight:bolder;">@ViewBag.Message</div>
+}

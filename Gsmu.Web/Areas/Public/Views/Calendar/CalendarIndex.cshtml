@@ -1,0 +1,28 @@
+﻿@{
+    ViewBag.Title = "Calendar";
+    Layout = "~/Areas/Public/Views/Shared/_Layout.cshtml";
+}
+<div style="text-align:center; float:left; position:absolute; margin-top:29px; margin-left:5px; z-index:9;">
+    <select id="list" onchange="RefreshCalendar(this)">
+        <option value="">View All Category</option>
+        @foreach (var mc in ViewBag.MainCategory as List<string>)
+        {
+            if(mc.Trim()!=""){
+            <option value="@mc">@Html.Raw(mc)</option>
+        }
+        }
+    </select>
+
+</div>
+<div style="padding-top: 10px;" id="calendarmain">@{Html.RenderPartial("GetCalendarByCategory");}</div>
+
+<script>
+	function RefreshCalendar(self)
+	{
+		var value = self.options[self.selectedIndex].value;
+		document.location = '/public/calendar/calendarindex?main=' + value;
+	}
+</script>
+
+
+

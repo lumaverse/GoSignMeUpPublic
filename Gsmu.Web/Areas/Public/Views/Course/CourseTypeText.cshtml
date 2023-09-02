@@ -1,0 +1,37 @@
+﻿@model Gsmu.Api.Data.School.Course.CourseModel
+@{
+    var courseModel = Model;
+    var course = courseModel.Course;
+    var csetting = courseModel.CourseSettings;
+
+    //var modifier = "CourseDetails";
+    var wgname = "TypeText";
+    var wgcontainer = "Course" + wgname + "Container";
+    var wgcontainerDet = "Course" + wgname + "ContainerDet";
+    
+    var contactname = ((!string.IsNullOrWhiteSpace(Model.Course.ContactName)) ? Model.Course.ContactName : string.Empty);
+    var contactphone = ((!string.IsNullOrWhiteSpace(Model.Course.ContactPhone)) ? Model.Course.ContactPhone : string.Empty);
+    var altverbiage = ((!string.IsNullOrWhiteSpace(Model.Course.CourseTypeAltVerbiage)) ? Model.Course.CourseTypeAltVerbiage : string.Empty);
+}
+<div id="@wgcontainer" class="course-widgetbox" style="position:inherit; min-height:50px; background-color:#b8eca7 ">
+
+    <div id="@wgcontainerDet" style="padding:5px;">
+
+        <div style="width: 100%;">
+            <div style="display: inline-block; width:100%" class="coursestype-text">
+                @if (Model.Course.CoursesType == 1)
+                {
+                    <span style="font-weight: bold;">Register by contacting:</span><br />
+                    @contactname<br />
+                    @contactphone
+                }
+                else if (Model.Course.CoursesType == 2)
+                {
+                    @Html.Raw(altverbiage)
+                }
+            </div>
+        </div>
+
+    </div>
+
+</div>

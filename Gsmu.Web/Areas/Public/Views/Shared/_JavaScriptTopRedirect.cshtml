@@ -1,0 +1,20 @@
+﻿@using Newtonsoft.Json
+@model string
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <script type="text/javascript">
+        top.location = @(Html.Json(Model));
+    </script>
+</head>
+<body>
+    <div> 
+    </div>
+</body>
+</html>

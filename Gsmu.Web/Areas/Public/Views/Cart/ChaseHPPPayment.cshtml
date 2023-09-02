@@ -1,0 +1,96 @@
+  
+
+
+    <title>Chase Payment Form</title>
+    
+    <link href="Areas/Public/Styles/Layout.css" rel="stylesheet"/>
+    
+
+
+    </script>
+    <style id="Style1" type="text/css" runat="server">
+        .sq-input {
+            border: 1px solid #CCCCCC;
+            margin-bottom: 10px;
+            padding: 1px;
+        }
+
+        .sq-input--focus {
+            outline-width: 5px;
+            outline-color: #70ACE9;
+            outline-offset: -1px;
+            outline-style: auto;
+        }
+
+        .sq-input--error {
+            outline-width: 5px;
+            outline-color: #FF9393;
+            outline-offset: 0px;
+            outline-style: auto;
+        }
+
+
+    </style>
+
+<div class="cart-steps-wrap">
+    <div class="cart-steps cart-step3"></div>
+    <ul class="cart-steps-text" style="list-style-type: none;">
+        <li class="cart-step-1 current-step">Log in/ Create Account</li>
+        <li class="cart-step-2">Review</li>
+        <li class="cart-step-3">Payments</li>
+        <li class="cart-step-4">Receipt & Confirmation</li>
+    </ul>
+</div>
+
+
+
+
+
+    <div style="float:left;">
+                        
+        <div style="width: 60%; float: left; padding-right:120px; padding-left:30px; position:relative; text-align:left;">
+            <h1>Payment</h1>
+
+            <div style="font-size: 18px;margin-top : 8px; margin-bottom: 8px; margin-left:8px; text-align:right;">
+                Amount: &nbsp; @ViewBag.PaymentTotalLbl
+            </div>
+
+            <div style="font-size: 18px;margin-top : 8px; margin-bottom: 8px; margin-left:8px; text-align:right;">
+                Order Number: &nbsp;@ViewBag.OrderNo
+            </div>
+
+            <div style="font-size: 18px;margin-top : 80px; margin-bottom: 8px; margin-left:8px; text-align:right;">
+                    <form name ="frmSubmit" id="frmSubmit" method="POST" action="@ViewBag.UrlSubmit" target="_self">
+                    Redirecting...
+                 </form>
+
+                 <p></p>
+                <p></p>
+                <p></p>
+                <div id="prcssqr" style="color:blue; margin-top: 20px; min-height:20px;"></div>
+                <div id="errors" style="color:red; min-height:40px;">@ViewBag.message</div>
+            </div>
+
+
+
+
+        </div>
+
+        <div style="float: left; width: 40%; padding-right: 10px; padding-left: 50px;">
+            <div style="padding-left: 5px; margin-top:30px; font-size:15px;">
+            <p></p>Powered by:
+            <img src="/images/ChasePayment.png"  height="60"/ style="padding: 20px;">
+
+
+
+        <div style="float: left; width: 40%; padding-left: 120px; padding-top:130px;">
+        </div>
+
+</div>     
+                       
+<script type="text/javascript">
+    $(function () {
+        document.frmSubmit.submit();
+    });
+</script>
+   

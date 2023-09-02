@@ -1,0 +1,42 @@
+﻿<div id="widget-course-enrolllment">
+    <div class="panel panel-default">
+        <div class="panel-heading gsmu-sub-panel-heading">
+            <div class="panel-title pull-left">
+                Enrollment
+            </div>
+            <div class="pull-right">
+                <div id="course-enrollment-data-btns">
+                    <div>
+                        <button type="button" title="Export to Excel" class="btn btn-success btn-xs excel" onclick="courseRosters.exportToExcel()"><span class="fa fa-file-excel-o"></span></button>
+                        <button type="button" title="Export to PDF" class="btn btn-danger btn-xs excel" onclick="courseRosters.exportToPDF()"><span class="fa fa-file-pdf-o"></span></button>
+                        <button type="button" title="Take Attendance" class="btn btn-success btn-xs attendance" onclick=""><span class="fa fa-check"></span></button>
+                    </div>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <div class="panel-body gsmu-sub-panel-body large-panel panel-collapse collapse in scroll-y">
+            <ul class="nav nav-tabs">
+                <li role="presentation" class="active"><a href="#course-enrollment-active" data-toggle="tab">Active</a></li>
+                <li role="presentation"><a href="#course-enrollment-waiting" data-toggle="tab">Waiting</a></li>
+                <li role="presentation"><a href="#course-enrollment-cancelled" data-toggle="tab">Cancelled</a></li>
+                <li role="presentation"><a href="#course-enrollment-transcripted" data-toggle="tab">Transcripted</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="course-enrollment-active" class="tab-pane fade in active">
+                    <table id="course-enrollment-data-active-grid" class="table table-striped table-hover"></table>
+                </div>
+                <div id="course-enrollment-waiting" class="tab-pane fade">
+                    <table id="course-enrollment-data-waiting-grid" class="table table-striped table-hover"></table>
+                </div>
+                <div id="course-enrollment-cancelled" class="tab-pane fade">
+                    <table id="course-enrollment-data-cancel-grid" class="table table-striped table-hover"></table>
+                </div>
+                <div id="course-enrollment-transcripted" class="tab-pane fade">
+                    <table id="course-enrollment-data-transcripted-grid" class="table table-striped table-hover"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/Areas/Adm/Scripts/Widgets/CourseRosters.js")

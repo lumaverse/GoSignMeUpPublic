@@ -1,0 +1,94 @@
+@using Gsmu.Api.Commerce.ShoppingCart;
+@using Gsmu.Api.Web
+@using Gsmu.Api.Authorization
+@using Gsmu.Api.Data.School.Terminology;
+@model Gsmu.Api.Data.School.CourseRoster.OrderModel
+
+@{
+    ViewBag.Title = "Paypal Confirmation";
+    var chkout = CheckoutInfo.Instance;
+    var layoutConfig = Gsmu.Api.Data.ViewModels.Layout.LayoutManager.PublicLayoutConfiguration;
+}
+@*<br />
+<div id="confirmationprint">
+        Silent Post
+</div>
+<br />*@
+<link rel="stylesheet" href="@Url.Content("~/Content/Confirmation.css")"/>  
+
+   @if(Request.QueryString["RESULT"]=="0")
+    {
+      @*<div style="display: none;">
+             @{Html.RenderAction("Empty", "Cart");}
+      </div>*@
+       <div style="clear: both">
+                @Html.Partial("_PartialConfirmation", Model)
+        </div>
+
+        <div id="confirmation-print-button-container" style="margin-top:20px">
+        <table>
+            <tr>
+                <td>
+                     <a href="javascript:cart.printreceipt(@Json.Encode(Model.OrderNumber));"
+                     class="simpleCart_checkout hudbtn primary" style="height: 25px; width: 250px; font-size: 16px; vertical-align: central; text-align: center;">Print @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Receipt)</a>
+                </td>
+                <td>
+                    <a href="javascript:cart.backToBrowse(true);" 
+                       class="simpleCart_checkout hudbtn primary" style="height: 28px; width: 290px; font-size: 16px; vertical-align: central; text-align: center;">@layoutConfig.LayoutButtons.ContinueShoppingCourse</a>
+                </td>
+                <td>
+
+                    @if(AuthorizationHelper.CurrentSupervisorUser!=null)
+                    {
+                    <text>
+                        <a href="@Url.Content("~/public/supervisor")" class="simpleCart_checkout hudbtn primary" style="height: 28px; width: 290px; font-size: 16px; vertical-align: central; text-align: center;">Back To User Home</a>
+                    </text>
+                    }else{
+                    <text>
+                        <a href="@Url.Content("~/public/user/dashboard")" class="simpleCart_checkout hudbtn primary" style="height: 28px; width: 290px; font-size: 16px; vertical-align: central; text-align: center;">Back To User Home</a>
+                    </text>
+                    }
+
+                     
+                </td>
+            </tr>
+        </table>
+        @Html.Raw(ViewBag.GoogleAnalyticsSetUpScript != null || ViewBag.GoogleAnalyticsSetUpScript != "" ? ViewBag.GoogleAnalyticsSetUpScript : "")
+        </div>
+        <script type="text/javascript">
+            ga('send', 'pageview', {
+                'page': config.getUrl('public/cart/ThankYou'),
+                'title': 'Google Analytics Tracking (Thank You ActionResult)'
+            });
+            ga('send', 'pageview', {
+                'page': config.getUrl('thankyou.asp?callfrom=ruby'),
+                'title': 'Google Analytics Tracking (Thank You ASP)'
+            });
+        </script>
+    }
+    else if(Request.QueryString["RESULT"]!="0" && Request.QueryString["RESPMSG"] != null)
+    {
+        <div style="background-color: #FCF58C;
+        border: 3px dashed #FFFF00;
+        padding: 20px;
+        text-align: center;">
+        <b>Transaction Declined. There's an issue on your credit card information. Please go back and try again.</b>
+            <br /> <br /> <br />
+            <div id="paypal_response_error">
+               <b>Paypal Response Message:   <i style="color:red">@Html.Raw(ViewBag.ResponseMessage)</i> </b> 
+            </div>
+        </div>
+        <div id="go_back" style="margin-top:20px">
+             <input type="hidden" value="@ViewBag.Amount" id="hiddenOrderTotal" />
+                    <a href="javascript:cart.ShowPaymentPage('@chkout.PaymentTotal','@chkout.OrderNumber','','@chkout.PaymentCaller');"
+                        class="simpleCart_checkout hudbtn primary right" style="height: 25px; width: 150px; font-size: 16px; vertical-align: central; text-align: center;">Go Back</a>
+
+        </div>
+    }
+    else 
+    {
+        <div style="clear: both">
+                @Html.Partial("_PartialConfirmation", Model)
+        </div>
+    }
+

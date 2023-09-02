@@ -1,0 +1,26 @@
+@{
+    ViewBag.Title = "Confirmation";
+}
+<br />
+<input type="hidden" value="@Html.Raw(ViewBag.OrderNo)" id="OrderNumber" style="width:530px;" class="textbox-cc" />
+<input type="hidden" value="@Html.Raw(ViewBag.OrderTotal)" id="OrderTotal" style="width:530px;" class="textbox-cc" />
+<input type="hidden" value="@Html.Raw(ViewBag.transactionid)" id="transactionid" style="width:530px;" class="textbox-cc" />
+
+@if (ViewBag.ApproveNelNet == "1")
+{
+    <div id="confirmationprint">
+        Processing Receipt...
+    </div>
+    <br />
+    @Html.Raw(ViewBag.GoogleAnalyticsSetUpScript != null || ViewBag.GoogleAnalyticsSetUpScript != "" ? ViewBag.GoogleAnalyticsSetUpScript : "")
+    <script>
+        Cart.prototype.ShowConfirmationPageforPaygov();
+    </script>
+}
+
+else
+{
+    <div id="confirmationprint">
+        Transaction Declined.
+    </div>
+}

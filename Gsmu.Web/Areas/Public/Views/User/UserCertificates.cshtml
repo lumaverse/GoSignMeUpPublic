@@ -1,0 +1,673 @@
+﻿@using Gsmu.Api.Data;
+@using Gsmu.Api.Data.School.User;
+@using Gsmu.Api.Data.School.Terminology;
+@model UserModel
+
+@{
+    string cmd = ViewBag.cmd;
+
+    string formTitle = "Certificates";
+    var userModel = Model;
+    var usr = new UserInfo();
+    usr = userModel.CommonUserInfo;
+    var asp = Settings.Instance.GetMasterInfo4().AspSiteRootUrl ?? string.Empty;
+    var usrID = usr != null ? usr.userid : 0;
+}
+<script type="text/javascript">
+    //destroy first main panel if exist for the edit mode to prevent duplicate
+    var emailCmp = Ext.getCmp('UserDashboardCertificates');
+    if (emailCmp != null) {emailCmp.destroy();}
+
+    function ShowCertFile(fullPath) {
+        var filename = fullPath.substring(fullPath.lastIndexOf('CERT_'));
+
+        Ext.Ajax.request({
+            url: config.getUrl('public/user/CheckCertAvailabilty'),
+            params: { filename: filename},
+            success: function (response) {
+                var result = response.responseText;
+                console.log(result)
+                if (result == "available") {
+                    window.open("admin/temp/" + filename, '_blank');
+                } else {
+                    alert("The Certificate is no longer available to print.Please contact Administrator.")
+                }
+
+            }
+
+        });
+
+    }
+
+    function GetUserCertificate(courseId, studentid, certtype, certnum) {
+
+        Ext.Ajax.request({
+            url: config.getUrl('public/user/userCertificate'),
+            params: {
+                cmd: 'getfilename',
+                courseId: courseId,
+                studentid: studentid,
+                certtype: certtype,
+                certnum: certnum
+            },
+            success: function (response) {
+                var result = response.responseText;
+                if (result.indexOf("temp")>0) {
+                    var filename = result.replace("~/","");
+                    window.open(filename, '_blank');
+                } else {
+                    alert(result)
+                }
+
+            }
+
+        });
+
+    }
+
+    function ShowCertificateDetails(event,certificateId){
+
+        var html_result = "<table style='width:100%;text-align: center;'><tr><td style='font-weight:bold;'>Requirements</td><td style='font-weight:bold;'>Status</td></tr>";
+        Ext.Ajax.request({
+            url: config.getUrl('public/Certificate/GetCertificateRequirements'),
+            params: {CertifiacteId : certificateId},
+            success: function (response) {
+                var result = Ext.decode(response.responseText);
+                var bg= 'white';
+                var expirydate="";
+                Ext.each(result, function(op) {
+                    expirydate = op.certificate_expiry;
+                    if(op.Status =="Not Completed"){
+                        courses ="";
+                        fontcolor="red";
+                    }
+                    else if(op.Status =="In Progress"){
+                        courses =op.Courses;
+                        fontcolor="blue";
+                    }
+                    else
+                    {
+                        courses ="";
+                        fontcolor="green";
+                    }
+                    html_result = html_result +"<tr style='background-color:"+bg+";'><td>"+ op.CourseNumber+"<hr><div style='font-style:italic; text-align:center;'>"+"@TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course)"+"(s) Requirements"+op.Courses_Requirements + "</div>"+""+"</td><td style=' color:"+fontcolor+"'>" + op.Status +"<br />"+ courses+"</td></tr>";
+                    if(bg=='white'){
+                        bg='#E8E8E8';
+                    }
+                    else{
+                        bg= 'white';
+                    }
+                });
+                html_result = html_result +"</table>";
+                Ext.getCmp('certificatecourses').update(html_result +"<hr>Expiry date: "+ expirydate);
+                // wintip.show();
+            }
+
+        });
+
+    }
+    var certCmp = Ext.getCmp('UserDashboardCertificates');
+    if (certCmp != null) {certCmp.destroy();}
+
+    var UserCertificatesTab = Ext.create('Ext.tab.Panel', {
+        layout: 'fit',
+        items: [{
+            title: 'Certificates Completed',
+            listeners: {
+                activate: function () {
+                    certification_panel.hide()
+                    UserCertificationsCompletedsGrid.hide()
+                    UserCertificatesCompletedsGrid.show()
+                    UserCertificatesReceivedGrid.hide()
+                    panelcourses.hide()
+                }
+
+            }
+            }, {
+             title: 'Certifications Completed',
+            listeners: {
+               activate: function () {
+              certification_panel.hide()
+              UserCertificationsCompletedsGrid.show()
+              UserCertificatesCompletedsGrid.hide()
+              UserCertificatesReceivedGrid.hide()
+              panelcourses.hide()
+           }
+            }
+        }, {
+            title: 'Certificates Received',
+            listeners: {
+                activate: function () {
+                    certification_panel.hide()
+                    UserCertificationsCompletedsGrid.hide()
+                    UserCertificatesCompletedsGrid.hide()
+                    UserCertificatesReceivedGrid.show()
+                    panelcourses.hide()
+                }
+            }
+        }, {
+            title: 'Certifications',
+            listeners: {
+                activate: function () {
+                    certification_panel.show()
+                    UserCertificationsCompletedsGrid.hide()
+                    UserCertificatesCompletedsGrid.hide()
+                    UserCertificatesReceivedGrid.hide()
+                    panelcourses.show()
+                }
+            }
+
+        }
+        ]
+    });
+
+   @{
+        var comma = string.Empty;
+    }
+
+    var storeCertificatesReceived = Ext.create('Ext.data.Store', {
+        fields: ['recvddate', 'recvdsubj', 'attachment'],
+        remoteFilter: false,
+        data: [
+        @if (usr != null)
+    {
+        foreach (var item in usr.CertificatesReceived.OrderByDescending(l => l.RecvdDate))
+        {
+            <text>
+                @comma
+            {
+                "recvddate": "@item.RecvdDate",
+                "recvdsubj": "@item.RecvdSubj",
+                "attachment": "@item.Attachment",
+                }
+            </text>
+            comma = ",";
+        }
+    }
+    ]
+    });
+
+   @{
+       comma = string.Empty;
+   }
+
+    var storeCertifications = Ext.create('Ext.data.Store', {
+        fields: ['certificationsstudentid', 'certtitle', 'expiredate','CertificationsId'],
+        remoteFilter: false,
+        data: [
+        @if (usr!= null && usr.certifications != null)
+        {
+    var expiresdate = "";
+    foreach (var item in usr.certifications)
+    {
+        if(item.ExpireDate == null)
+        {
+            expiresdate = "none";
+        }
+        else {
+            expiresdate = item.ExpireDate.Value.ToShortDateString();
+        }
+        <text>
+            @comma
+        {
+            "certificationsstudentid": "@item.CertificationsStudentId",
+            "certtitle": "@item.CertificationsTitle",
+            "expiredate": "@expiresdate",
+            "CertificationsId": "@item.CertificationsId"
+
+        }
+        </text>
+        comma = ",";
+    }
+    }
+    ]
+    });
+
+
+    @{
+        comma = string.Empty;
+    }
+
+    var storeCertifications_unfiltered = Ext.create('Ext.data.Store', {
+        fields: ['certificationsstudentid', 'certtitle', 'expiredate','CertificationsId'],
+        remoteFilter: false,
+        data: [
+        @if (usr!= null && usr.certifications != null)
+        {
+    var expiresdate = "";
+    foreach (var item in usr.certifications)
+    {
+        if(item.ExpireDate == null)
+        {
+            expiresdate = "none";
+        }
+        else {
+            expiresdate = item.ExpireDate.Value.ToShortDateString();
+        }
+        <text>
+            @comma
+        {
+            "certificationsstudentid": "@item.CertificationsStudentId",
+            "certtitle": "@item.CertificationsTitle",
+            "expiredate": "@expiresdate",
+            "CertificationsId": "@item.CertificationsId"
+
+        }
+        </text>
+        comma = ",";
+    }
+    }
+    ]
+    });
+
+
+    @{
+        comma = string.Empty;
+    }
+    var storeCertifications_expiresnear = Ext.create('Ext.data.Store', {
+        fields: ['certificationsstudentid', 'certtitle', 'expiredate','CertificationsId'],
+        remoteFilter: false,
+        data: [
+        @if (usr!= null && usr.certifications != null)
+        {
+    var expiresdate = "";
+    foreach (var item in usr.certifications)
+    {
+        if(item.ExpireDate == null)
+        {
+            expiresdate = "none";
+        }
+        else {
+            expiresdate = item.ExpireDate.Value.ToShortDateString();
+        }
+        if(expiresdate!="none"){
+            DateTime dt = Convert.ToDateTime(expiresdate);
+            if((dt<DateTime.Today.AddDays(30)) && ((dt>DateTime.Today))){
+                <text>
+                    @comma
+                {
+                    "certificationsstudentid": "@item.CertificationsStudentId",
+                    "certtitle": "@item.CertificationsTitle",
+                    "expiredate": "@expiresdate",
+                    "CertificationsId": "@item.CertificationsId"
+
+                }
+                </text>
+                comma = ",";
+            }
+        }
+
+    }
+    }
+    ]
+    });
+
+    @{
+        comma = string.Empty;
+    }
+    var storeCertifications_expired = Ext.create('Ext.data.Store', {
+        fields: ['certificationsstudentid', 'certtitle', 'expiredate','CertificationsId'],
+        remoteFilter: false,
+        data: [
+        @if (usr!= null && usr.certifications != null)
+        {
+    var expiresdate = "";
+    foreach (var item in usr.certifications)
+    {
+        if(item.ExpireDate == null)
+        {
+            expiresdate = "none";
+        }
+        else {
+            expiresdate = item.ExpireDate.Value.ToShortDateString();
+        }
+        if(expiresdate!="none"){
+            DateTime dt = Convert.ToDateTime(expiresdate);
+            if(dt<DateTime.Today){
+                <text>
+                    @comma
+                {
+                    "certificationsstudentid": "@item.CertificationsStudentId",
+                    "certtitle": "@item.CertificationsTitle",
+                    "expiredate": "@expiresdate",
+                    "CertificationsId": "@item.CertificationsId"
+
+                }
+                </text>
+                comma = ",";
+            }
+        }
+
+    }
+    }
+    ]
+    });
+
+    @{
+        comma = string.Empty;
+    }
+
+    var storeCertificationsCompleteds = Ext.create('Ext.data.Store', {
+        fields: ['certificationsstudentid', 'certtitle', 'completiondate'],
+        remoteFilter: false,
+        data: [
+        @if (usr!= null && usr.certificationsCompleteds != null)
+        {
+        foreach (var item in usr.certificationsCompleteds)
+    {
+        <text>
+            @comma
+        {
+            "certificationsstudentid": "@item.CertificationsStudentId",
+            "certtitle": "@item.CertificationsTitle",
+            "completiondate": "@item.CompletionDate",
+            "CertificationsStudentId": "@item.CertificationsStudentId", 
+            "usrID": "@usrID",
+            "CertificateID": "@item.CertificateID"
+        }
+        </text>
+        comma = ",";
+    }
+    }
+    ]
+    });
+
+
+    @{
+        comma = string.Empty;
+    }
+
+    var storeCertificatesCompleteds = Ext.create('Ext.data.Store', {
+        fields: ['certificationsstudentid', 'certtitle', 'completiondate','certtype','certnum'],
+        remoteFilter: false,
+        data: [
+        @if (usr!= null && usr.certificatesCompleteds != null)
+        {
+        foreach (var item in usr.certificatesCompleteds.OrderByDescending(l => l.CompletionDate))
+    {
+        <text>
+            @comma
+        {
+            "CourseId": "@item.CourseId",
+            "CourseNum": "@item.CourseNum",
+            "CourseName": "@item.CourseName",
+            "asp": "@asp",
+            "usrID": "@usrID",
+            "StartDate": "@item.StartDate",
+            "completiondate": "@item.CompletionDate",
+            "certtype": "@item.CertType",
+            "certnum": "@item.CertNum",
+            }
+        </text>
+        comma = ",";
+    }
+    }
+    ]
+    });
+
+
+
+    var groupHeaderTplDiv = '<div style="vertical-align:middle; height:30px; ">';
+    var TplSpace = '&nbsp;&nbsp;';
+    groupHeaderTplDiv += '<font style="font-size:13px;">' + TplSpace;
+    groupHeaderTplDiv += '{[values.rows[0].certificationsstudentid]} - #{[values.rows[0].certtitle]}';
+    groupHeaderTplDiv += '</font>';
+    groupHeaderTplDiv += '</div>';
+
+    var certification_expires_option =  Ext.create('Ext.container.Container', {
+        layout: 'hbox',
+        margin:2,
+        items: [
+                {
+                    xtype: 'checkbox',
+                    boxLabel: 'Expired &nbsp;',
+                    id: 'expired',
+                    inputValue: 'expired',
+                    listeners: {
+                        change: function (checkbox, isChecked) {
+                            if(isChecked){
+                                Ext.getCmp('nearexpires').setValue(false);
+                                UserCertificationsGrid.bindStore(storeCertifications_expired);
+                            }
+                            else
+                            {
+                                UserCertificationsGrid.bindStore(storeCertifications_unfiltered);
+                            }
+                            Ext.getCmp('cbcertificationlist').setValue('')
+                            Ext.getCmp('certificatecourses').update('');
+                        }
+
+                    }
+                },
+               {
+                   xtype: 'checkbox',
+                   boxLabel: 'Expiring soon (30 days)',
+                   id: 'nearexpires',
+                   inputValue: '30days',
+                   listeners: {
+                       change: function (checkbox, isChecked) {
+                           if(isChecked){
+                               Ext.getCmp('expired').setValue(false);
+                               UserCertificationsGrid.bindStore(storeCertifications_expiresnear);
+                           }
+                           else
+                           {
+                               UserCertificationsGrid.bindStore(storeCertifications_unfiltered);
+                           }
+                           Ext.getCmp('cbcertificationlist').setValue('')
+                           Ext.getCmp('certificatecourses').update('');
+                       }
+
+                   }
+               }]
+    });
+
+    var UserCertificationsGrid = Ext.create('Ext.form.ComboBox', {
+        border: false,
+        id:'cbcertificationlist',
+        store: storeCertifications,
+        enableColumnMove: false,
+        enableColumnResize: false,
+        hideHeaders: true,
+        sortableColumns: false,
+        flex: 1,
+        margin:2,
+        width: 200,
+        // scroll: 'vertical',
+        displayField: 'certtitle',
+        valueField: 'CertificationsId',
+        emptyText: 'Select Certificate',
+        listeners : {
+            'select' : function(combo, record) {
+                // we can get the selected value using getValue()
+                closedStatusSelectedID = this.getValue();
+                ShowCertificateDetails('',closedStatusSelectedID);
+            }
+        }
+        //    columns: [
+        // {
+        //   flex: 1,
+        //   dataIndex: 'certtitle',
+        //     xtype: 'templatecolumn', tpl: '<p style="height: 20px;" onclick="ShowCertificateDetails(event,{CertificationsId})"><img src="/Areas/Public/Images/Icons/course-center-actions-certificates.png" style="position: absolute; vertical-align: middle;"></img><span style="padding-right:40px;"></span>{certificationsstudentid} : {certtitle} (exp {expiredate})</p>'
+        //  }
+        //  ]
+    });
+
+    var panelcourses =  Ext.create('Ext.Panel', {
+        id: 'certificatecourses',
+        frame: true,
+        layout: 'anchor',
+        autoScroll: false,
+        header: (dasboardadminmode ? true : false),
+        title: 'Test',
+        html:'No Certificate Selected..'
+    });
+
+    var UserCertificationsCompletedsGrid = Ext.create('Ext.grid.Panel', {
+        border: false,
+        store: storeCertificationsCompleteds,
+        enableColumnMove: false,
+        enableColumnResize: false,
+        hideHeaders: true,
+        sortableColumns: false,
+        height: 160,
+        flex: 1,
+        scroll: 'vertical',
+        emptyText: 'No certification to show',
+        columns: [
+            {
+                flex: 1,
+                dataIndex: 'certtitle',
+                xtype: 'templatecolumn', tpl: '<p style="height: 20px;"><img src="/Areas/Public/Images/Icons/course-center-actions-certificates.png" style="position: absolute; vertical-align: middle;"></img><span style="padding-right:40px;"></span>{certificationsstudentid} : {certtitle} (completion {completiondate})</p>'
+            },
+            {
+                width: 30,
+                dataIndex: 'CertificationsStudentId',
+                //xtype: 'templatecolumn', tpl: '<p style="height: 20px;"><a href="/public/user/userCertificate?courseId={CourseId}&studentid={usrID}&certtype={certtype}&certnum={certnum}" target="_blank"><img src="/Images/Icons/FamFamFam/application_form_magnify.png" style="position: absolute; vertical-align: middle;"></img></></p>'
+                xtype: 'templatecolumn', tpl: '<p style="height: 20px;"><a href="javascript:GetUserCertificate(\'0\',\'{usrID}\',\'Certification\',\'{CertificateID}\')"><img src="/Images/Icons/FamFamFam/application_form_magnify.png" style="position: absolute; vertical-align: middle;"></img></></p>'
+            }
+        ]
+    });
+
+
+
+
+    var UserCertificatesCompletedsGrid = Ext.create('Ext.grid.Panel', {
+        border: false,
+        store: storeCertificatesCompleteds,
+        enableColumnMove: false,
+        enableColumnResize: false,
+        hideHeaders: true,
+        sortableColumns: false,
+        height: 160,
+        flex: 1,
+        scroll: 'vertical',
+        emptyText: 'No certificates to show',
+        columns: [
+            {
+                flex: 1,
+                dataIndex: 'certtitle',
+                xtype: 'templatecolumn', tpl: '<p style="height: 20px;"><img src="/Areas/Public/Images/Icons/course-center-actions-certificates.png" style="position: absolute; vertical-align: middle;"></img><span style="padding-right:40px;"></span>{CourseNum} {CourseName}</p>'
+            },
+
+            {
+                width: 80,
+                dataIndex: 'CourseId',
+                xtype: 'templatecolumn', tpl: '<p style="height: 20px;">Start Date </br> {StartDate:date("m/d/Y")}</p>'
+            },
+
+            {
+                width: 80,
+                dataIndex: 'CourseId',
+                xtype: 'templatecolumn', tpl: '<p style="height: 20px;">Completion </br> {completiondate:date("m/d/Y")}</p>'
+            },
+
+            {
+                width: 30,
+                dataIndex: 'CourseId',
+                //xtype: 'templatecolumn', tpl: '<p style="height: 20px;"><a href="/public/user/userCertificate?courseId={CourseId}&studentid={usrID}&certtype={certtype}&certnum={certnum}" target="_blank"><img src="/Images/Icons/FamFamFam/application_form_magnify.png" style="position: absolute; vertical-align: middle;"></img></></p>'
+                xtype: 'templatecolumn', tpl: '<p style="height: 20px;"><a href="javascript:GetUserCertificate(\'{CourseId}\',\'{usrID}\',\'{certtype}\',\'{certnum}\')"><img src="/Images/Icons/FamFamFam/application_form_magnify.png" style="position: absolute; vertical-align: middle;"></img></></p>'
+            }
+        ]
+    });
+
+
+    var UserCertificatesReceivedGrid = Ext.create('Ext.grid.Panel', {
+        border: false,
+        store: storeCertificatesReceived,
+        enableColumnMove: false,
+        enableColumnResize: false,
+        hideHeaders: true,
+        sortableColumns: false,
+        height: 160,
+        flex: 1,
+        scroll: 'vertical',
+        emptyText: 'No certificates to show',
+        columns: [
+            {
+                flex: 1,
+                dataIndex: 'recvdsubj',
+                xtype: 'templatecolumn', tpl: '<p style="height: 20px;"><img src="/Areas/Public/Images/Icons/course-center-actions-certificates.png" style="position: absolute; vertical-align: middle;"></img><span style="padding-right:40px;"></span>{recvdsubj}</p>'
+            },
+
+            {
+                width: 80,
+                dataIndex: 'recvddate',
+                xtype: 'templatecolumn', tpl: '<p style="height: 20px;">Date </br> {recvddate:date("m/d/Y")}</p>'
+            },
+
+            {
+                width: 30,
+                dataIndex: 'attachment',
+                //xtype: 'templatecolumn', tpl: '<p style="height: 20px;"><a href="/admin/datastores/datastore-user.asp?action=get-file'+ '&rubyrequest=1&uname=' + username + '&usersessionid=' + instructorsessionId+'&param={attachment}" target="_blank"><img src="/Images/Icons/FamFamFam/application_form_magnify.png" style="position: absolute; vertical-align: middle;"></img></></p>'
+                xtype: 'templatecolumn', tpl: '<p style="height: 20px;"><a href="javascript:ShowCertFile(\'{attachment}\')"><img src="/Images/Icons/FamFamFam/application_form_magnify.png" style="position: absolute; vertical-align: middle;"></img></></p>'
+            }
+        ]
+    });
+
+
+    var certification_panel = Ext.create('Ext.Panel', {
+        id: 'certpanel',
+        frame: true,
+        autoScroll: false,
+        title: '',
+        layout:'column',
+        items: [
+            UserCertificationsGrid,certification_expires_option,
+        ]
+
+    });
+
+    Ext.onReady(function () {
+
+        Ext.create('Ext.Panel', {
+            id: 'UserDashboardCertificates',
+            frame: true,
+            renderTo: Ext.get('Certificatesrender'),
+            layout: 'anchor',
+            autoScroll: false,
+            header: (dasboardadminmode ? true : false),
+            title: '',
+            tools: [
+                {
+                    hidden: (dasboardadminmode ? false : true),
+                    type: 'cross',
+                    tooltip: 'Delete this widget. Note, header is hidden in view mode',
+                    handler: function (e, toolEl, panel, tc) {
+                        DeleteUserWidget(GetwidgetColIDbyPlID('UserDashboardCertificates'), GetwidgetIDbyPlID('UserDashboardCertificates'));
+                    }
+                }
+            ],
+            items: [
+                UserCertificatesTab,
+                certification_panel,
+                UserCertificationsCompletedsGrid,
+                UserCertificatesCompletedsGrid,
+                UserCertificatesReceivedGrid,
+                panelcourses
+            ]
+
+        });
+
+    });
+
+    reloadUserCertificatesForm = function(cmd,userid,usergroup) {
+
+        Ext.Ajax.request({
+            url: config.getUrl('public/user/UserCertificates'),
+            params: {
+                cmd: cmd,
+                userid: userid,
+                usergroup: usergroup
+            },
+            success: function (data) {
+                $("#UserCertificatesContainer").html(data.responseText);
+            }
+        })
+    }
+
+</script>
+
+<div id="Certificatesrender" style="position: relative; min-height: 100px; padding-bottom: 20px"></div>
+
+

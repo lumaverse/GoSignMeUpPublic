@@ -1,0 +1,184 @@
+﻿@using Gsmu.Api.Commerce.ShoppingCart;  
+@using Gsmu.Api.Data;
+@{
+    var cnti = 0;
+    string flds = "";
+    string courselst = "";
+    string comma = "";
+    decimal multipleTotal = 0;
+    string cybersourceurl = "https://secureacceptance.cybersource.com/pay";
+    if(ViewBag.access_key=="eec391443f873a0fb8fed87640644167"){
+        cybersourceurl = "https://testsecureacceptance.cybersource.com/pay";
+    }
+    bool UseCyberSourceItemized = WebConfiguration.UseCyberSourceItemized;
+}
+
+    <title>Cybersource Payment Form</title>
+    
+    <link href="Areas/Public/Styles/Layout.css" rel="stylesheet"/>
+    
+
+
+    </script>
+    <style id="Style1" type="text/css" runat="server">
+        .sq-input {
+            border: 1px solid #CCCCCC;
+            margin-bottom: 10px;
+            padding: 1px;
+        }
+
+        .sq-input--focus {
+            outline-width: 5px;
+            outline-color: #70ACE9;
+            outline-offset: -1px;
+            outline-style: auto;
+        }
+
+        .sq-input--error {
+            outline-width: 5px;
+            outline-color: #FF9393;
+            outline-offset: 0px;
+            outline-style: auto;
+        }
+
+
+    </style>
+
+<div class="cart-steps-wrap">
+    <div class="cart-steps cart-step3"></div>
+    <ul class="cart-steps-text" style="list-style-type: none;">
+        <li class="cart-step-1 current-step">Log in/ Create Account</li>
+        <li class="cart-step-2">Review</li>
+        <li class="cart-step-3">Payments</li>
+        <li class="cart-step-4">Receipt & Confirmation</li>
+    </ul>
+</div>
+
+
+
+
+
+    <div style="float:left;">
+                        
+        <div style="width: 60%; float: left; padding-right:120px; padding-left:30px; position:relative; text-align:left;">
+            <h1>Payment</h1>
+
+            <div style="font-size: 18px;margin-top : 8px; margin-bottom: 8px; margin-left:8px; text-align:right;">
+                Amount: &nbsp; @ViewBag.PaymentTotalLbl
+            </div>
+
+            <div style="font-size: 18px;margin-top : 8px; margin-bottom: 8px; margin-left:8px; text-align:right;">
+                Order Number: &nbsp;@ViewBag.OrderNo
+            </div>
+
+            <div style="font-size: 18px;margin-top : 80px; margin-bottom: 8px; margin-left:8px; text-align:right;">
+                <form id="payment_form" name="payment_form" action="@cybersourceurl" method="post">
+                    <input type="hidden" name="access_key" value="@ViewBag.access_key">
+                    <input type="hidden" name="profile_id" value="@ViewBag.profile_id">
+                    <input type="hidden" name="transaction_uuid" value="@ViewBag.transaction_uuid">
+
+                    <input type="hidden" name="signed_date_time" value="@ViewBag.signed_date_time">
+                    <input type="hidden" name="locale" value="en">
+                    <input type="hidden" name="signature" value="@ViewBag.signature">
+                    <input type="hidden" name="transaction_type" size="25"  value="sale">
+                    <input type="hidden" name="reference_number" size="25" value="@ViewBag.reference_number">
+                    <input type="hidden" name="currency" size="25" value="USD">
+                    @foreach (var item in CourseShoppingCart.Instance.Items)
+                        {
+                            if (UseCyberSourceItemized)
+                            {
+
+                            flds += ",item_"+cnti+"_code,"+"item_"+cnti+"_name,"+"item_"+cnti+"_sku,"+"item_"+cnti+"_quantity,"+"item_"+cnti+"_unit_price";
+                                if (CourseShoppingCart.Instance.MultipleStudentCourses != null && CourseShoppingCart.Instance.MultipleStudentCourses.Count() > 0)
+                                {
+                                    foreach(var multiitem in CourseShoppingCart.Instance.MultipleStudentCourses ){
+                                            multipleTotal = multipleTotal + multiitem.CourseTotal;
+                                        }
+                                } else {
+                                	multipleTotal = item.LineTotal;
+                                }
+                           
+                         <text>
+                           <input type="hidden" name="@Html.Raw("item_"+cnti+"_code")"  value="@item.Course.COURSENUM">
+                           <input type="hidden" name="@Html.Raw("item_"+cnti+"_name")"  value="@item.Course.COURSENAME">
+                           <input type="hidden" name="@Html.Raw("item_"+cnti+"_sku")"  value="@item.Course.COURSENUM">
+                           <input type="hidden" name="@Html.Raw("item_"+cnti+"_quantity")" value="1">
+                           <input type="hidden" name="@Html.Raw("item_"+cnti+"_unit_price")" value="@multipleTotal.ToString("0.##")">
+                        </text>
+                          cnti += 1;   
+                            multipleTotal=0;
+                            } else {
+                                courselst += comma + item.Course.COURSENUM + " - " + item.Course.COURSENAME;
+                                comma = "; ";                           
+                            }                       
+                        }
+
+                   
+                   <input type="hidden" name="unsigned_field_names" value="">
+                    @if (UseCyberSourceItemized == false){
+                        <text>
+                        <input type="hidden" name="merchant_secure_data4" value="@courselst">
+                        <input type="hidden" name="amount" size="25" value="@ViewBag.amount">
+                        </text>
+                        flds += ",amount,merchant_secure_data4";
+                    } else if (ViewBag.PaymentCaller == "paynowuserdash") {
+                        <text>
+                        <input type="hidden" name="merchant_secure_data4" value="Gosignmeup - Pay Remainder Balance">
+                        <input type="hidden" name="amount" size="25" value="@ViewBag.amount">
+                        </text>
+                        flds += ",amount,merchant_secure_data4";
+
+                    }else{
+                        <text>
+                        <input type="hidden" name="line_item_count"  value="@cnti">
+                        </text>
+                        flds += ",line_item_count";
+                    }
+                    <input type="hidden" name="signed_field_names" value="@Html.Raw("access_key,profile_id,transaction_uuid,signed_field_names,unsigned_field_names,signed_date_time,locale,transaction_type,reference_number,currency"+flds)">
+                    <input type="hidden" id="SubmitPayment" name="SubmitPayment" value="Proceed"/>
+                    &nbsp;&nbsp;&nbsp;
+                    <!--<input type="button" onclick="location.href = '/public/course/browse'" value="Cancel"/>-->
+                </form>
+<input type="hidden" name="signature" value="@ViewBag.signdflds">
+
+                <p></p>
+                <p></p>
+                <p></p>
+                <div id="prcssqr" style="color:blue; margin-top: 20px; min-height:20px;"></div>
+                <div id="errors" style="color:red; min-height:40px;">@ViewBag.message</div>
+            </div>
+
+
+
+
+        </div>
+
+        <div style="float: left; width: 40%; padding-right: 10px; padding-left: 50px;">
+            <div style="padding-left: 5px; margin-top:30px; font-size:15px;">
+            <p></p>Powered by:
+            <img src="/images/CyberSourcePayment-logo.png"  height="60"/ style="padding: 20px;">
+
+
+
+        <div style="float: left; width: 40%; padding-left: 120px; padding-top:130px;">
+        </div>
+
+</div>     
+                       
+<script type="text/javascript">
+    var errorDiv = document.getElementById('prcssqr');
+    if ('@ViewBag.reason_code' == '') {
+        errorDiv.innerHTML = "Redirecting to Cybersource Payment gateway...";
+        document.getElementById('SubmitPayment').innerHTML = "Proceed"
+        document.payment_form.submit();
+    } else {
+        if ('@ViewBag.reason_code' == '100') {
+            errorDiv.innerHTML = "Payment Successful and Confirmation complete.";
+            window.location = "/Public/cart/ShowConfirmationReceipt?OrderNumber=@ViewBag.OrderNo"
+        } else {
+            errorDiv.innerHTML = "Error on Payment.";
+            document.getElementById('SubmitPayment').innerHTML = "Try Again"
+        }
+    }
+</script>
+   

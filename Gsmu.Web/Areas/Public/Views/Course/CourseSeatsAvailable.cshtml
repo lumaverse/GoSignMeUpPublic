@@ -1,0 +1,81 @@
+﻿@model Gsmu.Api.Data.School.Course.CourseModel
+@{
+    var courseModel = Model;
+    var masterSettings = Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().HideSeatsAvailable;
+
+    
+    var courseEnrollmentStat = courseModel.Course.EnrollmentStatistics;
+    
+    var wgname = "Availability";
+    var wgcontainer = "Course" + wgname + "Container";
+    var wgcontainerDet = "Course" + wgname + "ContainerDet";
+}
+@if(courseEnrollmentStat.SpaceAvailable!=10000){
+<div id="@wgcontainer" class="course-widgetbox" style="position:inherit; min-height:20px;">
+    <div class="course-widgetbox-smheader">
+        Availability
+    </div>
+    <div id="@wgcontainerDet" style="padding:5px;margin:5px; ">
+        <table style="width: 115%;">
+                @if ((masterSettings == 1) && (courseEnrollmentStat.SpaceAvailable!=10000)) {
+                //show class size & seat avail
+                    <tr>
+                        <td>Open Seats</td>
+                        <td><span class="availabilityValue">@courseEnrollmentStat.SpaceAvailable of @courseEnrollmentStat.MaxEnrolledRosterCount</span></td>
+                    </tr>
+                    <tr>
+                        <td>Wait List</td>
+                        <td><span class="availabilityValue">@courseEnrollmentStat.WaitSpaceAvailable of @courseEnrollmentStat.MaxWaitingRosterCount</span></td>
+                    </tr>          
+                }
+                @if ((masterSettings == 2) && (courseEnrollmentStat.SpaceAvailable !=10000)) {
+                //hide class size & show seat avail
+                    <tr>
+                        <td>Open</td>
+                        <td>
+                            @if (courseModel.Course.coursetype == 0)
+                            {
+                                <span class="availabilityValue">@courseEnrollmentStat.SpaceAvailable Open Seats Left</span>
+                            }
+                            else
+                            {
+                                <span class="availabilityValue">@(courseEnrollmentStat.SpaceAvailable - courseEnrollmentStat.TotalRosterCount) Open Seats Left</span>
+                            }
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Wait List</td>
+                        <td><span class="availabilityValue">@courseEnrollmentStat.WaitSpaceAvailable Wait Spaces Available</span></td>
+                    </tr>
+                }
+                @if ((masterSettings == 3) && (courseEnrollmentStat.SpaceAvailable !=10000)) {
+                //show class size & hide seat avail
+                    <tr>
+                        <td>Class Size</td>
+                        <td><span class="availabilityValue">@courseEnrollmentStat.MaxEnrolledRosterCount</span></td>
+                    </tr>
+                    <tr>
+                        <td>Waiting</td>
+                        <td><span class="availabilityValue">@courseEnrollmentStat.MaxWaitingRosterCount</span></td>
+                    </tr>
+                }
+                <!--@if (masterSettings == 1 || masterSettings == 3)
+                {
+                <tr>
+                    <td>Enrolled</td>
+                    <td><span class="availabilityValue">@courseEnrollmentStat.EnrolledRosterCount</span></td>
+                </tr>
+                }
+                @if (masterSettings == 1 || masterSettings == 2)
+                {
+                <tr>
+                    <td style="font-weight:bold">Open</td>
+                    <td style="font-weight:bold"><span class="availabilityValue">@courseEnrollmentStat.SpaceAvailable</span></td>
+                </tr>
+                }-->
+
+        </table>
+    </div>
+</div>
+}

@@ -1,0 +1,24 @@
+﻿@using Gsmu.Api.Data.School.Course
+@using Gsmu.Api.Data.ViewModels.Layout
+@model CourseModel
+
+@{
+    var id = System.Guid.NewGuid();
+}
+
+@if (Model.Course.ShowPrerequisiteAsBoolean)
+{
+    <img src="@Url.Content("~/images/icons/glyph2/icons16x16/page-check.png")" id="@id" style="padding: 3px;"/>
+    <script type="text/javascript">
+        Ext.onReady(function () {
+            Ext.create('Ext.tip.ToolTip', {
+                target: '@id',
+                anchor: 'left',
+                anchorToTarget: true,
+                showDelay: 100,
+                autoHide: true,
+                html: 'Prerequisite @(Model.Course.PrereqiusiteRequired ? "required": ""): ' + @Html.Raw(Json.Encode(Model.Course.PrerequisiteInfo))
+            });
+        });
+    </script>
+}

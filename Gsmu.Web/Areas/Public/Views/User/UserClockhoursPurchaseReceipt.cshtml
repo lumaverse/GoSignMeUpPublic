@@ -1,0 +1,47 @@
+﻿@using Gsmu.Api.Data;
+@using Gsmu.Api.Data.School.User;
+@using Gsmu.Api.Data.School.Terminology;
+@model UserModel
+
+@if (ViewBag.TranscriptDetails!=null){
+<text>
+<link rel="stylesheet" href="@Url.Content("~/Content/Confirmation.css")"/>   
+<div><a href='javascript:window.print()' class="simpleCart_checkout hudbtn primary right" style="height: 25px; width: 150px; font-size: 16px; vertical-align: central; text-align: center;">Print Receipt</a></div>
+<div>
+<div style="font-weight:bold; font-size:xx-large">Order Receipt</div>
+<table>
+<tr>
+<td  class="confirmation-area-header" style="width:300px" >Sold To: </td>
+<td  class="confirmation-area-header"  style="width:300px">Payment Details:
+
+</td>
+</tr>
+<tr>
+<td> @ViewBag.TranscriptDetails.SoldTo</td>
+<td>@Html.Raw(ViewBag.TranscriptDetails.IsHoursPaidInfo)</td>
+</tr>
+</table><br />
+<div class="confirmation-area-header">Checkout</div>
+<table style="padding:10px 0px 50px 50px">
+<tr>
+<td style="width:300px; font-weight:bold; border-bottom:solid; border-bottom-width:1px;">Course Name</td>
+<td style="width:200px; font-weight:bold; border-bottom:solid;border-bottom-width:1px;">Course date</td>
+<td style="width:150px; font-weight:bold; border-bottom:solid;border-bottom-width:1px;">Purchased <br />@ViewBag.CreditLabel </td>
+<td style="width:150px; font-weight:bold; border-bottom:solid;border-bottom-width:1px;">Amount</td>
+</tr>
+<tr>
+
+<td style="width:300px">@ViewBag.TranscriptDetails.coursename</td>
+<td style="width:200px">@ViewBag.TranscriptDetails.CourseStartDateString</td>
+<td style="width:150px">@ViewBag.TranscriptDetails.CustomCreditHours</td>
+<td style="width:150px">@string.Format("{0:C}",ViewBag.TranscriptDetails.Amount)</td>
+</tr>
+
+</table>
+
+<div style="padding-left:68%; font-weight:bold">Total: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @string.Format("{0:C}",ViewBag.TranscriptDetails.Amount)</div>
+</div>
+<br />
+<div><a href='javascript:window.print()' class="simpleCart_checkout hudbtn primary right" style="height: 25px; width: 150px; font-size: 16px; vertical-align: central; text-align: center;">Print Receipt</a></div>
+</text>
+}

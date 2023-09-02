@@ -1,0 +1,36 @@
+﻿@using lti = Gsmu.Api.Integration.Lti;
+@{
+    ViewBag.Title = "Lti Settings";
+}
+
+
+@section Head {
+
+@*
+<link rel="stylesheet" href="@Url.Content("~/Areas/Public/Styles/LtiAdmin.css")"/>
+*@
+@Scripts.Render("~/Areas/Adm/Scripts/Lti/LtiSettings.js")    
+    
+    <script type="text/javascript">
+        Ext.onReady(function() {
+            var component = new LtiSettings({
+                containerId: 'lti-settings-panel',
+                settings: @Html.Raw(Json.Encode(lti.Configuration.Instance))
+            });
+        });
+    </script>
+
+}
+
+@*
+@section TopMiddle {
+}
+*@
+
+@*
+@section sidebar {
+
+}
+*@
+
+<div id="lti-settings-panel"></div>

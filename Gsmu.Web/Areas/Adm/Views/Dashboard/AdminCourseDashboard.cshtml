@@ -1,0 +1,165 @@
+﻿@{
+    Layout = "~/Areas/Adm/Views/Shared/_Layout.cshtml";
+}
+@Scripts.Render("~/Areas/Adm/Scripts/Dashboard/CourseDashboard.js")
+<div class="container-fluid">
+    <div class="col-lg-12">
+        <div class="row form-group form-group-sm">
+            @*<div class="search-header-panel">
+                <div class="col-lg-7 col-md-offset-3">
+                    <div class="input-group">
+                        <input type="text" data-provide="typeahead" class="form-control course-search-input typeahead" placeholder="Course Name, Description, Date, ID, Teacher or Number">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button">Search</button>
+                        </span>
+                    </div>
+                    
+                </div>
+            </div>*@
+            <div class="col-lg-7 col-md-offset-3">
+                @RenderPage("../Widgets/Course/CourseSearch.cshtml")
+            </div>
+        </div>
+        <div class="row widget-transcript-info-panel" style="display:none">
+            @RenderPage("../Widgets/CourseTranscripts.cshtml")
+        </div>
+        <div id="course-dashboard-widget-container">
+            <div class="row widget-course-info-panel">
+                <div class="panel panel-default">
+                    <div class="panel-heading gsmu-sub-panel-heading">
+                        <div class="panel-title">
+                            <div id="course-desc-content" class="btn-group pull-left">
+                                <button class="btn btn-default" onclick="courseEditor.initEditor()"><span id="course-name">..</span> &nbsp;&nbsp;<span class="glyphicon glyphicon-pencil pencil-color"></span></button>
+                                <button class="btn btn-default" onclick="courseEditor.initEditor()"># : <span id="course-number"></span>  &nbsp;&nbsp;<span class="glyphicon glyphicon-pencil pencil-color"></span></button>
+                                <button class="btn btn-default" onclick="courseEditor.initEditor()">Master Course ID : <span id="master-course-id"></span> &nbsp;&nbsp;<span class="glyphicon glyphicon-pencil pencil-color"></span>&nbsp;</button>
+                                <button class="btn btn-default" onclick="courseEditor.initEditor()">ID :  <span id="course-id"></span> &nbsp;&nbsp;<span class="glyphicon glyphicon-pencil pencil-color"></span>&nbsp;</button>
+                            </div>
+                            <div id="course-desc-content-editor">
+                                <div class="col-lg-6 pad-x-0 pull-left">
+                                    <input type="text" class="form-control input-sm" placeholder="Course Name" data-bind="course-name" name="CourseName" />
+                                    <input type="text" class="form-control input-sm" placeholder="Cousre Number" data-bind="course-number" name="CourseNumber" />
+                                    <input type="text" class="form-control input-sm" placeholder="Master Id" data-bind="master-course-id" name="MasterCourseId" />
+                                    <div class="btn-group" style="margin-bottom:3px">
+                                        <button type="button" class="btn btn-success btn-xs" onclick="courseEditor.save()"><span class="glyphicon glyphicon-ok"></span></button>
+                                        <button type="button" class="btn btn-danger btn-xs" onclick="courseEditor.initView()"><span class="glyphicon glyphicon-remove"></span></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pull-right">
+                                <div class="title-controls">
+                                    Cancel Course <input type="checkbox" id="course-cancel" data-size="mini" />
+                                    <span id="google-integration-container">Sync with Google <input type="checkbox" id="course-sync-google" class="bootstrap-toggle" data-size="mini" /> <button type="button" id="sync-course-btn" class="btn btn-success btn-xs" onclick="courseIntegrationObject.syncCourseToGoogle()">Sync <span class="glyphicon glyphicon-refresh"></span></button></span>
+                                    Internal <input type="checkbox" id="course-internal" data-size="mini" />
+                                </div>
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+                    </div>
+                    <div class="panel-body gsmu-sub-panel-body panel-collapse collapse in">
+                        <div class="widget-course-categories-panel">
+                            @RenderPage("../Widgets/CourseCategories.cshtml")
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row widget-container pad-x-13-14">
+                <div class="row centered">
+                    <div class="col-lg-5 col-md-5 col-sm-5 widget-times pad-x-2">
+                        <div class="widget-enrollment-statistics-panel">
+                            @RenderPage("../Widgets/CourseEnrollmentStatistics.cshtml")
+                        </div>
+                    </div>
+                    <div class="col-lg-5 col-md-5 col-sm-5  pad-x-2">
+                        <div class="widget-course-enrolllment-panel">
+                            @RenderPage("../Widgets/CourseEnrollmentData.cshtml")
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2 pad-x-2">
+                        <div class="widget-actions-panel">
+                            @RenderPage("../Widgets/CourseDashboardQuickLinks.cshtml")
+                        </div>
+                    </div>
+                </div>
+                <div class="row centered">
+                    <div class="col-lg-5 col-md-5 col-sm-5 widget-times pad-x-2">
+                        <div class="widget-course-descriptions-panel">
+                            @RenderPage("../Widgets/CourseDescriptions.cshtml")
+                        </div>
+                        <div class="widget-course-confirmation-panel">
+                            @RenderPage("../Widgets/CourseConfirmationEmail.cshtml")
+                        </div>
+                    </div>
+                    <div class="col-lg-5 col-md-5 col-sm-5 widget-times pad-x-2">
+                        <div class="widget-times-panel">
+                            @RenderPage("../Widgets/CourseDateTimes.cshtml")
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2 pad-x-2">
+                        <div class="widget-surveys-panel">
+                            @RenderPage("../Widgets/CourseSurvey.cshtml")
+                        </div>
+                        <div class="widget-reports-panel">
+                            <div class="widget-reports-panel">
+                                @RenderPage("../Widgets/CourseReports.cshtml")
+                            </div>
+                        </div>
+                        <div class="widget-social-networking-panel">
+                            @RenderPage("../Widgets/CourseSocialNetworking.cshtml")
+                        </div>
+                    </div>
+                </div>
+                <div class="row centered">
+                    <div class="col-lg-5 col-md-5 col-sm-5 widget-times pad-x-2">
+                        <div class="widget-instructor-panel">
+                            @RenderPage("../Widgets/CourseInstructors.cshtml")
+                        </div>
+                    </div>
+                    <div class="col-lg-5 col-md-5 col-sm-5 widget-times pad-x-2">
+                        <div class="widget-location-panel">
+                            @RenderPage("../Widgets/CourseLocation.cshtml")
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2 widget-times pad-x-2">
+                        <div class="widget-integration-panel">
+                            @RenderPage("../Widgets/CourseIntegration.cshtml")
+                        </div>
+                    </div>
+                </div>
+                <div class="row centered">
+                    <div class="col-lg-5 col-md-5 col-sm-5 widget-times pad-x-2">
+                        <div class="widget-location-panel">
+                            @RenderPage("../Widgets/CourseOptions.cshtml")
+                        </div>
+                    </div>
+                    <div class="col-lg-5 col-md-5 col-sm-5 widget-times pad-x-2">
+                        <div class="widget-display-image-panel">
+                            @RenderPage("../Widgets/CourseDisplayImage.cshtml")
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2 pad-x-2">
+                        <div class="widget-display-image-panel">
+                            @RenderPage("../Widgets/CourseContactInformation.cshtml")
+                        </div>
+                        <div class="widget-course-bundle-panel">
+                            @RenderPage("../Widgets/CourseBundle.cshtml")
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-9 col-md-4 pad-x-2">
+                        <div class="widget-course-pricing-panel">
+                            @RenderPage("../Widgets/CoursePricing.cshtml")
+                        </div>
+                    </div>
+                    @*<div class="col-lg-4 col-md-4 pad-x-2">
+                       
+                    </div>*@
+                    <div class="col-lg-2 col-md-4 pad-x-2">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/Areas/Adm/Scripts/Widgets/CourseMain.js")

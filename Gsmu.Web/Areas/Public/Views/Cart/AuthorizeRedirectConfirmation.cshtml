@@ -1,0 +1,44 @@
+﻿
+@{
+    ViewBag.Title = "Confirmation";
+}
+
+@if(ViewBag.IsTranscript){
+<text>
+
+    <center>
+    @ViewBag.response_reason_text
+    </center>
+
+        @if(ViewBag.FromAdmin)
+        {  
+        <script language=javascript>
+            window.location = "@ViewBag.AdminLink";
+
+    </script>
+        }
+        else
+            {
+            
+           <script language=javascript>
+               window.location = "@Url.Content("~/public/user/dashboard")";
+
+    </script>
+        }
+
+
+
+
+</text>
+
+}else{
+<text>
+    
+    Processing Receipt...
+<script language=javascript>
+    window.location = "@Html.Raw(HttpUtility.HtmlDecode(ViewBag.AnetReceiptLink))";
+</script>
+
+</text>
+
+}

@@ -1,0 +1,405 @@
+﻿@using Gsmu.Api.Data.School.Course
+@using Gsmu.Api.Commerce.ShoppingCart
+@model CourseModel
+
+@{
+    var course = Model;
+    var effectivePrices = Model.EffectivePrices;
+    var allowPartialPayment = (Gsmu.Api.Data.Settings.Instance.GetMasterInfo3().AllowPartialPayment == 1) ? true : false;
+    int courseId = Model.Course.COURSEID;
+    var cartItem = CourseShoppingCart.Instance.GetCourseItem(courseId);
+    var modifier = ViewData["Modifier"] != null ? ViewData["Modifier"].ToString() : string.Empty;
+    var readOnly = ViewData["ReadOnly"] != null ? (bool)ViewData["ReadOnly"] : false;
+    var fade = ViewData["Fade"] != null && (bool)ViewData["Fade"] == true ? true : false;
+
+    var width = ViewData["Width"] != null ? (int)ViewData["Width"] : 135;
+    var comma = string.Empty;
+
+    var renderTo = "container-" + courseId + modifier;
+}
+<style>
+    #CoursePriceContainer label {
+    /*font-weight : bold*/
+    }
+</style>
+@if (cartItem== null)
+{
+    if (effectivePrices.Count > 1)
+    {
+        <span id="@renderTo"></span>
+        /*
+        <select id="course-price-@(courseId+modifier)">
+            <option value="">Choose price</option>
+            @foreach (var item in effectivePrices)
+            {
+                <option value="@(item.IsOption ? item.CoursePricingOption.CoursePricingOptionId.ToString() : "0")">
+                    @item.Label
+                    @string.Format("{0:c}", item.EffectivePrice)
+                </option>
+            }
+        </select>
+         */
+    if(modifier!="MainEvent"){
+    <text>
+        <script type="text/javascript">
+            (function() {
+        var prices = @Html.JsonEntity(effectivePrices);
+        var readOnly = @Html.Raw(Json.Encode(readOnly));
+        var moneyIcon = config.getUrl('Images/Icons/glyph2/Icons16x16/money-4.png');
+        var fade = @Html.Raw(Json.Encode(fade));
+        Ext.onReady(function () {
+
+            if (readOnly) {
+
+                var priceItems = [];
+                var membershiplabel = "@Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().membertypememberlabel";
+                var nonmemberlabel = "@Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().membertypenonmemberlabel";
+                for(var index = 0; index < prices.length; index++) {
+                    var price = prices[index];
+                    var ropricetag = '<div style="float: right; text-align: right;">$' + Ext.util.Format.number(price.EffectivePrice, '0.00') + '</div>';
+                    if ((@Gsmu.Api.Data.Settings.Instance.GetMasterInfo().Membership_Status != 0))
+                    {
+                        ropricetag = ropricetag + '<div style="font-weight: bold; white-space: normal !important;">' + price.Label + '</div>';
+                    }
+                    else
+                    {
+                        if((membershiplabel.indexOf(price.Label)>-1) ||(nonmemberlabel.indexOf(price.Label)>-1))
+                        {
+                            ropricetag = ropricetag + '<div style="font-weight: bold; white-space: normal !important;">' + " " + '</div>';
+                        }
+                        else
+                        {
+                            ropricetag = ropricetag + '<div style="font-weight: bold; white-space: normal !important;">' + price.Label + '</div>';
+
+                        }
+                    }
+
+                    var priceMenuItem = {
+                        text: ropricetag,
+                        xtype: 'menuitem',
+                        plain: true,
+                        style: window.LAYOUT.Options.plainMenuItemStyle
+                    };
+                    priceItems.push(priceMenuItem);
+                    ropricetag = "";
+                }
+
+                var button = Ext.create('Ext.button.Button', {
+                    //id: 'coursebtn-price-@(courseId+modifier)',
+                    renderTo: '@renderTo',
+                    cls: fade ? 'item-fade' : '',
+                    text: 'Pricing options',
+                    icon: moneyIcon,
+                    maxWidth: @width,
+                    textAlign: 'left',
+                    menuAlign: 'tr-br?',
+                    menu: new Ext.menu.Menu({
+                        showSeparator: false,
+                        items: priceItems
+                    })
+                });
+
+            } else {
+                @if(modifier=="CourseDetails"){
+                // this was commented because of extj issue in the new browsers see quick fix below
+
+                //        <text>
+
+                ////['course-price-@(courseId+modifier)'].forEach(function(value) {
+                ////    var previousCmp = Ext.getCmp(value);
+                ////    if (previousCmp != null) {
+                ////        previousCmp.destroy();
+                ////    }
+                ////});
+
+                //var prvCmp = Ext.getCmp('coursebtn-price-@(courseId+modifier)');
+                //if (prvCmp != null) {prvCmp.destroy();}
+				
+                //var prvCmp = Ext.getCmp('course-price-@(courseId+modifier)');
+                //if (prvCmp != null) {prvCmp.destroy();}
+
+                //var pricing = Ext.create('Ext.form.RadioGroup', {
+                //    name: '@(courseId+modifier)',
+                //    cls: fade ? 'item-fade' : '',
+                //    id: 'course-price-@(courseId+modifier)',
+                //    renderTo: '@renderTo',
+                //    forceSelection: true,
+                //    width: 250,
+
+                //    defaults: {
+                //        flex: 1,
+                //        width:250,
+                //        labelWidth:243,
+                //    },
+                //    style: 'color:black;font-weight:bold',
+                //    layout: 'vbox',
+                //    items: [
+                //    @foreach (var item in effectivePrices)
+                //    {
+                //        bool isdisabled = item.Disabled;
+                //                  string strvlu = "0";
+                //                if (item.IsOption)
+                //                {
+                //                    strvlu = item.CoursePricingOption.CoursePricingOptionId.ToString();
+                //                }
+                //                String curEffectivePrice = String.Format("{0:C}", item.EffectivePrice);
+                //                string cdpricetag = curEffectivePrice;
+                //                if (Gsmu.Api.Data.Settings.Instance.GetMasterInfo().Membership_Status != 0)
+                //                {
+                //                    cdpricetag = cdpricetag + " - " + item.Label;
+                //                }
+                //                else
+                //                {
+                //                    if(!(Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().membertypememberlabel.Contains(item.Label)) && !(Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().membertypenonmemberlabel.Contains(item.Label))){
+                //                        cdpricetag = cdpricetag + " - " + item.Label;
+                //                    }
+
+                //                    else
+                //                    {
+                //                        if((Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().DefaultPublicPricingType == 0) && (Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().membertypememberlabel.Contains(item.Label)))
+                //                        {
+                //                            cdpricetag = cdpricetag;
+                //                        }
+
+                //                        else
+                //                        {
+                //                            cdpricetag = cdpricetag + " - " + item.Label;
+                //                        }
+                //                    }
+                //                }
+                //                <text>
+                //        @comma
+                //        {
+                //            boxLabel  : '@cdpricetag',
+                //            name      : 'coursepriceitem',
+                //            inputValue: '@strvlu',
+                //            style: 'font-weight:bold;',
+                //            disabled:'@isdisabled'.toLowerCase()=='true'
+                //        }
+                //        </text>
+                //                comma = ",";
+                //            }
+
+                //    ]
+                //});
+
+
+                //</text>
+                        }else{
+                        <text>
+
+                var pricing = Ext.create('Ext.form.field.ComboBox', {
+                    name: '@(courseId+modifier)',
+                    cls: fade ? 'item-fade' : '',
+                    id: 'course-price-@(courseId+modifier)',
+                    typeAhead: true,
+                    width: @width,
+                    emptyText: 'Choose price',
+                    editable: false,
+                    renderTo: '@renderTo',
+                    forceSelection: true,
+                    matchFieldWidth: false,
+                    store: Ext.create('Ext.data.Store', {
+                        fields: [
+                            'Label', 'EffectivePrice', 'IsOption', 'CoursePricingOption',
+                            {name: 'Value', convert: function(v, record) {
+                                var result;
+                                var data = record.data;
+                                if (data.IsOption) {
+                                    result = data.CoursePricingOption.CoursePricingOptionId;
+                                } else {
+                                    result = '0';
+                                }
+                                return result;
+                            }}
+                        ],
+                        data : prices
+                    }),
+                    listConfig: {
+                        getInnerTpl: function() {
+                            var lcpricetag = '<div style="float: right">{EffectivePrice:currency}</div>';
+                            if (@Gsmu.Api.Data.Settings.Instance.GetMasterInfo().Membership_Status != 0) {
+                                lcpricetag = lcpricetag + '<div style="font-weight: bold;">{Label}</div>';
+                            }
+                            return lcpricetag;
+                        }
+                    },
+                    displayField: 'Label',
+                    valueField: 'Value',
+                    listeners:        {
+                        change:    function(field, newValue, oldValue)
+                        {
+                            $("#CoursePriceContainer").removeClass("course-widgetbox_error").addClass('course-widgetbox');
+                        }
+                    }
+                });
+
+                </text>
+                        }
+
+
+            }
+        });
+    })();
+    </script>
+    </text>
+    }
+
+if (!readOnly && (modifier=="CourseDetails" || modifier=="MainEvent")) {
+    if(modifier=="MainEvent"){
+    <text>
+       <select class="EventPrice @course.CourseId">
+            <option value="">Choose price</option>
+    </text>
+    }
+    foreach (var item in effectivePrices)
+        {
+
+                        bool isdisabled = item.Disabled;
+                                  string strvlu = "0";
+                                if (item.IsOption)
+                                {
+                                    strvlu = item.CoursePricingOption.CoursePricingOptionId.ToString();
+                                }
+                                String curEffectivePrice = String.Format("{0:C}", item.EffectivePrice);
+                                string cdpricetag = curEffectivePrice;
+                                if (Gsmu.Api.Data.Settings.Instance.GetMasterInfo().Membership_Status != 0)
+                                {
+                                    cdpricetag = cdpricetag + " - " + item.Label;
+                                }
+                                else
+                                {
+                                    if(!(Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().membertypememberlabel.Contains(item.Label)) && !(Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().membertypenonmemberlabel.Contains(item.Label))){
+                                        cdpricetag = cdpricetag + " - " + item.Label;
+                                    }
+
+                                    else
+                                    {
+                                        if((Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().DefaultPublicPricingType == 0) && (Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().membertypememberlabel.Contains(item.Label)))
+                                        {
+                                            cdpricetag = cdpricetag;
+                                        }
+
+                                        else
+                                        {
+                                            cdpricetag = cdpricetag + " - " + item.Label;
+                                        }
+                                    }
+                                }
+
+
+                                 var htmlAttributes = new Dictionary<string, object>();
+                                if (isdisabled)
+                                 {
+                                      htmlAttributes.Add("disabled", "disabled");
+                                 }
+                                if(modifier=="MainEvent"){
+                                    <text>
+                                        <option value="@strvlu" @*@if(isdisabled){<text>disabled="disabled"</text>}*@ >
+                                            @cdpricetag
+                                        </option>
+                                    </text>
+                                }else{    
+                                    <text>
+                                        <label style="font-weight:bold;line-height:22px;">@Html.RadioButton("coursepriceitem", strvlu,false,htmlAttributes)  @cdpricetag</label>
+                                        <br>
+                                    </text>
+                                }
+
+        }
+
+
+
+}
+
+
+
+    }
+    else if (effectivePrices.Count == 1)
+    {
+        var lbltext = "";
+        var item = effectivePrices.First();
+        var text = string.Format("{0:c}", item.EffectivePrice);
+        if (@Gsmu.Api.Data.Settings.Instance.GetMasterInfo().Membership_Status != 0) 
+        {
+            
+            lbltext = text +" ";
+        }
+        else {
+            if(!(Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().membertypememberlabel.Contains(item.Label)) && !(Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().membertypenonmemberlabel.Contains(item.Label))){   
+                 lbltext = text + " - " +  item.Label;
+            }
+        }
+        if(@Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().HidePaymentInfo == 0)
+        {
+            lbltext = text + " - " +  item.Label;
+        }
+        else 
+        {
+            lbltext = item.Label;
+        }
+        <input type="hidden" id="course-price-@(courseId+modifier)" value="@(item.IsOption ? item.CoursePricingOption.CoursePricingOptionId.ToString() : "0")" />
+        <span class="price-single" title="@text" style="white-space: normal; width: @width;">
+            @lbltext
+        </span>
+    }
+
+}
+else if (cartItem.PricingModel != null)
+{
+   
+    var text = string.Format("{0:c}", cartItem.PricingModel.EffectivePrice);
+    if (@Gsmu.Api.Data.Settings.Instance.GetMasterInfo().Membership_Status != 0)
+    {
+        text = text + " - " + cartItem.PricingModel.Label;
+    }
+    else {
+        if(!(Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().membertypememberlabel.Contains(cartItem.PricingModel.Label)) && !(Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().membertypenonmemberlabel.Contains(cartItem.PricingModel.Label))){
+            text = text + " - " +  cartItem.PricingModel.Label;
+        }
+    }
+    if(@Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().HidePaymentInfo == 0)
+    {
+        text = text + " - " +  cartItem.PricingModel.Label;
+    }
+    else
+    {
+        text = cartItem.PricingModel.Label;;
+    }
+    <span class="price-single" title="@text" style="white-space: normal; width: @width;">
+        @text
+    </span>    
+}
+
+@if (allowPartialPayment)
+{
+    <br />
+    var partialPaymentNon = Model.PartialPaymentNon;
+    var partialPaymentAmount = Model.PartialPaymentAmount;
+    var partialPaymentSP = Model.PartialPaymentSP;
+    var isShowLabel = Gsmu.Api.Data.Settings.Instance.GetMasterInfo().Membership_Status != 0;
+
+    if (partialPaymentNon > 0)
+    {
+        <span style="font-weight: 700">
+            $@partialPaymentNon down payment available @(isShowLabel ? "for " + Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().membertypenonmemberlabel : "")
+        </span>
+        <br />
+    }
+
+    if (partialPaymentAmount > 0)
+    {
+        <span style="font-weight: 700">
+            $@partialPaymentAmount down payment available @(isShowLabel ? "for " + Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().membertypememberlabel : "")
+        </span>
+        <br />
+    }
+
+    if (partialPaymentSP > 0)
+    {
+        <span style="font-weight: 700">
+            $@partialPaymentSP down payment available @(isShowLabel ? "for " + Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().MemberTypeSpecialMemberLabel1 : "")
+        </span>
+    }
+
+}

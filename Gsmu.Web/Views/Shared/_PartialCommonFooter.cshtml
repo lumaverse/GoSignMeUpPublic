@@ -1,0 +1,40 @@
+﻿@using Gsmu.Api.Data
+@{
+    var apiAsm = typeof(Gsmu.Api.Web.DevelopmentModeAttribute).Assembly;
+    var webAsm = typeof(Gsmu.Web.MvcApplication).Assembly;
+    var buildDate = DateTime.Parse(Gsmu.Web.Resources.BuildDate).ToString();
+
+    var apiVersion = apiAsm.GetName().Version;
+    var apiVersionDisplay = apiVersion.ToString(4);
+    
+    var webVersion = webAsm.GetName().Version;
+    var webVersionDisplay = webVersion.ToString(4);       
+}
+
+@Html.Raw(WebConfiguration.DevelopmentMode ? "<div style=\"margin-top: 15px;\">" : "<!--")
+Gsmu.Api V@(apiVersionDisplay)
+|
+Gsmu.Web V@(webVersionDisplay)
+|
+@(WebConfiguration.IsDebugRelease ? "Debug version" : "Release version") built on @buildDate by @Gsmu.Web.Resources.BuildUser
+@Html.Raw(WebConfiguration.DevelopmentMode ? "</div>" : "-->")
+
+@if (WebConfiguration.DevelopmentMode)
+{
+    if (WebConfiguration.IsDebugRelease)
+    {
+        var messages = Gsmu.Api.Web.ObjectHelper.GetRequestDebugMessages(ViewContext.Controller);
+        if (messages.Count > 0)
+        {
+            <fieldset>
+                <legend>DEBUG MODE MESSAGES:</legend>
+                <div>
+                    @foreach (var text in messages)
+                    {
+                        <div>@text</div>
+                    }
+                </div>
+            </fieldset>
+        }
+    }
+}

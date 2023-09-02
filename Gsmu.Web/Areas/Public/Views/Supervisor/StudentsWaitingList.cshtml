@@ -1,0 +1,90 @@
+﻿@{
+    Layout = null;
+}
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+<link href="~/Content/font-awesome.min.css" rel="stylesheet" />
+
+<link href="~/Content/DataTables/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/responsive.bootstrap.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/responsive.dataTables.min.css" rel="stylesheet" />
+<link href="~/Content/plugins/bootstnipp-button.css" rel="stylesheet" />
+
+<script src="~/Scripts.Gsmu/UrlHelper.js"></script>
+@Scripts.Render("~/bundles/jquery")
+<script src="~/Scripts.Gsmu/Utility.js"></script>
+<style>
+    .ext-js-title {
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .center {
+        text-align: center;
+    }
+
+    .table, .dt-bootstrap {
+        font-size: 12px;
+        width: 100% !important;
+    }
+
+    div.bottom {
+        display: flex;
+    }
+
+    div.dataTables_length {
+        text-align: right !important;
+    }
+
+    div.dataTables_paginate {
+        text-align: left !important;
+    }
+
+    div.dataTables_filter {
+        text-align: left !important;
+    }
+
+    #waitlist-export, #approved-export {
+        float: right;
+    }
+</style>
+
+<div id="supervisor-student-waitlist">
+    <div class="panel panel-default">
+        <div class="panel-heading gsmu-sub-panel-heading">
+            <div class="panel-title ext-js-title">
+                Students on Waitlist
+            </div>
+        </div>
+        <div class="panel-body gsmu-sub-panel-body panel-collapse collapse in">
+            <div class="row form-group form-group-sm">
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#waitlisttoapprove" aria-controls="waitlisttoapprove" role="tab" data-toggle="tab">Waiting List to Approve</a></li>
+                    <li role="presentation"><a href="#waitlistwaiting" aria-controls="waitlistwaiting" role="tab" data-toggle="tab">Approved Records</a></li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="waitlisttoapprove">
+                        <div id="students-waitlist-grid-container" class="col-lg-12">
+                            <br />
+                            <div>
+                                <button id="waitlist-export" onclick="supervisorStudentsWaitList.exportApproveToWaitlistToExcel()" class="btn btn-xs btn-success">Export to Excel</button>
+                            </div>
+                            <table id="supervisor-student-waitlist-grid" style="width:100%;font-size:11px!important" class="table table-striped table-hover"></table>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="waitlistwaiting">
+                        <div id="students-approved-grid-container" class="col-lg-12">
+                            <br />
+                            <div>
+                                <button id="approved-export" onclick="supervisorStudentsWaitList.exportApprovedlistToExcel()" class="btn btn-xs btn-success">Export to Excel</button>
+                            </div>
+                            <table id="supervisor-student-approved-grid" style="width:100%;font-size:11px!important" class="table table-striped table-hover"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/Areas/Public/Scripts/Supervisor/Shared/StudentsWaitingList.js")

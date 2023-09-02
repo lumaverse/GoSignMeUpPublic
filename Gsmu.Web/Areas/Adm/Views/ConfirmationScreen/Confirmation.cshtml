@@ -1,0 +1,38 @@
+﻿@using Gsmu.Api.Web
+@{
+    ViewBag.Title = "Order Confirmation";
+}
+
+@Styles.Render("~/Content/Confirmation.css")
+@Scripts.Render("~/Areas/Adm/Scripts/ConfirmationScreen/LayoutOrderModel.js")    
+@Scripts.Render("~/Areas/Adm/Scripts/ConfirmationScreen/LayoutOrderDataStore.js")    
+@Scripts.Render("~/Areas/Adm/Scripts/ConfirmationScreen/LayoutConfirmationScreen.js")    
+
+<script type="text/javascript">
+    Ext.onReady(function () {
+        var layoutConfirmation = new LayoutConfirmationScreen();
+
+        Ext.onReady(function () {
+            layoutConfirmation.RenderAdmin();
+        });
+    });
+</script>
+
+<div style="float: right; margin-left: 5px;" id="confirmation-toolbar-container">
+</div>
+<div style="float: right; margin-left: 5px;" id="confirmation-toolbar-admin-edit">
+</div>
+<div style="float: right; margin-left: 5px;" id="confirmation-toolbar-admin-combo">
+</div>
+
+<div id="confirmation-header-editor-container" style="clear: both;">
+</div>
+
+<div id="confirmation-container">    
+</div>
+
+<div id="confirmation-footer-editor-container">
+</div>
+
+<div id="confirmation-print-button-container" style="float: right;"></div>
+

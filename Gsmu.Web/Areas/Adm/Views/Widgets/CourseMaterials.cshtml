@@ -1,0 +1,15 @@
+﻿<div id="widget-course-materials">
+    <div class="row pad-bot-10">
+        <div class="toggle-middle">Require Material &nbsp;<input type="checkbox" id="course-require-material" class="bootstrap-toggle" data-size="mini"></div>
+        <div class="pull-right">
+            <select id="course-materials-dropdown" data-live-search="true" data-style="btn-xs btn-primary">
+                <option>Select Material</option>
+            </select>
+            <button type="button" class="btn btn-info btn-xs add" onclick="courseMaterials.addMaterial()"><span class="glyphicon glyphicon-plus"></span></button>
+        </div>
+    </div>
+    <div class="row pad-bot-5">
+        <table id="course-material-grid" class="table table-striped table-hover"></table>
+    </div>
+ </div>
+@Scripts.Render("~/Areas/Adm/Scripts/Widgets/CourseMaterials.js")

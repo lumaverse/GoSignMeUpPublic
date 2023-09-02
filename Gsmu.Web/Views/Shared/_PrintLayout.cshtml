@@ -1,0 +1,11 @@
+﻿<html>
+    <head>
+        <title>@ViewBag.Title</title>
+        @Styles.Render("~/Content/PrintLayout.css")    
+        @{Html.RenderPartial("_PartialScriptsAndStyles");}
+        @RenderSection("Head", false)
+    </head>
+    <body>
+        @RenderBody()        
+    </body>
+</html>

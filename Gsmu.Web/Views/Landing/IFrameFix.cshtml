@@ -1,0 +1,22 @@
+﻿@using Gsmu.Api.Web
+@using Gsmu.Api.Data
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>IFrameFix</title>
+
+    <script type="text/javascript">
+        var url =   @Html.Raw(Json.Encode(ViewBag.redirect));
+        function redirect() {
+            location = url;
+        }
+    </script>
+</head>
+<body onload="redirect();">
+Executing Safari IFrame fix ...
+</body>
+</html>

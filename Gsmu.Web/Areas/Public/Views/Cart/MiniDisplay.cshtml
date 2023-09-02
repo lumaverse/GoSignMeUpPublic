@@ -1,0 +1,124 @@
+﻿@using Gsmu.Api.Data.ViewModels.Layout;
+@using Gsmu.Api.Data.School.Course;
+@model Gsmu.Api.Commerce.ShoppingCart.CourseShoppingCart
+@if (Model.Count > 0)
+{
+
+    var additionalStyle = "opacity: 0.6;";
+    
+    var layoutConfig = LayoutManager.PublicLayoutConfiguration;
+    var hide_payment_info = Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().HidePaymentInfo;
+    var count = 0;
+
+
+    foreach (var item in Model.Items)
+    {
+        var student_count =  (from an in Model.MultipleStudentCourses where an.CourseId == item.Course.COURSEID select an.StudentId).Count();
+        var bundleStyle = item.IsBundledCourse ? "opacity: 0.8;" : string.Empty;
+        var title = item.Course.COURSENUM + " - " + item.Course.COURSENAME;
+        var coursetype = item.Course.coursetype;
+        var eventStyle = "";
+        if(coursetype == 1){
+           eventStyle = "font-size: 14px;color: wheat;";    
+        }
+        if(item.Course.COURSENUM == "~ZZZZZZ~"){
+             title = item.Course.COURSENAME;
+        }
+        
+        var message = Uri.EscapeDataString(Model.GetRemoveCourseAlertText(item.Course.COURSEID));
+
+        if(item.Course.sessionid == 0 && count>0){
+        <div style="height: 1px; background-color: #6b6565; margin-top: 3px; margin-bottom: 3px; clear: both;"></div>    
+        }
+
+        <div id="cart-item-@item.Course.COURSEID" title="@title " class="cart-mini-display cart-mini-display-title" style="@bundleStyle @eventStyle">
+            @item.Course.COURSENAME           
+                @if(Model.MultipleStudentCourses.Count > 0){
+                 <b>(@student_count)</b>
+            }
+        </div>
+
+        if (!item.IsBundledCourse)
+        {
+            if(item.Course.coursetype==1){
+                <div style="float: right;">
+                <a style="height: 18px;line-height: 18px;font-size: 10px;" href="javascript:cart.RemoveEvent(@(item.Course.COURSEID));" class="simpleCart_checkout hudbtn primary right button-component" data-button-type="@LayoutButton.Checkout.ToString()">REMOVE</a>
+                <a style="height: 18px;line-height: 18px;font-size: 10px;" href="javascript:window.CourseSearchInstance.ShowCourseDetails(@(item.Course.COURSEID));" class="simpleCart_checkout hudbtn primary right button-component" data-button-type="@LayoutButton.Checkout.ToString()">EDIT</a>
+                </div>
+            }else{
+                if(item.Course.eventid>0){
+                <div style="float: right;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+                }else{
+                <div style="float: right;"><a title="Remove course from cart" id="remove-@(item.Course.COURSEID)" href="javascript:cart.remove(@(item.Course.COURSEID));" data-message="@message" class="closebtn">x</a></div>
+                }
+            }
+             if(@hide_payment_info == 0  && item.Course.coursetype!=1)
+             {
+                <div style="float: right;">@string.Format("{0:c}", item.LineTotal)</div>
+             }
+        }
+
+        if (item.HasExtraParticipants)
+        {
+            <div style="clear: both; position: relative; top: -7px; @additionalStyle">
+                <div class="cart-mini-display">@PricingOptionsHelper.ExtraParticipantLabel @Gsmu.Api.Data.GrammarHelper.GetConditionallyPluralizedWord(item.ExtraParticipants.Count, "member")</div>
+                <div style="clear: both;"></div>
+
+                @foreach (var participant in item.ExtraParticipants)
+                {
+                    <div class="cart-mini-display"></div>
+                    <div class="cart-close-button-placeholder">@participant.StudentFirst @participant.StudentLast</div>
+                    <div style="clear: both;"></div>
+                }
+            </div>
+
+        }
+
+
+        if (item.HasMaterials)
+        {
+            <div style="clear: both; position: relative; top: -7px; @additionalStyle">
+                <div class="cart-mini-display">Course total</div>
+                @if(hide_payment_info == 0)
+                {
+                    <div class="cart-close-button-placeholder">@string.Format("{0:c}", item.CourseTotal)</div>
+                }
+                <div style="clear: both;"></div>    
+
+                @foreach(var material in item.Materials) {
+                    <div class="cart-mini-display">@material.product_name</div>
+                    if(@hide_payment_info != 0 || material.hidematerialprice!=null && material.hidematerialprice == -1)
+                    {
+                        <div class="cart-close-button-placeholder">(@material.QuantityPurchased)</div>
+                    }else
+                    {
+                        <div class="cart-close-button-placeholder">(@material.QuantityPurchased) @string.Format("{0:c}", material.ActualPriceTotal)</div>
+                    }
+                    
+                    <div style="clear: both;"></div>    
+                }                                    
+            </div>
+        }
+    
+        count++;
+    }
+        if(hide_payment_info == 0)
+        {
+            <div style="height: 1px; background-color: #6b6565; margin-top: 3px; margin-bottom: 3px; clear: both;"></div>    
+            <div style="float: right;margin-right: 15px; margin-top: 5px; margin-bottom: 3px;"><span style="font-weight: bold;">Sub-total:</span> @string.Format("{0:c}", Model.SubTotal)</div>
+        }
+        
+        <div style="clear: both;"></div>    
+    
+    
+    <div id="cart-popup-buttons" class="clearfix">
+        <a href="javascript:cart.checkout();" class="simpleCart_checkout hudbtn primary right button-component" data-button-type="@LayoutButton.Checkout.ToString()">@Gsmu.Api.Data.Settings.Instance.GetMasterInfo4().PublicButtonLabelCheckout</a>
+        @*<a href="javascript:cart.checkout();" class="simpleCart_checkout hudbtn primary right">Checkout</a>*@
+        @*<a href="javascript:cart.showExpandedDisplay();" class="hudbtn left">View</a>*@
+        <a id="button-empty-cart" href="javascript:cart.empty();" class="hudbtn left button-component" data-button-type="@LayoutButton.EmptyCart.ToString()">@layoutConfig.LayoutButtons.EmptyCart</a>
+    </div>
+
+} else {
+    <div id="emptydiv" style="margin: 10px;">@Model.Status</div>
+}
+

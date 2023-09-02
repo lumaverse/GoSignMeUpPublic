@@ -1,0 +1,154 @@
+﻿@{
+    ViewBag.Title = "Confirmation";
+}
+<div class="cart-steps-wrap">
+    <div class="cart-steps cart-step3"></div>
+    <ul class="cart-steps-text" style="list-style-type: none;">
+        <li class="cart-step-1">Log in/ Create Account</li>
+        <li class="cart-step-2">Review</li>
+            <li class="cart-step-3  current-step">Payments</li>
+        <li class="cart-step-4">Receipt &amp; Confirmation</li>
+    </ul>
+</div>
+<div style="float: right">
+
+</div>
+<table border="0" style="width: 942px; margin-left: 10px;">
+    <tbody>
+<tr>
+            <td colspan="3">
+
+                <div style="font-size: 15px;color: Black;font-weight: bold;height: 18px;margin-top: 10px;">
+                    
+                </div>
+<div style="border-top: 2px solid #bfbfbf; height: 12px;">
+                    &nbsp;
+                </div>
+            </div></td>
+        </tr>
+        <tr>
+            <td>
+                <form id="payment-form" action="/public/cart/SpreedlyConfirmation" onsubmit='submitPaymentForm(); return false;' class="spf-form">
+                    <input type="hidden" name="payment_method_token" id="payment_method_token">
+                    <input type="hidden" name="OrderNo" id="OrderNo" value="@ViewBag.OrderID">
+                      <fieldset class="spf-fs-address" style="margin: 20px !important;">
+                          <h2>Billing Information</h2>
+                            <div class="spf-field spf-field-fname">
+                                <label class="internal" for="spf-fname">Card Holder First Name</label>
+                                <input type="text" class="spf-input-text" id="first_name">
+                            </div>
+                            <div class="spf-field spf-field-lname">
+                                <label class="internal" for="spf-lname"> Card Holder Last Name</label>
+                                <input type="text" class="spf-input-text" id="last_name">
+                            </div>
+                          <div class="spf-field spf-field-street">
+                            <label class="internal" for="spf-street">Street Address</label>
+                            <input type="text" class="spf-input-text" id="address1">
+                          </div>
+                          <div class="spf-field spf-field-street-2">
+                            <input type="text" class="spf-input-text" id="address2">
+                          </div>
+                          <div class="spf-field spf-field-city">
+                            <label class="internal" for="spf-city">City</label>
+                            <input type="text" class="spf-input-text" id="city">
+                          </div>
+                          <div class="spf-field spf-field-state">
+                            <label class="internal" for="spf-state">State</label>
+                            <input type="text" class="spf-input-text" id="state">
+                          </div>
+                          <div class="spf-field spf-field-postcode">
+                            <label class="internal" for="spf-postcode">Zip Code</label>
+                            <input type="text" class="spf-input-text" id="zip">
+                          </div>
+                          <div class="spf-field spf-field-country">
+                            <label class="internal" for="spf-country">Country</label>
+                            <input type="text" class="spf-input-text" id="country">
+                          </div>
+                        </fieldset>
+                    <fieldset class="spf-fs-cc" style="margin: 20px !important;">
+                        <h2>Payment Details</h2>
+                        <div style="font-weight:bolder; font-size:18px;">
+                                Payment Amount: &nbsp; $@String.Format("{0:0.00}", ViewBag.OrderToPay)
+                        </div>
+                        <hr />
+                        <div class="spf-field">
+                            <label class="spf-field-group spf-number">Credit Card Number</label>
+                            <label class="spf-field-group spf-verification_value">CVV</label>
+                            <div id="spreedly-number" class="spf-field-group spf-number spf-field-cc" style="height: 35px; border-radius: 3px; border: 1px solid #ccc;"></div>
+
+                            <div id="spreedly-cvv" class="spf-field-group spf-verification_value spf-field-cc" style="height: 35px; border-radius: 3px; border: 1px solid #ccc;"></div>
+                        </div>
+                        <div class="spf-field spf-field-exp">
+                            <label style="display: block;">Expiration Date</label>
+                            <div class="spf-field-group spf-month">
+                                <input type="text" class="spf-input-text spf-exp" id="month" size="3" maxlength="2" placeholder="MM">
+                                <!-- <label class="spf-label-secondary" for="spf-exp-m">Month (MM)</label> -->
+                            </div>
+                            <span class="spf-exp-divider">/</span>
+                            <div class="spf-field-group spf-year">
+                                <input type="text" class="spf-input-text spf-exp" id="year" size="5" maxlength="4" placeholder="YYYY">
+                                <!-- <label class="spf-label-secondary" for="spf-exp-y">Year (YYYY)</label> -->
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset class="spf-field-submit" style="margin: 20px;">
+                        <input type="submit" class="button" id="submit-button" value="Submit Payment" disabled>
+                        <div id="message"></div>
+                        <div id="errors"></div>
+                    </fieldset>
+                </form>
+                <script type="text/javascript">
+                    Spreedly.init("FHr13thPIer0SIg5PDSEcfK365a", {
+                        "numberEl": "spreedly-number",
+                        "cvvEl": "spreedly-cvv"
+                    });
+                    Spreedly.on("ready", function () {
+                        var submitButton = document.getElementById('submit-button');
+                        submitButton.disabled = false;
+                        Spreedly.setStyle('number', 'width: 100%; border-radius: 3px; border: 1px solid #ccc; padding: .65em .5em; font-size: 91%;');
+                        Spreedly.setStyle('cvv', 'width: 100%; border-radius: 3px; border: 1px solid #ccc; padding: .65em .5em; font-size: 91%;');
+                    });
+
+                    Spreedly.on('errors', function (errors) {
+                        var errorBorder = "1px solid red";
+                        var messageEl = document.getElementById('errors');
+                        for (var i = 0; i < errors.length; i++) {
+                            var error = errors[i];
+                            messageEl.innerHTML += error["message"] + "<br/>";
+                        };
+                    });
+
+                    function submitPaymentForm() {
+
+                        var requiredFields = {};
+
+                        // Get required, non-sensitive, values from host page
+                        requiredFields["first_name"] = document.getElementById("first_name").value;
+                        requiredFields["last_name"] = document.getElementById("last_name").value;
+                        requiredFields["month"] = document.getElementById("month").value;
+                        requiredFields["year"] = document.getElementById("year").value;
+                        requiredFields["city"] = document.getElementById("city").value;
+                        requiredFields["state"] = document.getElementById("state").value;
+                        requiredFields["zip"] = document.getElementById("zip").value;
+
+                        document.getElementById('errors').innerHTML = "";
+                        document.getElementById('message').innerHTML = "";
+                        Spreedly.tokenizeCreditCard(requiredFields);
+                    }
+
+                    Spreedly.on('paymentMethod', function (token, pmData) {
+
+                        // Set the token in the hidden form field
+                        var tokenField = document.getElementById("payment_method_token");
+                        tokenField.setAttribute("value", token);
+
+                        // Submit the form
+                        var masterForm = document.getElementById('payment-form');
+                        masterForm.submit();
+                    });
+                </script>
+            </td>
+        </tr>
+    </tbody>
+
+</table>

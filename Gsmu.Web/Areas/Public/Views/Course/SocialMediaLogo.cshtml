@@ -1,0 +1,15 @@
+﻿@model Gsmu.Api.Data.School.Course.CourseModel
+@{
+    var courseModel = Model;
+    var course = courseModel.Course;
+    var csetting = courseModel.CourseSettings;
+    var icons = courseModel.Icons;
+    var wgname = "Social Media";
+    var wgcontainer = "Course" + wgname + "Container";
+    var wgcontainerDet = "Course" + wgname + "ContainerDet";
+}
+    <div id="@wgcontainer" class="course-widgetbox" style="position:inherit; min-height:250px;">
+        <div id="@wgcontainerDet" style="padding:5px;margin:5px; text-align:center; ">
+                <img src="@Gsmu.Api.Data.Settings.Instance.GetPDFHeaderFooterInfo().SocialMediaLogo" width="100%" style="float: center; margin-right: 12px;" alt="Photo Not Available" />
+        </div>
+    </div>

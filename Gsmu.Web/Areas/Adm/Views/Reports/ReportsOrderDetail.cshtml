@@ -1,0 +1,65 @@
+﻿<div id="report-order-details">
+    <div class="loader">Loading...</div>
+    <script id="reports-order-detail-template" type="x-tmpl-mustache">
+        <div class="modal-header popover-title">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h5 class="modal-title gsmu-popop-header">
+                Edit Order
+            </h5>
+        </div>
+        <div class="modal-body popover-content">
+            <table id="order-detail-order-info" class="table table-striped table-responsive table-bordered">
+                <tr>
+                    <td>Order Number</td>
+                    <td colspan="3">Status</td>
+                </tr>
+                <tr>
+                    <td><b>{{ OrderNumber }}</b></td>
+                    <td colspan="3" style="background-color: {{ Color }}"><b>{{ Status }}</b></td>
+                </tr>
+                <tr>
+                    <td colspan="4">Order Date</td>
+                </tr>
+                <tr>
+                    <td colspan="4"><b>{{ OrderDate }}</b></td>
+                </tr>
+                <tr>
+                    <td colspan="2">Bill To</td>
+                    <td colspan="2">Student Information</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div id="order-detail-bill-information">
+                            <div>Student : <b>{{ StudentName }}</b> </div>
+                            <div>Home Tel : <b>{{ HomePhone }}</b> </div>
+                            <div>Work Tel : <b>{{ WorkPhone }}</b> </div>
+                            <div>Fax : <b>{{ Fax }}</b></div>
+                            <div>Email : <b>{{ Email }}</b></div>
+                        </div>
+                    </td>
+                    <td colspan="2">
+                        <div id="order-detail-student-information">
+                            <div>Grade : <b>{{ Grade }} </b></div>
+                            <div>School : <b>{{ School }}</b></div>
+                            <div>District : <b>{{ District }}</b></div>
+                            <div>Gender : <b>{{ Gender }}</b></div>
+                            <div>Race : <b>{{ Race }}</b></div>
+                            <div>Department : <b>{{ Department }}</b></div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <table id="order-detail-order-items" class="table table-striped table-responsive table-bordered"></table>
+            <div id="order-detail-order-accounting-details">
+            </div>
+            <div id="order-detail-order-payment-details">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-success btn-sm" onclick="StudentsNotes.saveNote()">Save Changes</button>
+            <button type="button" class="btn btn-secondary btn-sm">Reset</button>
+            <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+        </div>
+    </script>
+</div>
+<script src="~/Areas/Adm/Scripts/Reports/ReportsOrderDetail.js"></script>

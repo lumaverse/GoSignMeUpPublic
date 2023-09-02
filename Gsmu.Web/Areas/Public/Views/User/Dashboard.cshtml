@@ -1,0 +1,206 @@
+﻿@using data = Gsmu.Api.Data;
+@using Gsmu.Api.Data.School;
+@using Gsmu.Api.Data.School.User;
+@using student = Gsmu.Api.Data.School.Student;
+@using auth = Gsmu.Api.Authorization; 
+@using Gsmu.Api.Data.School.Terminology;
+@model UserModel
+@{
+    var userModel = Model;
+    ViewBag.Title = "Dashboard";
+    string MissingReqFields = ViewBag.MissingReqFields;
+    string cmd = ViewBag.cmd;
+    string usergroup = userModel.CommonUserInfo.usergroupAbv;
+    string username = Model.CommonUserInfo.username;
+    string sessionId = string.Empty;
+    int hideRoomManagementPublic = data.Settings.Instance.GetMasterInfo3().HideManagerRoomInPublic.HasValue ? data.Settings.Instance.GetMasterInfo3().HideManagerRoomInPublic.Value : 0;
+    DataLists dlists = new DataLists();
+
+    UserWidget userwidgets = new UserWidget();
+    if(usergroup=="IT"){
+        userwidgets = dlists.UserWidgets("InstructorsDashViewEdit");
+    }
+    else{
+        userwidgets = dlists.UserWidgets("StudentsDashViewEdit");
+        sessionId = userModel.Student.UserSessionId.Value.ToString();
+    }
+
+}
+
+@section Head {
+    @Scripts.Render("~/Areas/Public/Scripts/ExtFieldValidation.js")
+}
+
+@{Html.RenderPartial("UserWidgetStores");}
+<script>
+    var fldprop={};
+    var widgt = {};
+    var username = '@username';
+    var instructorsessionId='@sessionId';
+    widgt = eval(@Html.Raw(Json.Encode(userwidgets)));
+
+    var hideRoomManagement = @Html.Raw(Json.Encode(hideRoomManagementPublic));
+
+    Ext.onReady(function () {
+        var membershipUrl = config.getUrl('public/user/membershipstatus');
+
+        Ext.Ajax.request({
+            url: membershipUrl,
+            success: function (response) {
+                Ext.get('membership-status-container').setHtml(response.responseText);
+                loadAllWidgetFields('view', '@usergroup');
+            }
+        });
+
+
+    });
+
+    function openRoomMgmt() {
+        var userName = @Html.Raw(Json.Encode(username));
+        var studentSessionId = @Html.Raw(Json.Encode(sessionId));
+        winreport = Ext.create('Ext.form.Panel', {
+            id: 'UserWidgetRoomManagementPanel',
+            floating: true,
+            centered: true,
+            modal: true,
+            width: 970,
+            height: 640,
+            closable: true,
+            defaultType: 'textfield',
+            bodyPadding: 10,
+            items: [
+                {
+                    xtype: 'component',
+                    autoScroll: true,
+                    autoEl: {
+                        tag: 'iframe',
+                        id: 'UserWidgetRoomManagementIframe',
+                        style: 'height: 650px; width: 950px;',
+                        src: '/admin/roommgmt/index.asp?source=dev_students.asp&misc=552&rubyrequest=1&usergroup=student&uname=' + userName + '&usersessionid=' + studentSessionId
+                    },
+                    listeners: {
+                        afterrender: function () {
+                            this.getEl().on('load', function () {
+                                //For mobile, scrollbar and iframe height cannot be controlled. Extjs bug.
+                                var iframeHT = $("#UserWidgetRoomManagementIframe").height()
+                                var panel = Ext.getCmp('UserWidgetRoomManagementPanel');
+                                panel.setHeight(iframeHT)
+                            });
+                        }
+                    }
+                }
+            ],
+            renderTo: Ext.getBody(),
+        });
+        winreport.show();
+    }
+</script>
+
+<div style="float: left;" id="membership-status-container">   
+</div>
+
+@if (hideRoomManagementPublic == 0)
+{
+    <div style="float:left;padding-left: 15px;">
+        <a href="javascript:openRoomMgmt()"> Room Management</a>
+    </div>
+}
+
+<script type="text/javascript">
+(function () {
+    //var membershipUrl = config.getUrl('public/user/membershipstatus');
+    //var AjaxRequestCount = 0;
+    //Ext.Ajax.on('beforerequest', function (conn, options) {
+    //    if (options.url == membershipUrl) {
+    //        return;
+    //    }
+    //    AjaxRequestCount++;
+    //})
+    //Ext.Ajax.on('requestcomplete', CompleteAjax);
+    //Ext.Ajax.on('requestexception', CompleteAjax);
+
+    //function CompleteAjax(conn, response, options) {
+    //    if (options.url == membershipUrl) {
+    //        return;
+    //    }
+    //    AjaxRequestCount--;
+    //    if (AjaxRequestCount < 1) {
+    //        AjaxRequestCount = 0;
+    //        setTimeout(function () {
+    //            Ext.get('membership-status-container').load({
+    //                url: membershipUrl
+    //            });
+    //        }, 100);
+    //    }
+    //};
+})();
+</script>
+
+<div style="text-align:right; margin-right:10px;"><a href="/Public/Course/Browse">Browse @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course)s</a></div>
+<div id="SectionWrapper">
+
+    @{
+        String rmndrs = "";
+        if (Gsmu.Api.Data.Settings.Instance.GetMasterInfo3().ForceAccountUpdate == 1)
+        {
+            rmndrs = Gsmu.Api.Data.Settings.Instance.GetMasterInfo3().ForceAUMsg;
+        }
+    }
+
+    <div id="userwarningcontent">@Html.Raw(rmndrs)</div>
+    @if (MissingReqFields == "1")
+    {
+        <text>
+            <div style="font-size: 20px;color: red;text-align: right;height: 30px;width: 100%;line-height: 30px;padding-right: 10px;">* Please fill out all required fields</div>
+        </text>
+    }
+
+    @{
+
+        string STForceResetPassAdminCreated = System.Configuration.ConfigurationManager.AppSettings["STForceResetPassAdminCreated"];
+        if (STForceResetPassAdminCreated == "true")
+        {
+            if (Model.Student.ResetPassword == 1)
+            {
+                string STForceResetPassAdminCreatedMsg = System.Configuration.ConfigurationManager.AppSettings["STForceResetPassAdminCreatedMsg"];
+                <text>
+                    <div style="font-size: 20px;color: red;text-align: right;height: 30px;width: 100%;line-height: 30px;padding-right: 10px;">@Html.Raw(STForceResetPassAdminCreatedMsg)</div>
+
+                </text>
+            }
+        }
+
+    }
+    <div style="width:100%; overflow:auto; padding:0px">
+
+        @foreach (var col in userwidgets.Column)
+        {
+            string WidthPer = col.WidthPer.ToString() + "%";
+            int IntBtsCol = int.Parse(col.WidthPer.ToString()) * 12 / 100;
+
+            <text>
+
+                <div style="width:@WidthPer ;float: left; padding:10px">
+
+                    @foreach (var wdgt in userwidgets.Widgets.Where(cl => cl.ColID == col.ID).OrderBy(l => l.DispSort))
+                    {
+                        string containerID = wdgt.ID.ToString();
+                        <text>
+                            <div id="@containerID">
+                            </div>
+                        </text>
+                    }
+
+                </div>
+
+            </text>
+        }
+
+
+
+    </div>
+
+</div>
+
+
+

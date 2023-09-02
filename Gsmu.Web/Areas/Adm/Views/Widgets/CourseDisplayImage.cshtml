@@ -1,0 +1,41 @@
+﻿<div id="widget-course-display-image">
+    <div class="panel panel-default">
+        <div class="panel-heading gsmu-sub-panel-heading">
+            <div class="panel-title pull-left">
+                Public Course Display Image
+            </div>
+            <div class="pull-right">
+                <div id="course-enrollment-data-btns">
+                    <div>
+                        <button type="button" class="btn btn-default btn-xs attach" onclick="courseDisplayImage.openFileInput()"><span class="fa fa-paperclip"></span></button>
+                        <button type="button" class="btn btn-danger btn-xs cancel" onclick="courseDisplayImage.deleteImage()"><span class="fa fa-minus-circle"></span></button>
+                        <input type="file" id="course-display-image-input" name="TileCourse" onchange="courseDisplayImage.changeFileInput(this)" class="hidden" />
+                    </div>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <div class="panel-body gsmu-sub-panel-body medium-panel panel-collapse collapse in scroll-y">
+            <div class="row form-group form-group-sm">
+                <div class="col-lg-12">
+                        <p>
+                            The image uploaded here is displayed on the public site. The tile and image size can be configured on the public site. The current configuration is:
+                        </p>
+                        <p>
+                            Tile width: 230
+                        </p>
+                        <p>
+                            Tile image width: 230
+                        </p>
+                        <p>
+                            Tile image height: 133
+                        </p>
+                        <div id="course-display-image-container">
+                            <img id="course-display-image" src='../../Images/NoProfileImage.png' class="img-thumbnail" onerror="courseDisplayImage.changeUrl()" />
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/Areas/Adm/Scripts/Widgets/CourseDisplayImage.js")

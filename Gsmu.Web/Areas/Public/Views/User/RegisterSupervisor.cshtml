@@ -1,0 +1,330 @@
+﻿@using Gsmu.Api.Data.School;
+@using Gsmu.Api.Data.School.Terminology;
+@using Gsmu.Api.Data.School.User;
+@using Gsmu.Api.Data.ViewModels.Layout;
+@model UserModel
+@{
+    ViewBag.PrivacyReq = @Gsmu.Api.Data.Settings.Instance.GetMasterInfo().PrivacyReq;
+    ViewBag.PrivacyInFormDisp = @Gsmu.Api.Data.Settings.Instance.GetMasterInfo().PrivacyInFormDisp;
+            
+    ViewBag.Title = TerminologyHelper.Instance.GetTermCapital(TermsEnum.Supervisor) +" Registration";
+    var userModel = Model;
+    var usr = new UserInfo();
+    var layoutConfig = Gsmu.Api.Data.ViewModels.Layout.LayoutManager.PublicLayoutConfiguration;
+
+    DataLists dlists = new DataLists();
+    UserWidget userwidgets = dlists.UserWidgets("SupervisorDashAddnew");
+    
+    int iwgt = 0;
+    string formId = "";
+    
+}
+
+@section Head {
+    @Scripts.Render("~/Areas/Public/Scripts/ExtFieldValidation.js")
+    @{Html.RenderPartial("UserWidgetStores");}
+}
+
+<script type="text/javascript">
+
+    var globalusr ='';
+    function AgreeDisclaimer() {
+        $("#divdregistration").show();
+        $("#divdsclaimer").hide();
+    }
+
+    function ShowUserPrivacyPolicy() {
+        if ($("#UserPrivacyPolicy").css("display") == "block") {
+            $("#UserPrivacyPolicy").hide();
+        } else {
+            $("#UserPrivacyPolicy").slideDown("slow", function () {
+                $("#SubmitRegistrationButton").focus();
+            });
+        }
+    }
+
+    function InitSumbitFormUserRegistration() {
+        //if (InitSumbitFormUserIdentity()) {
+        SumbitFormUserRegistration();
+        //};
+    }
+
+
+    // check ref cart.SubmitRegistration([atsum]ViewBag.PrivacyReq)
+    function SumbitFormUserRegistration() {
+        var wgtCount = 0;
+        var wgtRunCountr = 0;
+        var formtitle = "";
+
+        @foreach (var col in userwidgets.Column.OrderBy(c => c.DispSort))
+        {
+            foreach (var wdgt in userwidgets.Widgets.Where(cl => cl.ColID == col.ID).OrderBy(l => l.DispSort)){
+                formId = "UserWdgt" + wdgt.ID.ToString() + "Form";    
+                <text>
+                    wgtCount += 1;
+
+                var validform = true;
+                var UserForm = Ext.getCmp('@formId').getForm();
+                formtitle += "@Html.Raw(wdgt.Title).<br />"
+
+                if (!UserForm.isValid()) {
+                    validform = false;
+                }
+
+
+                //for customized validators 
+                UserForm.getFields().filterBy(function(x) {
+                    if (x.validate === undefined) {
+                        return;
+                    }
+                    if( x.customizedvalidation){
+
+                        if(x.invalidText != undefined && x.invalidText !='' && !x.wasValid){
+                            x.setActiveErrors(x.invalidText);
+                            validform = false;
+                        }else{
+                            x.clearInvalid();
+                        }
+                    }
+                    if(x.vtype == "checkReqMultiselct"){
+                        if(!checkReqMultiselct(x)){validform = false;}
+                    }
+
+                });
+                </text>
+            }}
+
+        if(!validform){
+            Ext.Msg.alert("Invalid Entry", formtitle + "<br />Please check error indicator(s).");
+            return;
+        }
+
+        var userid = 0;
+        @{
+            WidgetColumn frstcol = userwidgets.Column.OrderBy(c => c.DispSort).First();
+            WidgetInfo frstwdgt = userwidgets.Widgets.Where(cl => cl.ColID == frstcol.ID).OrderBy(l => l.DispSort).First();
+            formId = "UserWdgt" + frstwdgt.ID.ToString() + "Form";         
+        }
+        if  (Ext.util.Cookies.get('post-registration-action') != "checkout") {
+            Ext.util.Cookies.set('post-registration-action', 'Dashboard');
+        }
+
+        var form = Ext.getCmp('@formId').getForm();
+        form.submit({
+            url: '/public/user/SubmitUserInfo',
+            method: 'POST',
+            waitMsg: 'Processing...',
+            success: function (form, action) {
+                userid = action.result.userid;
+                var username = action.result.username;
+                globalusr = username;
+                wgtRunCountr += 1;
+                if (wgtRunCountr == wgtCount) {
+                    ShowRegisterUserAcknowledgement(username);
+                }
+
+
+
+                @foreach (var col in userwidgets.Column.OrderBy(c => c.DispSort))
+                {
+                    foreach (var wdgt in userwidgets.Widgets.Where(cl => cl.ColID == col.ID).OrderBy(l => l.DispSort)){
+                        iwgt = iwgt+1;
+                        formId = "UserWdgt" + wdgt.ID.ToString() + "Form"; 
+                        string useridId = formId + "userid";
+                        if(iwgt>1){
+                            <text>
+
+                            Ext.getCmp("@useridId").setValue(userid);
+
+                            var subform = Ext.getCmp('@formId').getForm();
+                            subform.submit({
+                                url: '/public/user/SubmitUserInfo',
+                                method: 'POST',
+                                waitMsg: 'Processing...',
+                                success: function (form, action) {
+                                    wgtRunCountr += 1;
+                                    if (wgtRunCountr == wgtCount) {
+                                        ShowRegisterUserAcknowledgement(username);
+                                    }
+                                },
+                                failure: function (form, action) {
+                                    Ext.Msg.alert("@Html.Raw(wdgt.Title)", "Error in submitting data. Please contact your administrator." );
+                                }
+                            });
+
+
+                            </text>
+                        }
+                    }}
+
+
+
+            },
+            failure: function (form, action) {
+                Ext.Msg.alert("@Html.Raw(frstwdgt.Title)", action.result.error);
+            }
+        });
+
+
+    }
+
+    var initCloseRegisterUserDisclaimer = function () {
+
+        if (Ext.util.Cookies.get('post-registration-action') == "Dashboard") {
+            Ext.util.Cookies.clear('post-registration-action');
+            document.location = config.getUrl('public/user/dashboard');
+        }
+        /*
+           else if  (Ext.util.Cookies.get('post-registration-action') == "checkout") {
+               cart.ShowReviewCheckout();
+               Ext.util.Cookies.clear('post-registration-action');
+               Ext.getCmp('acknowledgementwindow').hide();
+               $("#link-login").text("Log Out");
+               $("#link-login").attr("href", "javascript:membership.logout()")
+               $("#btncreateaccount").text("My Account");
+               $("#btncreateaccount").attr("href", "/public/user/dashboard")
+           }
+           else {
+    
+           THIS ALREADY EXECUTES POST REGISTRATION ACTION AUTOMATICALLY BELOW?
+           */
+        cart.CloseRegisterUserDisclaimer()
+        /*
+           }
+           */
+
+    }
+
+    var ShowRegisterUserAcknowledgement = function (username) {
+        var self = this;
+        var window = Ext.create('Ext.window.Window', {
+            modal: true,
+            id:'acknowledgementwindow',
+            border: false,
+            frame: false,
+            header: false,
+            layout: 'anchor',
+            tbar: false,
+            width: 500,
+            height: 300,
+            autoScroll: false,
+            bodyStyle: {
+                backgroundColor: '#ffffff'
+            },
+            listeners: {
+                close: function () {
+                    cart.CloseRegisterUserDisclaimer(username);
+                }
+            }
+        });
+        window.show();
+        window.setLoading(true);
+
+        
+        window.setLoading(false);
+
+        window.setPosition(25, 10);
+        window.setWidth(document.documentElement.clientWidth - 50);
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+        
+        var SupervisorRegAknowledgement = $("#SupervisorRegAknowledgement").html();
+
+        window.update(SupervisorRegAknowledgement)
+
+
+
+    }
+
+    Ext.onReady(function () {
+
+        @foreach (var col in userwidgets.Column.OrderBy(c => c.DispSort))
+        {
+            foreach (var wdgt in userwidgets.Widgets.Where(cl => cl.ColID == col.ID).OrderBy(l => l.DispSort)){
+                formId = "UserWdgt" + wdgt.ID.ToString() + "Form";    
+                <text>
+                var RstUserForm = Ext.getCmp('@formId').getForm();
+                RstUserForm.reset();
+                </text>
+            }}
+
+
+
+    });
+
+
+</script>
+<div style="float: left; width:100%">
+    <div style="float: left;width:100%; margin-left:10px">Please enter information required.</div>
+
+    <form id="registuserall" method="post">
+
+   <div style="float: left;width:100%;">
+
+    @foreach (var col in userwidgets.Column)
+    {
+        string WidthPer = col.WidthPer.ToString() + "%";
+        
+    <text>
+
+        <div style="width:@WidthPer ;float: left; padding:10px">
+
+            @foreach (var wdgt in userwidgets.Widgets.Where(cl => cl.ColID == col.ID).OrderBy(l => l.DispSort))
+            {
+                
+            <text>
+	        <div>                
+               @{Html.RenderAction("UserWidget", "user", new { userwidget = userwidgets, widgetmodel = wdgt, cmd = "addnew", usergroup = "SP" });}
+	        </div>
+            </text>
+            }
+
+        </div>
+
+    </text>
+    }
+
+    </div>
+
+
+
+    </form>
+    <br />
+
+    <div style="float: left;width:100%; padding:20px;">
+        <br>
+                    <a href="javascript:InitSumbitFormUserRegistration();" id="SubmitRegistrationButton"
+                        class="simpleCart_checkout hudbtn primary left"
+                        style="height: 30px; font-size: 15px; vertical-align: central; width: auto; float: left;"
+                        >
+                        <div style="display: inline-block;" class="button-component" data-button-type="@LayoutButton.CreateAccount.ToString()">
+                            Submit
+                        </div>
+                    </a>
+<br><br>
+        
+
+    </div>
+</div>
+
+<div id="SupervisorRegAknowledgement" style="display:none">
+
+    <div id="rContainer" class="sd-cntr">
+        <div class="sd-rcc" id="newUserCnt" style="margin-top: 50px;">
+            <div class="sd-txtA">Thank you!</div>
+            <br>
+            <br>
+            <div class="sd-rts">Your account has been created and you can now log in by using your username and password. 
+                <br />
+
+            </div>
+            <br>
+            <br>
+            <div>
+                <input type="button" value="Continue" id="register_signin" class="btn btn-prim sd-sgnBtn" onclick="window.initCloseRegisterUserDisclaimer()">
+            </div>
+            <br>
+            <br>
+        </div>
+    </div>
+ 
+</div>

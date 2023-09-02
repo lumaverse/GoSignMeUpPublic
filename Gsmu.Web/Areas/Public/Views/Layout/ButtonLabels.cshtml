@@ -1,0 +1,181 @@
+﻿@using Gsmu.Api.Data
+@using Gsmu.Api.Data.ViewModels.Layout
+@{
+    ViewBag.Title = "Labels and button labels";
+    var layoutConfig = LayoutManager.PublicLayoutConfiguration;
+}
+
+
+@section Head {
+    <script type="text/javascript">
+        Ext.onReady(function () {
+            window.LAYOUT.State.isButtonPage = true;
+            window.LAYOUT.EnsureButtonEditing();
+        });
+    </script>
+
+    <style type="text/css">
+        #button-admin fieldset {
+            border: 2px solid #cccccc;
+            border-radius: 3px;
+            margin-bottom: 20px;
+        }
+
+        #button-admin fieldset legend {
+            font-size: 1.4em;
+            font-weight: bold;
+            padding-top: 3px;
+            padding-bottom: 3px;
+        }
+
+        .button-box {
+            float: left;
+            margin-right: 5px;
+        }
+
+        .button-box-title {
+            margin-bottom: 5px;
+            font-size: 10px;
+            color: silver;
+        }
+
+        .button-box-button {
+            float: left;
+            cursor: pointer;
+        }
+
+        .button-search {
+            font-weight: bold;
+            font-size: 1.5em;
+            color: #bbbbbb;
+            display: block;
+            width: 400px;
+            border: solid 1px #aaaaaa;
+            padding: 3px;
+            cursor: pointer;
+        }
+    </style>
+}
+
+<div id="button-admin">
+    <fieldset>
+        <legend>
+            <img src="@Url.Content("~/images/icons/famfamfam/information.png")" style="vertical-align: middle;"/> Information
+        </legend>
+
+        To edit the labels/buttons, just double click the actual text or use the pencil icon that appears when you hover your mouse over the button ...
+    </fieldset>
+
+    <fieldset>
+        <legend>
+            Commerce
+        </legend>
+
+        <div class="button-box">
+            <div class="button-box-title">
+                Add to cart
+            </div>
+            <div class="button-box-button cart-button button-addtocart button-component" data-button-type="@LayoutButton.AddToCart.ToString()">
+                @Settings.Instance.GetMasterInfo4().PublicButtonLabelAddToCart
+            </div>
+        </div>
+        
+        <div class="button-box">
+            <div class="button-box-title">
+                Checkout
+            </div>
+            <div class="button-box-button hudbtn primary button-component button-checkout" data-button-type="@LayoutButton.Checkout.ToString()">
+                @Settings.Instance.GetMasterInfo4().PublicButtonLabelCheckout
+            </div>
+        </div>
+        
+        <div class="button-box">
+            <div class="button-box-title">
+                Empty cart
+            </div>
+            <div class="button-box-button">
+                <a href="javascript:;" class="hudbtn left button-component" data-button-type="@LayoutButton.EmptyCart.ToString()">@layoutConfig.LayoutButtons.EmptyCart</a>
+            </div>
+        </div>        
+
+    </fieldset>
+
+    <fieldset>
+        <legend>
+            Course catalog
+        </legend>
+
+        <div class="button-box">
+            <div class="button-box-title">
+                Enrolled
+            </div>
+            <div class="button-box-button hudbtn info button-enrolled button-component" data-button-type="@LayoutButton.Enrolled.ToString()">
+                @Settings.Instance.GetMasterInfo4().PublicButtonLabelEnrolled
+            </div>
+        </div>
+    
+        <div class="button-box">
+            <div class="button-box-title">
+                Wait space available
+            </div>
+            <div>
+                <div class="button-box-button cart-button button-addtocart button-component" data-button-type="@LayoutButton.WaitSpaceAvailable.ToString()">
+                    @layoutConfig.LayoutButtons.WaitSpaceAvailable
+                </div>
+            </div>
+        </div>
+
+        <div class="button-box">
+            <div class="button-box-title">
+                Class full
+            </div>
+            <div class="button-box-button button-class-full button-component" data-button-type="@LayoutButton.ClassFull.ToString()">@layoutConfig.LayoutButtons.ClassFull</div>
+        </div>
+
+    </fieldset>
+
+    <fieldset>
+        <legend>
+            Membership
+        </legend>
+
+        <div class="button-box">
+            <div class="button-box-title">
+                Create account
+            </div>
+            <div class="button-box-button btn btn-prim sd-sgnBtn button-component" data-button-type="@LayoutButton.CreateAccount.ToString()">
+                @layoutConfig.LayoutButtons.CreateAccount
+            </div>
+        </div>
+
+        <div class="button-box">
+            <div class="button-box-title">
+                Login
+            </div>
+            <div class="button-box-button btn btn-prim sd-sgnBtn button-component" data-button-type="@LayoutButton.Login.ToString()">
+                @layoutConfig.LayoutButtons.Login
+            </div>
+        </div>
+
+    </fieldset>
+
+    <fieldset>
+        <legend>
+            Misc.
+        </legend>
+
+        <div class="button-box">
+            <div class="button-box-title">
+                Search
+            </div>
+            <div>
+                <div class="button-box-button button-search button-component" data-button-type="@LayoutButton.Search.ToString()">
+                    @layoutConfig.LayoutButtons.Search
+                </div>
+            </div>
+        </div>
+    
+
+    </fieldset>
+
+</div>

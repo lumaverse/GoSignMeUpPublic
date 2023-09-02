@@ -1,0 +1,33 @@
+﻿
+@{
+    ViewBag.Title = "Confirmation";
+}
+<br />
+    <input type="hidden" value="@Html.Raw(ViewBag.OrderNo)" id="OrderNumber" style="width:530px;" class="textbox-cc" />
+    <input type="hidden" value="@Html.Raw(ViewBag.OrderTotal)" id="OrderTotal" style="width:530px;" class="textbox-cc" />
+    <input type="hidden" value="@Html.Raw(ViewBag.ChasePaymentType)" id="ChasePaymentType" style="width:530px;" class="textbox-cc" />
+    <input type="hidden" value="@Html.Raw(ViewBag.ChaseResult)" id="ChaseResult" style="width:530px;" class="textbox-cc" />
+    <input type="hidden" value="@Html.Raw(ViewBag.ChaseAuthNum)" id="ChaseAuthNum" style="width:530px;" class="textbox-cc" />
+    <input type="hidden" value="@Html.Raw(ViewBag.ChasePaymentNumber)" id="ChasePaymentNumber" style="width:530px;" class="textbox-cc" />
+    <input type="hidden" value="@Html.Raw(ViewBag.ChaseRefNumber)" id="ChaseRefNumber" style="width:530px;" class="textbox-cc" />
+
+<div id="confirmationprint">
+@if(ViewBag.Result=="000")
+{
+    <div>Processing Receipt...</div>
+}
+</div>
+<br />
+@if(ViewBag.Result=="000")
+{
+    @Html.Raw(ViewBag.GoogleAnalyticsSetUpScript != null || ViewBag.GoogleAnalyticsSetUpScript != "" ? ViewBag.GoogleAnalyticsSetUpScript : "")
+    <script>
+     Cart.prototype.ShowConfirmationPageforPaygov();
+    </script>
+}
+else
+{
+        <script>
+            window.location.assign("/")
+    </script>
+}

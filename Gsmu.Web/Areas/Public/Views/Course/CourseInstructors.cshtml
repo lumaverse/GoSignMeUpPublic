@@ -1,0 +1,174 @@
+@model Gsmu.Api.Data.School.Course.CourseModel
+@{
+
+    var courseModel = Model;
+    var course = courseModel.Course;
+    var times = courseModel.CourseTimes;
+    var csetting = courseModel.CourseSettings;
+    var instructorlist = courseModel.Instructors;
+
+    int numofinstructor = instructorlist.Count;
+    var wgname = Gsmu.Api.Data.School.Terminology.TerminologyHelper.Instance.GetTermCapital(Gsmu.Api.Data.School.Terminology.TermsEnum.Instructor);
+    if (numofinstructor > 1)
+    {
+        wgname = Gsmu.Api.Data.School.Terminology.TerminologyHelper.Instance.GetTermCapital(Gsmu.Api.Data.School.Terminology.TermsEnum.Instructors);
+    }
+
+    var wgcontainer = "Course" + wgname + "Container";
+    var wgcontainerDet = "Course" + wgname + "ContainerDet";
+
+    var panelname = Gsmu.Api.Data.School.Terminology.TerminologyHelper.Instance.GetTermCapital(Gsmu.Api.Data.School.Terminology.TermsEnum.Instructor);
+    int counter = 0;
+    var minheight = "120px";
+    if (numofinstructor > 0)
+    {
+        if (numofinstructor == 1)
+        {
+            minheight = "220px";
+        }
+        if (numofinstructor == 2)
+        {
+            minheight = "300px";
+        }
+    }
+}
+
+<script>
+    function CourseInstructorsOpenWindow(InstFulInfoID) {
+
+        var htmldta = $("." + InstFulInfoID).html();
+
+        var cntrpanel = Ext.create('Ext.form.Panel', {
+            border: false,
+            frame: false,
+            bodyPadding: 10,
+            html: htmldta
+        });
+
+        var window = Ext.create('Ext.window.Window', {
+            modal: true,
+            bodyStyle: {
+                backgroundColor: '#ffffff'
+            },
+            layout: 'anchor',
+            tbar: false,
+            title: 'Biography',
+            width: 700,
+            height: document.documentElement.clientHeight - 40,
+            autoScroll: true,
+            items: cntrpanel
+        });
+
+        window.show();
+
+
+    }
+
+</script>
+
+<div id="CourseInstructorsContainer" class="course-widgetbox" style="min-height:@minheight;">
+    <div class="course-widgetbox-smheader">
+        @wgname
+    </div>
+    <div id="@wgcontainerDet" style="padding:5px;margin:5px; ">
+
+        <div class="panel-group" id="accordion">
+            @foreach (var inst in instructorlist)
+            {
+                counter = counter + 1;
+                string cntr = counter.ToString();
+                string InstFulInfoID = "InstFulInfoID" + cntr;
+
+                string ProfileImageFolder = "/Images/Profiles/";
+                string OldProfileImageFolder = ViewBag.V3InstructorImage;
+                string NoProfileImagePath = Url.Content(Gsmu.Api.Data.WebConfiguration.NoProfileImageVirtualPath);
+                string ProfileImagePath = NoProfileImagePath;
+                string OldProfileImagePath = "";
+
+                if (!string.IsNullOrWhiteSpace(inst.PhotoImage))
+                {
+                    ProfileImagePath = ProfileImageFolder + inst.PhotoImage;
+                    OldProfileImagePath = OldProfileImageFolder + inst.PhotoImage;
+
+                    if (System.IO.File.Exists(HttpContext.Current.Request.MapPath(ProfileImagePath)))
+                    {
+                        ProfileImagePath = ProfileImagePath;
+                    }
+                    else if (System.IO.File.Exists(HttpContext.Current.Request.MapPath(OldProfileImagePath)))
+                    {
+                        ProfileImagePath = OldProfileImagePath;
+                    }
+                    else
+                    {
+                        ProfileImagePath = NoProfileImagePath;
+                    }
+
+                }
+                string collpseaccdn = "";
+                if (counter == 1) { collpseaccdn = "in"; }
+                <text>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#@InstFulInfoID">
+                                <b>@Html.Raw(inst.FIRST)&nbsp; @Html.Raw(inst.LAST)</b>
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="@InstFulInfoID" class="panel-collapse collapse @collpseaccdn">
+                        <div class="panel-body">
+
+                            <img src="@ProfileImagePath" style="float:left; margin-right:12px; max-height:140px" alt="Photo Not Available" />
+                            @try
+                            {
+
+                                if (inst.Bio.Length > 150)
+                                {
+                                    <p>
+                                        <div class="courseBioIns" style="height: 98px; overflow: hidden;text-overflow: ellipsis;">@Html.Raw(inst.Bio)</div>
+                                        <a href="javascript:CourseInstructorsOpenWindow('@InstFulInfoID')">...</a>
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p>@Html.Raw(inst.Bio)</p>
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                            }
+                            <div id="@InstFulInfoID" class="@InstFulInfoID" style="display:none; height:0px">
+                                <div style="height:100%; background-color:white">
+                                    <div style="width:100%; text-align:center">
+                                        <img src="@ProfileImagePath" height="400" alt="Photo Not Available" />
+                                    </div>
+                                    <div style="width:100%; text-align:center;font-weight:bold; font-size:17px; margin-top:5px">
+                                        @Html.Raw(inst.FIRST)&nbsp;@Html.Raw(inst.LAST)
+                                    </div>
+                                    <div style="width:100%; font-family:Arial;">
+                                        <p>@Html.Raw(inst.Bio)</p>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+                </text>
+            }
+
+
+
+            </div>
+
+      
+    </div>
+</div>
+
+
+<style>
+    #s6 .ui-accordion-content {
+        height: 170px;
+    }
+</style>

@@ -1,0 +1,615 @@
+@using Gsmu.Api.Data;
+@using Gsmu.Api.Data.School;
+@using Gsmu.Api.Data.School.User;
+@using json = Newtonsoft.Json
+@model UserModel
+
+@{
+    string cmd = ViewBag.cmd;
+
+    DataLists dlists = new DataLists();
+    var userModel = Model;
+    string LoadWidgetDashboard = WebConfiguration.LoadWidgetDashboard;
+    var comma = string.Empty;
+    // note: the value "vlu" in datastore must always be string
+}
+<script type="text/javascript">
+
+    var schoolnewvalue ='';
+    var districtnewvalue = '';
+    var schoolcntrlid ='';
+    var districtcntrlid = '';
+    var gradecntrlid = '';    
+    var dasboardadminmode = false;
+
+    @if (1 == 1)
+{
+    <text>
+    var storeState = Ext.create('Ext.data.Store', {
+        fields: ['vlu', 'txt'],
+        remoteFilter: false,
+        data: [
+        @foreach (var item in dlists.States)
+        {<text>
+            @comma { "vlu": @Html.Json(item.vlu.ToString()), "txt": @Html.Json(item.txt) }
+    </text>
+            comma = ",";
+        }
+    ]});
+
+    @{
+        comma = string.Empty;
+    }
+
+    var storedistrictfield = Ext.create('Ext.data.Store', {
+        remoteFilter: false,
+        fields: ['vlu', 'txt'],
+        data: [
+        @foreach (var item in dlists.Districts)
+    {<text>
+       @comma { "vlu": @Html.Json(item.DISTID.ToString()), "txt": @Html.Json(item.DISTRICT1) }
+        </text>
+        comma = ",";
+    }
+    ]
+    });
+
+    @{
+        comma = string.Empty;
+    }
+
+ 
+    var storeschoolfield = Ext.create('Ext.data.Store', {
+        remoteFilter: false,
+        fields: ['vlu', 'txt'],
+        data: [
+        @foreach (var item in dlists.Schools.OrderBy(s => s.SortOrder))
+    {<text>
+        @comma { "vlu": @Html.Json(item.locationid.ToString()), "txt": @Html.Json(item.LOCATION) }
+        </text>
+        comma = ",";
+    }
+    ]
+    });
+
+    @{
+        comma = string.Empty;
+    }
+
+
+    var storeschoolfieldForFilter = Ext.create('Ext.data.Store', {
+        fields: ['vlu', 'txt', 'district'],
+        autoLoad: true,
+        autoSync: true,
+        remoteFilter: true,
+        proxy: {
+            type: 'ajax',
+            url: 'user/WidgetFilterSchool',
+            reader: {
+                type: 'json',
+                rootProperty: 'data',
+            }
+        }
+
+    });
+
+    var supervisorslevelfield= Ext.create('Ext.data.Store', {
+        remoteFilter: false,
+        autoLoad: false,
+        fields: ['vlu', 'txt'],
+        data: [
+        @foreach (var item in dlists.Supervisors)
+            {<text>
+                @comma { "vlu": @Html.Json(item.SUPERVISORID.ToString()), "txt": @Html.Json(item.LAST +", " +item.FIRST) }
+                </text>
+                comma = ",";
+            }
+            ]
+            });
+    @{
+        comma = string.Empty;
+    }
+    var gradelevelfield = Ext.create('Ext.data.Store', {
+        remoteFilter: false,
+        fields: ['vlu', 'txt'],
+        data: [
+        @foreach (var item in dlists.GradeLevels.OrderBy(a => a.GRADE))
+        {<text>
+            @comma { "vlu": @Html.Json(item.GRADEID.ToString()), "txt": @Html.Json(item.GRADE) }
+        </text>
+            comma = ",";
+        }
+        ]
+    });
+
+    @{
+        comma = string.Empty;
+    }
+
+
+
+    var gradelevelfieldForFilter = Ext.create('Ext.data.Store', {
+        fields: ['vlu', 'txt', 'schoolid'],
+        autoLoad: true,
+        autoSync: true,
+        remoteFilter: true,
+        proxy: {
+            type: 'ajax',
+            url: 'user/WidgetFilterGrade',
+            reader: {
+                type: 'json',
+                rootProperty: 'data',
+            }
+        }
+
+    });
+
+
+    var storeGender = Ext.create('Ext.data.Store', {
+        fields: ['vlu', 'txt'],
+        remoteFilter: false,
+        data: [
+        @foreach (var item in dlists.Genders)
+        {<text>
+            @comma { "vlu": @Html.Json(item.vlu.ToString()), "txt": @Html.Json(item.txt) }
+        </text>
+            comma = ",";
+        }
+        ]});
+
+    @{
+        comma = string.Empty;
+    }
+
+    var storeEthnicity1 = Ext.create('Ext.data.Store', {
+        remoteFilter: false,
+        fields: ['vlu', 'txt'],
+        data: [
+        @foreach (var item in dlists.Ethnicities1)
+        {<text>
+            @comma { "vlu": @Html.Json(item.vlu.ToString()), "txt": @Html.Json(item.txt) }
+        </text>
+            comma = ",";
+        }
+        ]});
+
+    @{
+        comma = string.Empty;
+    }
+
+    var storeYesNo = Ext.create('Ext.data.Store', {
+        fields: ['vlu', 'txt'],
+        remoteFilter: false,
+        data: [
+        @foreach (var item in dlists.YesNos)
+        {<text>
+            @comma { "vlu": @Html.Json(item.vlu.ToString()), "txt": @Html.Json(item.txt) }
+        </text>
+            comma = ",";
+        }
+        ]});
+
+    @{
+        comma = string.Empty;
+    }
+
+
+    var storeEthnicity2 = Ext.create('Ext.data.Store', {
+        fields: ['vlu', 'txt'],
+        remoteFilter: false,
+        data: [
+        @foreach (var item in dlists.Ethnicities2)
+        {<text>
+            @comma { "vlu": @Html.Json(item.vlu.ToString()), "txt": @Html.Json(item.txt) }
+        </text>
+            comma = ",";
+        }
+        ]});
+
+    @{
+        comma = string.Empty;
+    }
+
+    var storeRace = Ext.create('Ext.data.Store', {
+        fields: ['vlu', 'txt'],
+        remoteFilter: false,
+        data: [
+        @foreach (var item in dlists.Races)
+        {<text>
+            @comma { "vlu": @Html.Json(item.vlu.ToString()), "txt": @Html.Json(item.txt) }
+        </text>
+            comma = ",";
+        }
+        ]});
+
+    @{
+        comma = string.Empty;
+    }
+
+
+
+    var storeCountry = Ext.create('Ext.data.Store', {
+        fields: ['vlu', 'txt'],
+        remoteFilter: false,
+        data: [
+        @foreach (var item in dlists.Countries)
+        {<text>
+            @comma { "vlu": @Html.Json(item.countrycode.ToString()), "txt": @Html.Json(item.countryname) }
+        </text>
+            comma = ",";
+        }
+        ]});
+
+    @{
+        comma = string.Empty;
+    }
+
+    var storeDistemployee = Ext.create('Ext.data.Store', {
+        fields: ['vlu', 'txt'],
+        remoteFilter: false,
+        data: [
+        @foreach (var item in dlists.Distemployees)
+        {<text>
+            @comma { "vlu": @Html.Json(item.vlu.ToString()), "txt": @Html.Json(item.txt) }
+        </text>
+            comma = ",";
+        }
+        ]});
+
+
+    @for (int i = 0; i < 20; i++)
+    {
+        var storename = "studregfield" + i + "storeCustomList";
+        <text>
+            var @storename = null;
+        </text>
+    }
+
+
+    @foreach (var item in dlists.DemographicFields)
+    {
+        string dlstfldname = item.FieldName;
+        dlstfldname = string.Join("", dlstfldname.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries));
+		
+        var storename = dlstfldname + "storeCustomList";
+        if (item.MaskNum == 26)
+        {
+            var CustomList = item.FieldCustomList;
+            string[] CustomListArr = CustomList.Split('~');
+
+        <text>
+
+        @{
+            comma = string.Empty;
+        }
+
+
+        var @storename = Ext.create('Ext.data.Store', {
+            fields: ['vlu', 'txt'],
+            remoteFilter: false,
+            data: [
+            @foreach (var subitem in CustomListArr)
+            {
+                if (!string.IsNullOrWhiteSpace(subitem))
+                {
+             <text>
+                @comma { "vlu": @Html.Json(subitem.ToString()),"txt": @Html.Json(subitem)}
+            </text>
+                    comma = ",";
+                }
+            }
+            ]});
+
+        </text>
+        }else{
+        <text>
+            var @storename = null;
+        </text>
+        }
+    }
+</text>
+}
+
+    var multiseldta = function(fldname,fldcnt,fldid){
+        var dta = "";
+        for (var fldi=1; fldi<=fldcnt; fldi++)
+        {
+            if(Ext.getCmp(fldname + fldi).value){dta += Ext.getCmp(fldname + fldi).inputValue + ","}
+        }
+        Ext.getCmp(fldid).setValue(dta);
+    }
+
+
+    var multilistdta = function(dta,fldid){
+        Ext.getCmp(fldid).setValue(dta);
+    }
+
+
+
+
+    var UserStudentPresetWidgets = Ext.create('Ext.data.Store', {
+        fields: ['vlu', 'txt'],
+        data: [
+
+            { "vlu": [{
+                "Title":"Actions",
+                "Nametxt":"actions",
+                "Url":"UserActions?cmd=addnew",
+                "PanelID":"UserDashboardActions"
+            }], "txt": "Admin Actions" },
+
+            { "vlu": [{
+                "Title":"Reports",
+                "Nametxt":"reports",
+                "Url":"UserReports?cmd=addnew",
+                "PanelID":"UserDashboardReports"
+            }], "txt": "Admin Reports" },
+
+            { "vlu": [{
+                "Title":"Certificate and Certification",
+                "Nametxt":"certandcertifcation",
+                "Url":"UserCertificates?cmd=addnew",
+                "PanelID":"UserDashboardCertificates"
+            }], "txt": "Certificate" },
+
+            { "vlu": [{
+                "Title":"Courses",
+                "Nametxt":"courses",
+                "Url":"UserCourses?cmd=addnew",
+                "PanelID":"UserDashboardCourses"
+            }], "txt": "Courses" },
+
+            { "vlu": [{
+                "Title":"Received Emails",
+                "Nametxt":"recievdemails",
+                "Url":"UserEmails?cmd=addnew",
+                "PanelID":"UserDashboardReceivedEmail"
+            }], "txt": "Emails" },
+
+            { "vlu": [{
+                "Title":"Role",
+                "Nametxt":"role",
+                "Url":"UserRoles?cmd=addnew",
+                "PanelID":"UserDashboardRoles"
+            }], "txt": "Roles" },
+
+            { "vlu": [{
+                "Title": "@Settings.Instance.GetMasterInfo2().CreditHoursName Transactions",
+                "Nametxt":"coursehours",
+                "Url":"UserReportsCourseTransactions?cmd=addnew",
+                "PanelID":"UserDashCourseHoursTransactions"
+            }], "txt": "@Settings.Instance.GetMasterInfo2().CreditHoursName Transactions" },
+
+            { "vlu": [{
+                "Title":"Surveys",
+                "Nametxt":"surveys",
+                "Url":"UserSurveys?cmd=addnew",
+                "PanelID":"UserDashboardSurveys"
+            }], "txt": "Surveys" }
+
+        ]
+    });
+
+
+    var loadWidgetFields = function (widgetmodel,cmd,usergroup) {
+
+        var urltxt = 'public/user/UserWidget';
+
+        if (widgetmodel.WidgetType == "preset")
+        { 
+            if(typeof(widgetmodel.Url)=='undefined' || widgetmodel.Url==null){
+                //console.log('Error widget url: '+ widgetmodel.Nametxt)
+                window.LAYOUT.UnmaskLayout();
+                return;
+            }
+            urltxt = 'public/user/' + widgetmodel.Url; 
+        }
+
+        var element = Ext.get(document.getElementById(widgetmodel.ID));
+        if(element){
+            element.load({
+                url: config.getUrl(urltxt),
+                timeout : 1800000,
+                params: {
+                    txtuserwidget: JSON.stringify(widgt),
+                    txtwidgetmodel: JSON.stringify(widgetmodel),
+                    txtfld: '{"data":'+ JSON.stringify(fldprop) +'}',
+                    cmd: cmd,
+                    cmode: 'txt',
+                    usergroup: usergroup
+                },
+                scripts: true,
+                loadMask: true
+            });
+        
+        }
+    }
+
+
+    var WidgetTotalCount = 0;
+    var TempWidget = [];
+
+    var LoopSeqloadWidgetFields = function (iwdgt,cmd,usergroup){
+        var widgetmodel = widgt.Widgets[iwdgt]
+        var urltxt = 'public/user/UserWidget';
+        
+        if("@LoadWidgetDashboard" == "one" || cmd=="addnew"){
+            window.LAYOUT.MaskLayout('Loading '+ (iwdgt+1) +' of '+ WidgetTotalCount + ': ' +  widgetmodel.Title);
+        }else{
+            window.LAYOUT.MaskLayout('Loading ...');
+        }
+
+        if (widgetmodel.WidgetType == "preset")
+        { 
+            if(typeof(widgetmodel.Url)=='undefined' || widgetmodel.Url==null){
+                window.LAYOUT.UnmaskLayout();
+                return;
+            }
+            urltxt = 'public/user/' + widgetmodel.Url; 
+        }
+
+        Ext.Ajax.request({
+            url: config.getUrl(urltxt),
+            timeout : 1800000,
+            params: {
+                txtuserwidget: JSON.stringify(widgt),
+                txtwidgetmodel: JSON.stringify(widgetmodel),
+                txtfld: '{"data":'+ JSON.stringify(fldprop) +'}',
+                cmd: cmd,
+                cmode: 'txt',
+                usergroup: usergroup
+            },
+            success:function(response){
+                
+                if("@LoadWidgetDashboard" == "one" || cmd=="addnew"){
+                    var element = Ext.get(document.getElementById(widgetmodel.ID));
+                    element.setHtml(response.responseText, true);
+                }else{
+                    TempWidget.push(response.responseText);
+                }
+                iwdgt++;
+                if(iwdgt>=WidgetTotalCount){
+                    //end loop
+                    if("@LoadWidgetDashboard" == "one" || cmd=="addnew"){
+                        window.LAYOUT.UnmaskLayout(); 
+                    }else{
+                        AnimateloadAllWidget();
+                    }
+                    return;
+                }
+                LoopSeqloadWidgetFields(iwdgt,cmd,usergroup)
+            },
+            failure:function(response){
+                console.log("error:"+ widgetmodel.Title)
+        }
+    });	 
+    }
+
+    var AnimateloadAllWidget = function () {
+        for (var iwdgt = 0; iwdgt < widgt.Widgets.length; iwdgt++) {
+            for (var icol = 0; icol < widgt.Column.length; icol++) {
+                var ColID = widgt.Column[icol].ID
+                if (widgt.Widgets[iwdgt].ColID == ColID) {
+
+                    var element = Ext.get(document.getElementById(widgt.Widgets[iwdgt].ID));
+                    element.setHtml(TempWidget[iwdgt], true);
+
+                    //$("#"+ widgt.Widgets[iwdgt].ID).hide();
+                    $("#"+ widgt.Widgets[iwdgt].ID).addClass("widgtclass");
+                }
+            }
+        }
+        
+        $(".widgtclass").show("fold");
+        
+        setTimeout(function(){ 
+
+            $('.x-panel.x-panel-default-framed').each(function(i, obj) {
+                var curid = $(this).attr('id');
+                Ext.getCmp(curid).doLayout()
+            });
+
+        }, 500);
+
+        window.LAYOUT.UnmaskLayout();
+        
+    }
+
+    var loadAllWidgetFields = function (cmd,usergroup) {
+        WidgetTotalCount = 0;
+        for (var icol = 0; icol < widgt.Column.length; icol++) {
+            var ColID = widgt.Column[icol].ID
+            var DomID = "columncontnum" + ColID;
+
+            for (var iwdgt = 0; iwdgt < widgt.Widgets.length; iwdgt++) {
+                if (widgt.Widgets[iwdgt].ColID == ColID) {
+                    WidgetTotalCount += 1;
+                    //loadWidgetFields(widgt.Widgets[iwdgt],cmd,usergroup);
+                }
+            }
+        }
+        LoopSeqloadWidgetFields(0,cmd,usergroup);
+    }
+
+    var SumbitUserFormWidget = function (formid, widgetmodel,usergroup) {
+
+        var form = Ext.getCmp(formid).getForm();
+        console.log("submit form")
+        if (form.isValid()) {
+            vals = form.getValues();
+            for (var i in vals)
+                console.log(vals[i])
+                if (vals[i] !== '') {
+                    //doSubmit = true;
+
+                    //break;
+                }
+
+            console.log(form.getValues())
+            form.submit({
+                url: '/public/user/SubmitUserInfo',
+                method: 'POST',
+                submitEmptyText: false,
+                waitMsg: 'Processing...',
+                success: function (form, action) {
+                    loadWidgetFields(widgetmodel, 'view',usergroup);
+                },
+                failure: function (form, action) {
+                    Ext.Msg.alert("User Form","Unable to Process the account. Please contact your administrator. UErr101")
+                },
+                
+                    beforeaction: function (form, values, options) {
+                        console.log("before submit")
+                    }
+                
+            });
+
+            //form.on('beforeaction', function (form, action) {
+            //    console.log('before submit')
+            //    if (action.type == 'submit') {
+            //        var doSubmit = false, vals = form.getValues();
+            //        for (var i in vals)
+            //            if (vals[i] !== '') {
+            //                doSubmit = true;
+            //                break;
+            //            }
+            //        return doSubmit;
+            //    }
+            //});
+
+        }else{
+            form.getFields().filterBy(function(x) {
+                if (x.validate === undefined) {
+                    return;
+                }
+                if( x.customizedvalidation){
+                    if(x.invalidText != undefined && x.invalidText !='' && !x.wasValid){
+                        x.setActiveErrors(x.invalidText);
+                    }else{
+                        x.clearInvalid();
+                    }
+                }
+            });
+
+        }
+    }
+
+
+    var UserWidgetAdminModes = Ext.create('Ext.data.Store', {
+        fields: ['vlu', 'txt'],
+        data: [
+            { "vlu": "StudentsDashAddnew", "txt": "Student Registration" },
+            { "vlu": "StudentsDashViewEdit", "txt": "Student Dashboard Edit or View" },
+            { "vlu": "StudentsDashAdmin", "txt": "Student Admin View" },
+
+            { "vlu": "InstructorsDashAddnew", "txt": "Instructor Registration" },
+            { "vlu": "InstructorsDashViewEdit", "txt": "Instructor Dashboard Edit or View" },
+            { "vlu": "InstructorsDashAdmin", "txt": "Instructor Admin View" },
+        ]
+    });
+
+
+
+</script>
+  
+

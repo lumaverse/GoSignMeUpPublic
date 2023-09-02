@@ -1,0 +1,608 @@
+﻿<head>
+    <style>
+        .my-placeholder {
+            color: #aaa;
+        }
+
+        .trCC {
+            display: block;
+        }
+
+        .table-borderless > tbody > tr > td,
+        .table-borderless > tbody > tr > th,
+        .table-borderless > tfoot > tr > td,
+        .table-borderless > tfoot > tr > th,
+        .table-borderless > thead > tr > td,
+        .table-borderless > thead > tr > th {
+            border: none;
+        }
+    </style>
+</head>
+@using Gsmu.Api.Data;
+@using Gsmu.Api.Commerce.ShoppingCart;
+@model Gsmu.Api.Data.ViewModels.CreditCardPaymentModel
+
+@{
+    ViewBag.Title = "Payment";
+
+    var chkout = CheckoutInfo.Instance;
+
+
+    string ActiveCCProcessing = ViewBag.ActiveCCProcessing;
+    bool UseOrbital = (Settings.Instance.GetMasterInfo4().UseOrbital == 0 ? false : true);
+    bool use_BBPaygate = (Settings.Instance.GetMasterInfo3().use_BBPaygate == 0 ? false : true);
+    bool usePayGovRedirect  = (Settings.Instance.GetMasterInfo3().usePayGovRedirect  == 0 ? false : true);
+    bool usePayGovTCS  = (Settings.Instance.GetMasterInfo3().usePayGovTCS == 0 ? false : true);
+    bool UsePayflow  = (Settings.Instance.GetMasterInfo().UsePayflow == 0 ? false : true);
+    bool UseSquare  = (Settings.Instance.GetMasterInfo().UseSquare == 0 ? false : true);
+    bool UseCybersource  = (Settings.Instance.GetMasterInfo().UseCybersource == 0 ? false : true);
+    bool UseAdyen  = (Convert.ToInt64(ViewBag.UseAdyen) == 0 ? false : true);
+    bool UseFirstData  = (Convert.ToInt64(ViewBag.UseFirstData) == 0 ? false : true);
+    bool UseCashNetRedirect  = (Convert.ToInt64(ViewBag.UseCashNetRedirect) == 0 ? false : true);
+    bool UseAuthorizeNet  = (Settings.Instance.GetMasterInfo().UseAuthorizeNet == 0 ? false : true);
+    bool UseAuthorizeNetRedirect = (Settings.Instance.GetMasterInfo().UseAuthorizeNetRedirect == 0 ? false : true);
+    bool UseTouchnetRedirect = (Settings.Instance.GetMasterInfo4().UseTouchnet == 0 ? false : true);
+    bool usenelnetpayment = (Settings.Instance.GetMasterInfo3().usenelnetpayment == 0 ? false : true);
+    var hide_payment_info = Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().HidePaymentInfo;
+    bool UseSpreedly =  (Convert.ToInt64(ViewBag.UseSpreedly) == 0 ? false : true);
+    int idx = 0;
+
+
+}
+<script>
+    $(".paytabs .tab").click(function () {
+
+        $(".paytabs .tab").removeClass("here")
+        $(this).addClass("here");
+
+    });
+
+@if(ViewBag.IsPayPalAdvance){
+    <text>
+    $(function () {
+        $("#itemOtherPayments").val('Credit Card');
+        $("#itemOtherPayments").trigger("change");
+        $(".trCC").css("display", "block")
+    });
+    </text>
+}
+
+
+$( document ).ready(function() {
+
+        var OPselcted = false;
+        var IsThereCC = false;
+        $("#itemOtherPayments").find('option').each(function() {
+            var vlu =  this.value;
+            $(this).removeAttr('selected');
+
+            if ((vlu.toLowerCase().indexOf("@ActiveCCProcessing")>= 0) || (vlu.toLowerCase().indexOf("credit card") >= 0))
+            {
+                $(this).prop("selected", true);
+                OPselcted = true;
+                return false;
+            }
+
+            if ((vlu.toLowerCase().indexOf("credit card") >= 0))
+            {
+                IsThereCC = true;
+            }
+        });
+
+        if(OPselcted == false && "@ActiveCCProcessing" != "none"){
+            $("#itemOtherPayments").append("<option value='Credit Card' selected='selected'>Credit Card</option>");
+        }
+        if("@ViewBag.paynowUserDash" == "0" && IsThereCC == false && "@ActiveCCProcessing" != "none" && ("ViewBag.IsAuthorizedRedirect" == false && "ViewBag.ShowOtherPayments" == true) ){
+            $("#itemOtherPayments").append("<option value='Credit Card' selected='selected'>Credit Card</option>");
+        }
+
+    });
+</script>
+
+<div class="cart-steps-wrap">
+    <div class="cart-steps cart-step3"></div>
+    <ul class="cart-steps-text" style="list-style-type: none;">
+        <li class="cart-step-1 current-step">Log in/ Create Account</li>
+        <li class="cart-step-2">Review</li>
+        @if (hide_payment_info == 0)
+         {
+            <li class="cart-step-3">Payments</li>
+        }
+         else 
+         {
+            <li class="cart-step-3">Processing</li>
+        }
+        <li class="cart-step-4">Receipt & Confirmation</li>
+    </ul>
+</div>
+
+<div style="float: right">
+    <img style="cursor: pointer" onclick="cart.HideReviewCheckout();"
+        src="~/Areas/Public/Images/Layout/btn_close_off.jpg" width="20" height="20" />
+</div>
+
+
+
+
+<table border="0" style="width: 942px; margin-left: 10px;">
+    <tbody>
+        <tr>
+            <td colspan="3">
+
+                <div style="font-size: 15px; color: Black; font-weight: bold; height: 18px; margin-top: 10px;">
+                    @*
+                    @if(chkout.CountPayOptions >1){
+                    <text>
+                    How would you like to pay?
+                    </text>
+                    }
+*@
+                </div>
+                <div id="selectMainBody" class="mainBody">
+                    <input type="hidden" id="inlineDCCAjaxSucceeded" name="inlineDCCAjaxSucceeded" value="false"><input type="hidden" name="CONTROLGROUPPAYMENTBOTTOM$ControlGroupPaymentInputViewPaymentView$InlineDccOfferKey" id="CONTROLGROUPPAYMENTBOTTOM_ControlGroupPaymentInputViewPaymentView_InlineDccOfferKey"><div id="paymentInputContent" class="payform" style="">
+                        @*
+                    <div class="paytabs">
+                        @foreach (PayOption payoptn in chkout.PayOptionList){
+                        idx +=1;
+                        <text>
+                            <div id="Bancnet_tab" class="tab @(idx==1?"here":"")" onclick="cart.SelectPayOption('@payoptn.value')">@payoptn.title <br><span>@payoptn.subtitle</span></div>
+                        </text>
+                        }
+
+                    </div>
+                        *@
+
+
+                    </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <div style="border-top: 2px solid #bfbfbf; height: 12px;">
+                    &nbsp;
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <div style="background-color: #eeeeee; width: 320px; padding: 10px; font-weight: bold; color: black;">
+                    @if(chkout.PaymentCaller != "checkout" && chkout.PaymentCaller != "payclockhours"){
+                    <div style="font-size: 13px; margin-top: 8px; margin-left: 8px;">
+                        OrderNumber: <span>@Html.Raw(ViewBag.OrderID)</span>
+                    </div>
+                    }
+                    <div style="font-size: 18px; margin-top: 8px; margin-bottom: 8px; margin-left: 8px;">
+                        Payment Amount: &nbsp; $@String.Format("{0:0.00}", chkout.PaymentTotal)
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"></td>
+            <td align="right" style="color: #CDCDCD; width: 300px"></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="font-size: 20px;">
+
+                <input type="text" value="@Html.Raw(chkout.OrderNumber)" id="OrderNumber" style="display: none" />
+                <input type="text" value="@Html.Raw(ViewBag.RequiredFieldSetUp)" id="RequiredFieldSetUp" style="display: none" />
+                <input type="text" value="@Html.Raw(chkout.OrderTotal)" id="OrderTotal" style="display: none" />
+                <input type="text" value="@Html.Raw(chkout.PaymentTotal)" id="PaymentTotal" style="display: none" />
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td colspan="2" rowspan="3" style="text-align: center">@using (Html.BeginForm("Process", "Payments", FormMethod.Post, new { id = "creditcardform" }))
+                {
+                    <table style="text-align: left">
+                        <input type="hidden" value="@Html.Raw(ViewBag.IsAuthorizedRedirect)" id="hiddenIsAuthorized" />
+                        <input type="hidden" value="@Html.Raw(ViewBag.IsPayPalAdvance)" id="hiddenIsPaypal" />
+                        <input type="hidden" value="@Html.Raw(ViewBag.UseCashNetRedirect)" id="UseCashNetRedirect" />
+                        <input type="hidden" value="@Html.Raw(ViewBag.ShowCreditCard)" id="hiddenShowCredit" />
+                        <input type="hidden" value="@Html.Raw(ViewBag.IsChasePayment)" id="hiddenIsChasePayment" />
+                        <input type="hidden" value="@Html.Raw(ViewBag.IsPaygov)" id="hiddenIsPaygov" />
+                        <input type="hidden" value="@Html.Raw(ViewBag.IsPaygovTCS)" id="hiddenIsPaygovTCS" />
+                        <input type="hidden" value="@Html.Raw(ViewBag.UseIpay)" id="hiddenIsiPay" />
+                        <input type="hidden" value="@Html.Raw(ViewBag.IsSquare)" id="hiddenIsSquare" />
+                        <input type="hidden" value="@Html.Raw(ViewBag.IsCybersource)" id="hiddenIsCybersource" />
+                        <input type="hidden" value="@Html.Raw(ViewBag.IsFirstData)" id="hiddenIsFirstData" />
+                        <input type="hidden" value="@Html.Raw(ViewBag.IsAdyen)" id="hiddenIsAdyen" />
+                        <input type="hidden" value="@Html.Raw(usenelnetpayment)" id="hiddenIsNelNet" />
+                        <input type="hidden" value="@Html.Raw(UseTouchnetRedirect)" id="hiddenIsTouchnet" />
+                        <input type="hidden" value="@Html.Raw(ViewBag.paynowUserDash)" id="hiddenIsPayNowUserDash" />
+
+                        @if ((ViewBag.IsAuthorized != "authorized") && (!ViewBag.IsAuthorizedRedirect) && (!UseTouchnetRedirect) && (ViewBag.paynowUserDash!=1))
+                        {
+                         <text>
+                            <tr>
+                                <td colspan="2" class="table-cctd">
+                                    <input type="text" value="@Html.Raw(ViewBag.StudentFirstName)" id="StudentFirstName" style="width:260px;" class="textbox-cc" />
+                                </td>
+                                <td colspan="2" class="table-cctd">
+                                    <input type="text" value="@Html.Raw(ViewBag.StudentLastName)" id="StudentLastName" style="width:260px;" class="textbox-cc" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="table-cctd">
+                                    <input type="text" value="@Html.Raw(ViewBag.StudentAddress1)" id="StudentAddress1" style="width:530px;" class="textbox-cc"  />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="table-cctd">
+                                    <input type="text" value="" id="StudentAddress2" style="width: 530px;" class="textbox-cc" placeholder="Address Line 2 (Optional)" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="table-cctd">
+                                    <input type="text" value="@Html.Raw(ViewBag.StudentCity)" id="StudentCity" style="width:530px;" class="textbox-cc" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="table-cctd">
+                                    <input type="text" value="@Html.Raw(ViewBag.StudentState)" id="StudentState" style="width:106px;" class="textbox-cc" />
+                                    <input type="text" value="@Html.Raw(ViewBag.StudentZip)" id="StudentZip" style="width:149px;" class="textbox-cc" />
+                                </td>
+                                <td colspan="2" class="textbox-cc">
+                                    @Html.DropDownList("itemCountryList", null, new { placeholder = "Country", style = "width:247px; height:29px;" })
+                                    @*<input type="text" value="@Html.Raw(ViewBag.StudentCountry)" id="StudentCountry" style="width:255px;" class="textbox-cc" />*@
+                                </td>
+                            </tr>
+                        </text>
+                        }
+
+                         @{
+                             bool showCCMainform = ViewBag.ShowCreditCard;
+                             bool showCCNumbrform = true;
+                             bool hasCCPayment = false;
+
+                             string CCheadr = "Credit Card Payment";
+
+                             if(ViewBag.IsPaygov){
+                                 showCCMainform = false;
+                                 hasCCPayment = true;
+                             }
+                             if (ViewBag.IsPaygovTCS)
+                             {
+                                 showCCMainform = false;
+                                 hasCCPayment = true;
+                             }
+                             if(ViewBag.IsAuthorizedRedirect){
+                                 showCCMainform = false;
+                                 hasCCPayment = true;
+                             }
+                             if(ViewBag.IsAuthorizeNet){
+                                 showCCMainform = true;
+                             }
+                             if( ViewBag.IsUseClubPilates){
+                                 showCCMainform = true;
+                             }
+                             if(ViewBag.IsChasePayment){
+                                 showCCMainform = false;
+                                 hasCCPayment = true;
+                             }
+                             if(ViewBag.IsTouchnetRedirect){
+                                 showCCMainform = false;
+                                 hasCCPayment = true;
+                             }
+                             if(ViewBag.UseIpay){
+                                 showCCMainform = false;
+                                 hasCCPayment = true;
+                             }
+
+                             if(ViewBag.IsPayPalAdvance){
+                                 showCCMainform = true;
+                                 showCCNumbrform = false;
+                                 CCheadr  = "Credit Card Billing Information";
+                             }
+
+                             if (ViewBag.IsConverge)
+                             {
+                                 showCCMainform = true;
+                                 showCCNumbrform = false;
+                                 CCheadr  = "Credit Card Billing Information";
+                             }
+                             if (ViewBag.UseCashNetRedirect) {
+                                 showCCMainform = true;
+                                 showCCNumbrform = false;
+                             }
+                             if (ViewBag.UseSpreedly) {
+                                 showCCMainform = false;
+                                 showCCNumbrform = false;
+                             }
+                             if(ViewBag.IsSquare){
+                                 showCCMainform = false;
+                             }
+
+                             if(ViewBag.IsCybersource){
+                                 showCCMainform = false;
+                             }
+
+                             if(ViewBag.IsFirstData){
+                                 showCCMainform = false;
+                             }
+
+                             if(ViewBag.IsAdyen){
+                                 showCCMainform = false;
+                             }
+
+                          }  
+
+
+                            @if(showCCMainform)
+                            {
+                           
+                            }
+                            else if (hasCCPayment == true && ViewBag.ShowOtherPayments == true)
+                            {
+                            <text>
+                            <tr >
+                                <td colspan="4">
+                                    <div style="font-size: 12px; font-weight: bold;">Select Payment Method and click "Place Order Now".</div><br /><br />
+                                </td>
+                            </tr>
+                            </text>
+                        }
+
+                        @if (ViewBag.ShowOtherPayments == true)
+                        {
+                            <input type="hidden" value="@Html.Raw(ViewBag.ShowCreditCard)" id="hiddenShowCredit" />
+                        <tr>
+                            <td colspan="4"><b id="paymentLabel">@ViewBag.OterPaymentLabel</b>  </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="2" class="table-cctd">@Html.DropDownList("itemOtherPayments", null, new { placeholder = "Card Number", style = "width:255px; height:22px;", onchange = "javascript:cart.ShowPaymentNumber();" })                                </td>
+                            <td colspan="2" class="table-cctd">@Html.TextBoxFor(Model => Model.PaymentNumber, new { placeholder = "Payment Number", style = "width:255px; display:none;", @class = "textbox-cc" })
+                                    <div id="validatorpaynumber" style="display: none; color: red; font-size: 12px;">*Payment Number is Required.</div>
+                            </td>
+                        </tr>
+                        }
+
+                       <tr>
+                           <td>
+                               <br />
+                               <br />
+                           </td>
+                           <td></td>
+                       </tr>
+
+
+
+
+
+                        @if(showCCMainform)
+                            {
+                            <tr class="trCC">
+                                <td colspan="4"><b>@CCheadr</b></td>
+                            </tr>
+                        }
+
+                            @if(showCCNumbrform && showCCMainform)
+                            {
+                            <text>
+                            <tr class="trCC">
+                                <td class="table-cctd">
+                                    @Html.TextBoxFor(Model => Model.CardNumber, new { placeholder = "Card Number", style = "width:145px;", @class = "textbox-cc" })                            </td>
+                                <td class="table-cctd">
+                                    @Html.DropDownList("item1List", null, new { placeholder = "Card Type", style = "width:88px; height:29px;" })                            </td>
+                                <td class="table-cctd">
+                                    @if (ViewBag.ccvon == "1")
+                                    {
+                                        <text>
+                                        @Html.TextBoxFor(Model => Model.CCV, new { placeholder = "CCV", style = "width:60px;", @class = "textbox-cc" })
+                                        </text>
+                                    }
+                                    else
+                                    {
+                                        <text>
+                                        @Html.TextBoxFor(Model => Model.CCV, new { placeholder = "CCV", style = "width:60px;", @class = "textbox-cc", disabled = "disabled" })
+                                        </text>
+                                    }
+                                </td>
+
+
+                                <td class="table-cctd">Expiration Date:
+                                    <select style="width: 40px; height: 29px;" id="expirymonth">
+                                        <option value="01">01</option>
+                                        <option value="02">02</option>
+                                        <option value="03">03</option>
+                                        <option value="04">04</option>
+                                        <option value="05">05</option>
+                                        <option value="06">06</option>
+                                        <option value="07">07</option>
+                                        <option value="08">08</option>
+                                        <option value="09">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                    </select>
+                                    <select style="width: 60px; height: 29px;" id="expiryyear">
+				                        @{
+					                        int year = DateTime.Now.Year;
+                                            int smallyear = 0;
+					                        for (int i = year; i <= year + 10; i++)
+					                        {
+                                                smallyear = i - 2000;
+						                        <text><option value="@smallyear.ToString()">@i.ToString()</option></text>
+					                        }
+				                        }   
+                                    </select>
+                                </td>
+                            </tr>
+                            </text>
+                        }
+
+                            @if(showCCMainform)
+                            {
+                            <text>
+                            <tr class="trCC">
+                                <td colspan="2" class="table-cctd">
+                                    @Html.TextBoxFor(Model => Model.FirstName, new { placeholder = "First Name", style = "width:270px;", @class = "textbox-cc" })
+                                </td>
+                                <td colspan="2" class="table-cctd">
+                                    @Html.TextBoxFor(Model => Model.LastName, new { placeholder = "Last Name", style = "width:270px;", @class = "textbox-cc" })
+                                </td>
+                            </tr>
+                            <tr class="trCC">
+                                <td colspan="4" class="table-cctd">
+                                    @Html.TextBoxFor(Model => Model.Email, new { placeholder = "Email Address", style = "width:270px;", @class = "textbox-cc" })
+                                </td>
+                            </tr>
+                            <tr class="trCC">
+                                <td colspan="4" class="table-cctd">
+                                    @Html.TextBoxFor(Model => Model.Address, new { placeholder = "Card Holder Address Line 1", style = "width:570px;", @class = "textbox-cc" })
+                                </td>
+                            </tr>
+                            <tr class="trCC">
+                                <td colspan="4" class="table-cctd">
+                                    @Html.TextBoxFor(Model => Model.Address2, new { placeholder = "Card Holder Address Line 2 (Optional)", style = "width:570px;", @class = "textbox-cc" })
+                                </td>
+                            </tr>
+                            <tr class="trCC">
+                                <td colspan="4" class="table-cctd">
+                                    @Html.TextBoxFor(Model => Model.City, new { placeholder = "Card Holder City ", style = "width:570px;", @class = "textbox-cc" })
+                                </td>
+                            </tr>
+                            <tr class="trCC">
+                                <td colspan="2" class="table-cctd">
+                                    @Html.TextBoxFor(Model => Model.State, new { placeholder = "State", style = "width:120px;", @class = "textbox-cc" })
+                                    @Html.TextBoxFor(Model => Model.Zip, new { placeholder = "Card Holder Zip No.", style = "width:140px;", @class = "textbox-cc", maxlength = 10 })
+                                </td>
+                                <td colspan="2" class="table-cctd">
+                                    @Html.DropDownList("itemCountryList", null, new { placeholder = "Card Holder Country", style = "width:270px; height:29px;" })
+                                    @*@Html.TextBoxFor(Model => Model.Country, new { placeholder = "Card Holder Country", style = "width:255px;", @class = "textbox-cc" })*@
+                                </td>
+                            </tr>
+                            </text>
+                        }
+                        
+                        <tr>
+                            <td colspan="4">@if (Gsmu.Api.Data.Settings.Instance.GetMasterInfo3().HideCreditCardPaymentAreaOnCheckout == 1)
+				            {
+				                 @Html.Raw(Gsmu.Api.Data.Settings.Instance.GetMasterInfo3().creditCardPolicyOnCheckout)
+				            }                              
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">&nbsp; </td>
+                        </tr>
+
+
+
+
+
+                    </table>
+                }            
+
+            </td>
+            <td height="45" style="padding-left: 10px; vertical-align: top;">
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td height="137" style="padding-left: 10px; vertical-align: top;">@if (UseCashNetRedirect || UseOrbital || use_BBPaygate || usePayGovRedirect || UsePayflow || UseSquare || UseCybersource  || UseAdyen || UseAuthorizeNet || UseAuthorizeNetRedirect || UseTouchnetRedirect || usenelnetpayment ||UseSpreedly )
+{
+                if(ViewBag.PaymentImageExisted == true)
+                {
+                    <img alt="credit card image" src="~/Areas/Public/Images/Layout/allcardsbig_new.jpg" class="right">
+                }
+                else 
+                {
+                    <img alt="credit card image" src="~/Areas/Public/Images/Layout/allcardsbig.jpg" class="right">
+                }
+}
+            </td>
+        </tr>
+        <tr>
+            <td id="place_order_now_info" style="padding-left: 10px; vertical-align: bottom;">
+                <br />
+                <b>You must press the button below to complete registration.</b></td>
+        </tr>
+        <tr>
+            <td colspan="2"></td>
+            <td>
+
+                <div style="width: 180px; margin: auto;">
+                    @if(ViewBag.credithourspayment){
+                    if (UseAuthorizeNetRedirect)
+                    {
+                         <form name="frmSubmit" id="frmSubmit" action="@ViewBag.AuthorizeRedirectLink" method="POST">
+                             <input type="hidden" name="x_login" value="@ViewBag.ANLogin" />
+                             <input type="hidden" name="x_amount" value="@ViewBag.Amount" />
+                             <input type="hidden" name="x_description" value="Course Registration (@ViewBag.FromUserType):@ViewBag.TranscriptId" />
+                             <input type="hidden" name="x_invoice_num" value="@ViewBag.Invoice" />
+                             <input type="hidden" name="x_fp_sequence" value="@ViewBag.AuthorizeRedirectSequnce" />
+                             <input type="hidden" name="x_fp_timestamp" value="@ViewBag.TimeStamp" />
+                             <input type="hidden" name="x_fp_hash" value="@ViewBag.Fingerprint" />
+                             <input type="hidden" name="x_relay_response" value="TRUE">
+                             <input type="hidden" name="x_relay_always" value="TRUE">
+                             @*						
+						     <input type="hidden" name="x_receipt_link_method" value="LINK" />
+                             <input type="hidden" name="x_receipt_link_text" value="Return to registration page" />
+                             <input type="hidden" name="x_receipt_link_url" value="@ViewBag.ReceiptLink" />
+                             *@
+                        <input type="hidden" name="x_show_form" value="PAYMENT_FORM" />
+
+                             <input type="hidden" name="x_relay_url" value="@ViewBag.RelayLink" />
+                             <input type="hidden" name="x_logo_url" value="@ViewBag.x_logo_url" />
+                             @if(ViewBag.passUser == true)
+                        {
+                            <input type="hidden" name="x_address" value="@ViewBag.x_address" />
+                             <input type="hidden" name="x_city" value="@ViewBag.x_city" />
+                             <input type="hidden" name="x_state" value="@ViewBag.x_state" />
+                             <input type="hidden" name="x_zip" value="@ViewBag.x_zip" />
+                             <input type="hidden" name="x_country" value="@ViewBag.x_country" />
+                             }
+
+                            <br>
+                             <input type="text" value="@Html.Raw(ViewBag.TranscriptId)" id="TranscriptId" style="display: none" />
+                             <a href=" javascript:Cart.prototype.ProcessCreditHoursPayment('anetredirect');"
+                                 class="simpleCart_checkout hudbtn primary right" id="place_order_now" style="height: 25px; width: 150px; font size: 15px; vertical align: central; text align: center">@ViewBag.OrderButtonLabel</a>
+
+                             <table border="0" style="border collapse: collapse;" cellspacing="0">
+                                 <tr>
+                                     <td height="700">
+                                         <img src="/images/share/2x700spacer.gif" /></td>
+                                 </tr>
+                             </table>
+                             <script language="javascript">
+                                  
+                                  
+                             </script>
+
+
+                         </form>
+                    }
+                     else
+                     {
+                        <input type="text" value="@Html.Raw(ViewBag.Amount)" id="OrderTotalHours" style="display: none" />
+                    <input type="text" value="@Html.Raw(ViewBag.TranscriptId)" id="TranscriptId" style="display: none" />
+                    <a href="javascript:Cart.prototype.ProcessCreditHoursPayment('inhouse');"
+                        class="simpleCart_checkout hudbtn primary right" id="place_order_now" style="height: 25px; width: 150px; font size: 15px; vertical-align: central; text-align: center">@ViewBag.OrderButtonLabel</a>
+
+                    }
+
+                }
+                else
+                {
+                    
+                    <text>
+                        <a href="javascript:cart.ShowConfirmationPage();"
+                            class="simpleCart_checkout hudbtn primary right" id="place_order_now" style="height: 25px; width: 150px; font-size: 15px; vertical-align: central; text-align: center">@ViewBag.OrderButtonLabel</a>
+                    </text>
+                    }
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">&nbsp;</td>
+        </tr>
+    </tbody>
+</table>
+<script src="~/Scripts/jquery.placeholder.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        //APPLIES TO LOWER VERSION OF BROWSERS HAVING ISSUES ON RENDERRING PLACEHOLDER TAG
+        $('input, textarea').placeholder({ customClass: 'my-placeholder' });
+    });
+</script>

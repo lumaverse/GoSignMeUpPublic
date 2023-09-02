@@ -1,0 +1,38 @@
+﻿@{
+    var x = 0;
+}
+<table style="width:100%">
+    <tr>
+        <td colspan="2" style="cursor:pointer; text-decoration:underline; color:blue;" onclick="window.CourseSearchInstance.CloseCourseDetailsWindow(); window.CourseSearchInstance.ShowCourseDetails(@ViewBag.COURSEID)">@ViewBag.COURSENAME</td>
+    </tr>
+    <tr>
+            @if (ViewBag.courseStartEndTimeDisplay.Length > 0)
+            {
+                <text>
+                    <td style="text-align:right">
+                    @ViewBag.courseStartEndTimeDisplay  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </td>
+                </text> 
+            }else{
+                <text>
+                    <td style="text-align:right">
+                    Starts: @ViewBag.CourseStartDate.ToShortDateString() - @ViewBag.CourseStartTime.ToShortTimeString()
+                    </td>
+            </text>
+            }
+        <td style="text-align:right">
+                @if(ViewBag.EnrollmentStatus == "SpaceAvailable")
+                {
+                    <div>Status: Space available</div>
+                }
+                else if(ViewBag.EnrollmentStatus == "WaitSpaceAvailable")
+                {
+                    <div>Status: Wait space available</div>
+                }
+                else if(ViewBag.EnrollmentStatus == "Full")
+                {
+                    <div>Status: Class full</div>
+                }
+        </td>
+    </tr>
+</table>

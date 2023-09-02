@@ -1,0 +1,276 @@
+﻿@using Gsmu.Api.Data
+@using Gsmu.Api.Data.School.Terminology;
+@model Gsmu.Api.Data.School.Course.CourseModel
+@{
+
+    var layoutConfig = Gsmu.Api.Data.ViewModels.Layout.LayoutManager.PublicLayoutConfiguration;
+    var config = layoutConfig.SearchColumns.TileJuly;
+    var courseModel = Model;
+    var course = courseModel.Course;
+    var duration = courseModel.Duration;
+    var times = courseModel.CourseTimes;
+    var courseStartEndTimeDisplay = (courseModel.Course.StartEndTimeDisplay != null ? courseModel.Course.StartEndTimeDisplay.Trim() : string.Empty);
+    var csetting = courseModel.CourseSettings;
+    var relatedcourseids = courseModel.Courses;
+    var instructorlist = courseModel.Instructors;
+    bool ShowOnlineClassDate = (Gsmu.Api.Data.Settings.Instance.GetMasterInfo3().ShowOnlineClassDate == 1? true : false);
+
+    var wgname = "Dates_and_Times";
+    var wgcontainer = "Course" + wgname + "Container";
+    var wgcontainerDet = "Course" + wgname + "ContainerDet";
+
+    string PubDateFormat = Settings.Instance.GetPubDateFormat();
+    string jsPubDateFormat = Settings.Instance.GetJsPubDateFormat();
+
+    var countinst = 0;
+    var insttxt = "";
+    foreach (var inst in instructorlist)
+    {
+        countinst = countinst + 1;
+        insttxt = insttxt + (countinst>1? ", " : "")  + Html.Raw(inst.FIRST) + " " + Html.Raw(inst.LAST);
+    }
+    var countsession = 0;
+    Double rsumsessionhours = 0;
+    Double rsumsessionmins = 0;
+    TimeSpan Difference;
+    string RegistrationCloseDate = "";
+
+}
+
+<div id="@wgcontainer" class="course-widgetbox" style="min-height:100px;">
+
+    <div class="course-widgetbox-smheader">
+        @wgname.Replace("_"," ")
+    </div>
+    <div id="@wgcontainerDet" style="padding:5px;margin:5px; ">
+        <div style="padding:5px; height:20px">
+            <div style="float: left;">
+                @if (courseStartEndTimeDisplay.Length > 0)
+                {
+                    @Html.Raw(courseStartEndTimeDisplay)
+                } else if(courseModel.CourseStart!=null)
+                {
+                    <text>
+                    <div class ="coursedetstrong">Starts:&nbsp;&nbsp;&nbsp;</div> 
+                    <div style="float:left;" >
+                    @courseModel.CourseStart.COURSEDATE.Value.ToString(PubDateFormat)
+                    &nbsp;
+                    @if (course.coursetype == 0)  
+                    {
+                        try{
+                             @courseModel.CourseStart.STARTTIME.Value.ToShortTimeString()
+                        }
+catch{}
+                        if (@csetting.TimezoneAbv !="") 
+                        {   
+                            /// ***** NOTE *****
+                            /// for now we are not going to have the course time here reflecting to the selected global
+                            ///  Timezone setting until we have everything in the system does it. 10/29/2014 - Lang
+                            //courseModel.CourseStart.STARTTIME.Value.AddHours(csetting.TimezoneAddHour).ToShortTimeString()
+                            <text>(@csetting.TimezoneAbv) </text>
+                        }
+                    }
+                    </div>
+                    </text>
+                }
+            </div>
+            
+        </div>
+
+        @if (courseStartEndTimeDisplay.Length == 0)
+        {
+       <div style="padding:5px; width:100%; min-height:20px; overflow: auto;">
+           <div  class="coursedetstrong"width: 60px">Sessions:</div>
+           <div style="float:left; "> 
+                <div style="height:20px"> 
+                @if (csetting.ShowCourseDateTime == true)
+                {
+                    <!--<text>
+                    &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;@csetting.CourseDateTimeHeader1st&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;@csetting.CourseDateTimeHeader2nd
+                    </text> -->
+                }
+                else
+                {
+                   <text>&nbsp;@csetting.OnlineClasslabel</text>
+                }
+                </div>
+                @if ((courseModel.CourseStart != null && courseModel.Course.OnlineCourse == 0) || (courseModel.Course.OnlineCourse != 0 && ShowOnlineClassDate && courseStartEndTimeDisplay.Length == 0))
+                {
+                    var OnlineStartDay = "";
+                    var OnlineStartDate = "";
+                    var OnlineStartTime = "";
+                    foreach (var time in times)
+                    {
+                        countsession = countsession + 1;
+                        //see note above about timezone
+                        //var STARTTIMETimeZoneDiff = time.STARTTIME.Value.AddHours(csetting.TimezoneAddHour);
+                        //var FINISHTIMETimeZoneDiff = time.FINISHTIME.Value.AddHours(csetting.TimezoneAddHour);
+                        var STARTTIMETimeZoneDiff =System.DateTime.Now;
+                        var FINISHTIMETimeZoneDiff= System.DateTime.Now;
+                        try{
+                            STARTTIMETimeZoneDiff = time.STARTTIME.Value;
+                            FINISHTIMETimeZoneDiff = time.FINISHTIME.Value;
+                        }catch{}
+                        Difference = FINISHTIMETimeZoneDiff.Subtract(STARTTIMETimeZoneDiff);
+                        rsumsessionhours = rsumsessionhours + Difference.Hours;
+                        rsumsessionmins = rsumsessionmins + Difference.Minutes;
+                        
+                        if(courseModel.Course.OnlineCourse != 0){
+                            if(countsession==1){
+                                OnlineStartDate = time.COURSEDATE.Value.ToString(PubDateFormat);
+                                OnlineStartTime = STARTTIMETimeZoneDiff.ToShortTimeString();
+                            }
+                            if(countsession==2){
+                            <text>
+                            <div style="padding:5px; height:20px; display: table-row; width:100%;">
+                                <div style="height:20px; float:left; width:100%">
+                                    @OnlineStartDate - @time.COURSEDATE.Value.ToString(PubDateFormat)
+                                </div>
+                                @if (course.coursetype == 0) {
+                                <div style="height:20px; float:left; width:100%">
+                                    @OnlineStartTime - @FINISHTIMETimeZoneDiff.ToShortTimeString()
+                                    @if (@csetting.TimezoneAbv !="") 
+                                    {
+                                    <text>(@csetting.TimezoneAbv) </text>
+                                    }
+
+                                </div>
+                                }
+                            </div>
+                            </text>
+                            }
+
+                        }
+                        else
+                        {                 
+                            if (course.coursetype == 0)  
+                            {
+                                <text>
+                                <div style="padding:5px; height:20px; display: table-row; width:100%;">
+                                <div style="height:20px; float:left;  width:150px;">@time.COURSEDATE.Value.ToString(PubDateFormat) </div>
+
+                                    <div style="height:20px; float:left; ">&nbsp;&nbsp;  @STARTTIMETimeZoneDiff.ToShortTimeString() - @FINISHTIMETimeZoneDiff.ToShortTimeString()
+                                    @if (@csetting.TimezoneAbv !="") 
+                                    {
+                                    <text>&nbsp;(@csetting.TimezoneAbv) </text>
+                                    }                            
+                                </div>
+                                </div>
+                                </text>
+                            } else {
+                               <text>
+                                <div style="padding:5px; height:20px; display: table-row; width:100%;">
+                                <div style="height:20px; float:left;  width:150px;">@time.COURSEDATE.Value.ToString(PubDateFormat) </div>
+                                </div>
+                                </text>
+                            }  
+                        }
+                    }
+                }
+            </div>
+
+        </div>
+        }
+
+        <!-- course will show closed for enrollment xx days before start date -->
+        @if (course.CourseCloseDays > 0 || courseModel.CourseStart != null || course.CourseCloseDays!= null)
+        {
+            try
+            {
+                int days = 0;
+                if(course.viewpastcoursesdays.Value!=0){
+                    days = course.viewpastcoursesdays.Value;
+                }
+                if(course.CourseCloseDays.Value!=0){
+                    days = (-1 * course.CourseCloseDays.Value);
+                }
+                
+                RegistrationCloseDate = courseModel.CourseStart.COURSEDATE.Value.AddDays(days).ToString(PubDateFormat) + "  ";
+                //see note above about timezone
+                //RegistrationCloseDate = RegistrationCloseDate + courseModel.CourseStart.STARTTIME.Value.AddHours(csetting.TimezoneAddHour).ToShortTimeString();
+                RegistrationCloseDate = RegistrationCloseDate; //+ courseModel.CourseStart.STARTTIME.Value.ToShortTimeString();
+
+                if (@csetting.TimezoneAbv !="") 
+                {
+                    RegistrationCloseDate = RegistrationCloseDate ; //+ " (" + @csetting.TimezoneAbv + ")";
+                }
+            }
+            catch
+            {
+            }
+           
+            if (Gsmu.Api.Data.Settings.Instance.GetMasterInfo3().ShowCloseCourseDate != 2 && Gsmu.Api.Data.Settings.Instance.GetMasterInfo3().ShowCloseCourseDate != 3 && RegistrationCloseDate != "") 
+            {
+            <text>
+            <div style="float:none; padding:5px; height:20px">
+            <div class="coursedetstrong">Registration closes:&nbsp;&nbsp;&nbsp;</div>
+             <div style="float:left;" > 
+                 @RegistrationCloseDate
+             </div>  
+             
+            </div>
+            </text>
+            }
+        }
+        @if (config.Duration && duration.HasValue && !course.IsOnlineCourse && courseStartEndTimeDisplay.Length == 0)
+        {
+            <text>
+             <div style="float:none; padding:5px; height:20px; clear: both;">
+                <div class="coursedetstrong">Duration:&nbsp;&nbsp;&nbsp;</div> 
+                 @{
+                     var sessiontxt = countsession + " Sessions";
+                     if (countsession == 0)
+                     {
+                         sessiontxt = "No Session";
+                     }
+                     else if (countsession == 1)
+                     {
+                         sessiontxt = countsession + " Session";
+                     }
+
+                     rsumsessionhours = rsumsessionhours + (rsumsessionmins / 60);
+                 
+                     var hourtxt = ", "+ rsumsessionhours + " Hours";
+                     if (rsumsessionhours == 0)
+                     {
+                         hourtxt = "";
+                     }
+                     else if (rsumsessionhours == 1)
+                     {
+                         hourtxt = countsession + " Hour";
+                     }
+                 //do not show sessioncount as per Task #8114
+                 }
+
+                 <div style="float:left;" >
+
+                            @if (duration.Value.Days > 0)
+                            {
+                                <text>
+                                @duration.Value.Days @(GrammarHelper.GetConditionallyPluralizedWord(duration.Value.Days, "day"))
+                                </text>
+                            }
+                            @if (duration.Value.Hours > 0)
+                            {
+                                <text>
+                                @duration.Value.Hours @(GrammarHelper.GetConditionallyPluralizedWord(duration.Value.Hours, "hour"))
+                                </text>
+                            }
+                            
+                            @if (duration.Value.Minutes > 0)
+                            {
+                                <text>
+                                @duration.Value.Minutes @(GrammarHelper.GetConditionallyPluralizedWord(duration.Value.Minutes, "minute"))
+                                </text>
+                            }
+
+                 </div>
+            </div>
+            </text>
+        }
+        <p></p>
+        <div style="clear: both;"></div>
+
+    </div>
+
+</div>

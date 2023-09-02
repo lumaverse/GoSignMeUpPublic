@@ -1,0 +1,97 @@
+﻿@using Gsmu.Api.Data.School.Terminology;
+@{
+    ViewBag.Title = "Calendar";
+}
+
+@section Head {
+    <script type="text/javascript">
+        Ext.Loader.setConfig({
+            enabled: true,
+            paths: {
+                'Ext.calendar': config.getUrl('Areas/Public/Scripts/Calendar/ExtJsCalendar5/src')
+            }
+        });
+        var studentTerm = ' @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Student)';
+    </script>
+    <link href="~/Areas/Public/Scripts/Calendar/ExtJsCalendar5/resources/css/calendar.css" rel="stylesheet" />
+
+    <script type="text/javascript">
+        function RefreshCalendar(self) {
+            var value = self.options[self.selectedIndex].value;
+            document.location = '/public/calendar/index?main=' + value;
+        }
+        function RefreshCalendarbySubcategory(self) {
+            var value = self.options[self.selectedIndex].value;
+            var maincategory = $('#list').val();
+            document.location = '/public/calendar/index?main='+maincategory+'&sub=' + value;
+        }
+
+        function getURLParameter(name) {
+            return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null
+        }
+
+        Ext.require([
+            'Ext.calendar.App'
+        ]);
+
+        Ext.onReady(function () {
+            Ext.create({
+                xtype: 'datefield',
+                renderTo: 'gsmu-calendar-date',
+                id: 'app-nav-picker',
+                fieldLabel: 'Pick a date for your view',
+                labelAlign: 'right',
+                labelWidth: 200,
+                cls: 'ext-cal-nav-picker',
+                listeners: {
+                    'change': {
+                        fn: function (dp, dt) {
+                            Ext.getCmp('app-calendar').setStartDate(dt);
+                        },
+                        scope: this
+                    }
+                }
+            });
+            Ext.create('Ext.calendar.App');
+        });
+    </script>
+}
+
+<div id="app-msg" style="color: red;" class="x-hidden">test</div>
+
+<div style="float: right;">
+    <div id="gsmu-calendar-date"></div>
+</div>
+@if( ViewBag.MaincategoryCounter>0){
+<div style="float: left;">
+    <select id="list" onchange="RefreshCalendar(this)">
+        <option value="">View All Main Categories</option>
+        @foreach (var mc in ViewBag.MainCategory as List<string>)
+        {
+            if (mc.Trim() != "")
+            {
+                <option value="@mc">@Html.Raw(mc)</option>
+            }
+        }
+    </select>
+</div>
+}
+
+@if( ViewBag.SubcategoryCounter>0){
+<div style="float: left; margin-left:20px;">
+    <select id="sublist" onchange="RefreshCalendarbySubcategory(this)">
+        <option value="">View All Sub Categories</option>
+        @foreach (var mc in  ViewBag.SubCategory  as List<string>)
+        {
+            if (mc.Trim() != "")
+            {
+                <option value="@mc">@Html.Raw(mc)</option>
+            }
+        }
+    </select>
+</div>
+}
+
+<br /><br />
+
+<div id="gsmu-calendar-container"></div>

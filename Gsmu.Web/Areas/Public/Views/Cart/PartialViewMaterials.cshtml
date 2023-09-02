@@ -1,0 +1,179 @@
+﻿@using Gsmu.Api.Data.School.Course
+@using Gsmu.Api.Commerce.ShoppingCart
+@using Gsmu.Api.Data.School.Terminology;
+
+@using Gsmu.Api.Data
+@using Gsmu.Api.Data.School
+@using Gsmu.Api.Data.School.Entities
+@model IEnumerable<Gsmu.Api.Data.School.Entities.Material>
+@{
+    decimal PriceSubtotal = 0;
+    var cID = ViewBag.intCourseId.ToString();
+    var subtotid = "matsubtot" + cID;
+    var materiallistid = "matlist" + cID;
+    var materialselectedlist = "";
+    var cartItem = HttpContext.Current.Items["currentCartItem"] as CourseShoppingCartItem;
+    var autoselectmaterial = Settings.Instance.GetMasterInfo3().materialdefault;
+    var materialRequiredVal = ViewBag.MaterialRequiredVal;
+    var autoselectmaterialbool = "";
+    var qty = ViewBag.QuantitiesPerMaterial;
+    var index = 0;
+    var materialOriginalSelected = "";
+    
+    var hide_payment_info = Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().HidePaymentInfo;
+    IEnumerable<Material> nmateriallist = Model.OrderBy(materiallist => materiallist.product_num);
+}
+<table border="0" style="width: 100%">
+    @if(nmateriallist.Count()>0){
+
+    <tr>
+        <td></td>
+        <td colspan="4" style="height: 10px">
+
+                    Materials:
+
+        </td>
+    </tr>    }
+    @if (cartItem.Course.MaterialsRequiredAsBoolean)
+    {
+    <tr>
+        <td colspan="5" style="height: 10px">
+                <span style="color: red;">
+                    @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Materials) required (please make sure to have at least one selected)
+                </span>
+        </td>
+    </tr>
+    }
+    
+    @foreach (var item in nmateriallist)
+    {
+        var pID = item.productID.ToString();
+        var cIdpID = @cID + "-" + pID;
+        var chkid = "chk" + cIdpID;
+        var chkname = "selectMaterialCheckout" +cID + ViewBag.sid; 
+        var trid = "tr" + cIdpID;
+        var priceid = "price" + cIdpID;
+        var isChecked = "false";
+        var itemprice = float.Parse("0");
+        var qtyId = "qty_" + cIdpID;
+        var qty_data =1;
+        var index_selected =0;
+        var radionunseelctedstyle="";
+        var opacitystyle="";
+        var priceIsHidden = (hide_payment_info != 0) || (item.hidematerialprice == -1 && item.hidematerialprice !=null) ? "none" : "block";
+        if(ViewBag.IsDisbledMaterials==1)
+            trid =ViewBag.sid+ trid;
+        
+
+
+
+
+            <tr id="@trid">
+            @foreach (var materialselected in ViewBag.materials)
+            {
+                    
+                if ((materialselected == pID))
+                {
+                    try{
+                    qty_data = qty == null ? 1 : qty[index_selected];
+                    }
+                    catch{}
+                    materialselectedlist = materialselectedlist + "," + materialselected;
+                    isChecked = "checked=\"checked\"";
+                    radionunseelctedstyle = "";
+                    materialOriginalSelected = pID;
+                    if (item.priceincluded == 0)
+                    {
+                       // PriceSubtotal += item.price.ToString().AsDecimal();
+                        try
+                        {
+                            itemprice = float.Parse(item.price.ToString());
+                            if(item.hidematerialprice==1 || item.hidematerialprice==-1 ){
+                                itemprice=0;
+                            }
+                            materialOriginalSelected = materialOriginalSelected.ToString() + "|" + itemprice.ToString() + "|" +qty_data.ToString();
+                        }
+                        catch
+                        {
+                        }
+                    }
+                     break;
+                    
+                }
+                else
+                {
+                    radionunseelctedstyle = "text-decoration:line-through; ";
+                    isChecked = "";
+                    //opacitystyle = "opacity: 0.4;";
+                }
+                 if (materialRequiredVal == 2)
+                  {
+                     materialOriginalSelected = materialOriginalSelected.ToString() + "|" + itemprice.ToString() + "|" +qty_data.ToString();
+                  }
+                index_selected++;
+            }
+
+            <td style="width: 50px">
+                 
+
+                        @if (hide_payment_info == 0 && item.priceincluded == 0)
+                                    {
+                                        itemprice = float.Parse(item.price.ToString());
+                                    }</td>
+            <td>
+                                    @if ((autoselectmaterial == "checked") || item.quantity == 0)
+                                    {
+                                        //autoselectmaterialbool = "disabled=disabled";
+                                    }
+                <text></text>
+                @if(materialRequiredVal != 2){
+                    if(ViewBag.IsDisbledMaterials!=1)
+                    {
+                        <input id="@chkid" @isChecked name="@chkid" @autoselectmaterialbool class="ignore" type="checkbox" value="false" onclick="javascript:cart.checkMaterial(@cID.ToString(),@pID.ToString(),@itemprice, @qty_data);" data-material-course="@(cartItem.Course.COURSEID)" />
+                    }    
+                    else
+                    {
+                         <input id="@ViewBag.sid@chkid" @isChecked name="@ViewBag.sid@chkid" disabled="disabled" class="ignore" type="checkbox" value="false" onclick="javascript:cart.checkMaterial(@cID.ToString(),@pID.ToString(),@itemprice, @qty_data);" data-material-course="@(cartItem.Course.COURSEID)" />
+                    } 
+                }else 
+                {
+                    materialOriginalSelected = materialOriginalSelected.ToString();
+
+                    if(ViewBag.IsDisbledMaterials!=1)
+                    {
+                         <input id="@chkid" @isChecked name="@chkname" class="ignore" type="radio" value="@pID.ToString()|@itemprice|@qty_data" onmouseover="javascript:cart.setOrignalSelectedMaterial()" onclick="javascript:cart.checkMaterial(@cID.ToString(),@pID.ToString(),@itemprice, @qty_data, '@materialOriginalSelected.ToString()');" data-material-course="@(cartItem.Course.COURSEID)" />
+                    }    
+                    else
+                    {
+                         <input id="@ViewBag.sid@chkid" @isChecked name="@chkname" disabled="disabled" class="ignore" type="radio" value="@itemprice|@qty_data" onclick="javascript:cart.checkMaterial(@cID.ToString(),@pID.ToString(),@itemprice, @qty_data, '@materialOriginalSelected.ToString()');" data-material-course="@(cartItem.Course.COURSEID)" />
+                    } 
+                }           
+                @Html.DisplayFor(modelItem => item.product_name)
+            </td>
+            @if(ViewBag.allowMaterialQuantity!=0){
+                if(ViewBag.QuantitiesPerMaterial!=null){
+                   <td><input type="number" id="@qtyId" name="@qtyId" @autoselectmaterialbool value="@qty_data" onkeypress="javascript:cart.calculateMaterialPerQty(@cID.ToString(),@pID.ToString(),this,'@priceid', @itemprice)" style="float: right;width: 50px;" /></td>
+                }
+                else 
+                {
+                    <td><input type="number" id="@qtyId" name="@qtyId" @autoselectmaterialbool onkeypress="javascript:cart.calculateMaterialPerQty(@cID.ToString(),@pID.ToString(),this,'@priceid', @itemprice)" style="float: right;width: 50px;" /></td>
+                }
+            }
+            <td id="@priceid" style="@radionunseelctedstyle text-align:right; width:100px; display:@priceIsHidden">@string.Format("{0:c}", itemprice * qty_data)</td>
+            <td style="text-align: right; width: 100px;display:@priceIsHidden">@Html.Raw(ViewBag.matPriceSubtotal)</td>
+            <td style="text-align: right; width: 40px"></td>
+        </tr>
+        index++;
+
+            if(opacitystyle!=""){
+                        <script>
+                            //$('#'+'@trid').fadeTo('slow', 0.4);
+                        </script>
+            }
+    }
+
+
+</table>
+<input id="@materiallistid" type="hidden" value="@materialselectedlist" />
+<input id="@subtotid" type="hidden" value="@PriceSubtotal" />
+<input type="hidden" class="material-required" data-course-id="@(cartItem.Course.COURSEID)" id="CourseMaterialsRequired@(cartItem.Course.COURSEID)" value="@(Newtonsoft.Json.JsonConvert.SerializeObject( cartItem.Course.MaterialsRequiredAsBoolean))"/>

@@ -1,0 +1,91 @@
+﻿@using Gsmu.Api.Data
+@model Gsmu.Api.Data.School.Course.CourseModel
+@{
+    var courseModel = Model;
+    var course = courseModel.Course;
+    var csetting = courseModel.CourseSettings;
+
+    var wgname = "Location";
+    var wgcontainer = "Course" + wgname + "Container";
+    var wgcontainerDet = "Course" + wgname + "ContainerDet";
+    var embedmapsearch ="+"+course.STREET+",+"+course.CITY+",+"+course.STATE+",+"+course.Country+",+"+course.ZIP;
+    embedmapsearch= embedmapsearch.Replace(", ",",").Replace(",,,",",").Replace(",,",",").Replace("&","");
+    var minheight = "100px";
+}
+@if (course.LOCATION != "" && course.LOCATION != "Fully Online")
+{
+	minheight = "200px";
+} 
+<div id="@wgcontainer" class="course-widgetbox" style="position:inherit; min-height:@minheight;">
+
+    <div class="course-widgetbox-smheader">
+        @wgname
+    </div>
+    <div id="@wgcontainerDet" style="padding:5px;margin:5px; ">
+    @if (course.LOCATION != "" && course.LOCATION.ToLower().IndexOf("online") < 0)
+    {
+        <div id="map-canvasx" style="width: 100%; height: 200px;">
+                <iframe width="100%" height="200" frameborder="0" style="border:0"
+                    src="https://www.google.com/maps/embed/v1/place?q=@embedmapsearch&key=@WebConfiguration.GoogleMapsApiKey" allowfullscreen></iframe>
+        </div>
+    }        
+        <input type="hidden" id="hdlocation" value="@course.LOCATION " />
+        <input type="hidden" id="hdzip" value="@course.ZIP " />
+        <input type="hidden" id="hdcity" value="@course.CITY " />
+        <input type="hidden" id="hdstreet" value="@course.STREET " />
+        <input type="hidden" id="hdstate" value="@course.STATE " />
+        <input type="hidden" id="hdcountry" value="@course.Country " />
+          <div style="margin:12px;">
+        @try
+        {
+          
+                if (course.LOCATION.Length != 0)
+                {
+                   
+                    if((course.STREET.Length != 0)|| (course.CITY.Length != 0) ||(course.STATE.Length != 0)||(course.Country.Length != 0))
+                        {
+                                @Html.Raw(course.LOCATION +", ");
+                        }
+                    else
+                        {
+                                @Html.Raw(course.LOCATION);
+                        }
+                }
+                if (course.STREET.Length != 0)
+                {
+                    @Html.Raw(course.STREET + "<br /> ");
+                }
+                if (course.CITY.Length != 0)
+                {
+                    @Html.Raw(course.CITY + ", ");
+                }
+                if (course.STATE.Length != 0)
+                {
+                    @Html.Raw(course.STATE + " ");
+                }
+                if (course.Country.Length != 0)
+                {
+                    @Html.Raw(course.Country + " ");
+                }
+                 @Html.Raw(course.ZIP + " ")
+                
+                if(course.ROOM != ""){
+                    @Html.Raw("<br /> Room: " + course.ROOM + "<br />");
+                }
+                if (course.RoomDirection != null)
+                {
+                    @Html.Raw("<br /> " + course.RoomDirection.RoomDirectionsTitle + ": " + course.RoomDirection.RoomDirectionsInfo + "<br />");
+                }
+                if (course.LocationAdditionalInfo != "")
+                {
+                    @Html.Raw("<br /> Additional Information: " + course.LocationAdditionalInfo + "<br />");
+                }       
+        }
+        catch (Exception ex)
+        {
+        }
+
+
+        </div>
+    </div>
+</div>

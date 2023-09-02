@@ -1,0 +1,60 @@
+﻿
+@{
+    ViewBag.Title = "Confirmation";
+}
+
+@if (ViewBag.Cmd == "success")
+{
+    <text>
+
+        <br />
+        <div id="confirmationprint">
+            Processing Receipt...
+        </div>
+        <br />
+        @Html.Raw(ViewBag.GoogleAnalyticsSetUpScript != null || ViewBag.GoogleAnalyticsSetUpScript != "" ? ViewBag.GoogleAnalyticsSetUpScript : "")
+        <script>
+    Cart.prototype.ShowConfirmationReceipt('@ViewBag.OrderNumber');
+        </script>
+
+    </text>
+}
+else
+{
+    if (ViewBag.ErrCode == "4117")
+    {
+        <text>
+
+            <div class="center" style="color:red;"><h3>Error in token.</h3></div>
+            <br />
+            <div class="center"><h4>Error Code: @ViewBag.ErrCode </h4></div>
+            <br />
+            <div class="center"><h4>@ViewBag.ErrDetail </h4></div>
+            <br /><br /><br />
+
+            <br /><br /><br />
+
+        </text>
+    }
+    else
+    {
+        <text>
+
+            <div class="center" style="color:red;"><h3>Error in payment.</h3></div>
+            <br />
+            <div class="center"><h4>Error Code: @ViewBag.ErrCode </h4></div>
+            <br />
+            <div class="center"><h4>@ViewBag.ErrDetail </h4></div>
+            <br /><br /><br />
+
+            <div class="center">
+                <a href="Javascript:cart.checkout()"><h5>Try again. Go to Checkout.</h5></a>
+
+            </div>
+            <br /><br /><br />
+
+        </text>
+    }
+
+}
+

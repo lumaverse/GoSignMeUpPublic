@@ -1,0 +1,428 @@
+﻿@using Gsmu.Api.Data.School.Course
+@using Gsmu.Api.Commerce.ShoppingCart;
+@using Gsmu.Api.Authorization
+@using Gsmu.Api.Data.School.Terminology;
+@using System.Configuration;
+@model Gsmu.Api.Data.School.CourseRoster.OrderModel
+@{
+    var chkout = CheckoutInfo.Instance;
+    var hide_payment_info = Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().HidePaymentInfo;
+    var layoutConfig = Gsmu.Api.Data.ViewModels.Layout.LayoutManager.PublicLayoutConfiguration;
+    var NelNetNoIframe = ConfigurationManager.AppSettings["NelNetNoIframe"];
+}
+
+@if ((((ViewBag.UseCashNetRedirect != null && !ViewBag.UseCashNetRedirect) || ViewBag.Result == "Approved") && (ViewBag.UseIpay != null && !ViewBag.UseIpay) || ViewBag.Result == "Approved") && ((!ViewBag.IsBBPayGateRedirect) || ViewBag.Result == "Approved") && (!ViewBag.IsTouchnetRedirect || ViewBag.Result == "Approved") && (!ViewBag.IsPaygovpayment || ViewBag.Result == "Approved") && (!ViewBag.IsAuthorizedRedirect || ViewBag.Result == "Approved") && (!ViewBag.IsChasePayment || ViewBag.Result == "Approved") && (!ViewBag.IsNelNet || ViewBag.Result == "Approved") && (((ViewBag.IsConverge != null && !ViewBag.IsConverge) || ViewBag.Result == "Approved")) && (((ViewBag.IsSpreedly != null && !ViewBag.IsSpreedly) || ViewBag.Result == "Approved")))
+{
+    <link rel="stylesheet" href="@Url.Content("~/Content/Confirmation.css")" />
+    @Scripts.Render("~/Areas/Adm/Scripts/ConfirmationScreen/LayoutConfirmationScreen.js")
+
+    <script type="text/javascript">
+        var options = {
+            orderNumber: @Html.Raw(HttpUtility.HtmlDecode(Json.Encode(Model.OrderNumber))),
+        isPublic: true
+        }
+        if($('#confirmation-header-editor-container').attr('value')){
+            var layoutConfirmation = new LayoutConfirmationScreen(options);
+        }
+
+    </script>
+
+
+
+    <table border="0" width="100%">
+        <tbody>
+            <tr>
+                <td colspan="3">
+                    <div class="cart-steps-wrap">
+                        <div class="cart-steps cart-step4"></div>
+                        <ul class="cart-steps-text" style="list-style-type: none;">
+                            <li class="cart-step-1 current-step">Log in/ Create Account</li>
+                            <li class="cart-step-2">Review</li>
+                            @if (hide_payment_info == 0)
+                            {
+                                <li class="cart-step-3">Payments</li>
+                            }
+                            else
+                            {
+                                <li class="cart-step-3">Processing</li>
+                            }
+                            <li class="cart-step-4">Receipt & Confirmation</li>
+                        </ul>
+                    </div>
+                </td>
+                <td width="22%" align="right" style="color: #CDCDCD;">
+                    @if (AuthorizationHelper.CurrentAdminUser == null || AuthorizationHelper.CurrentSubAdminUser != null)
+                    {
+                        <text>
+                            <img style="cursor: pointer" onclick="javascript:location.href='@Url.Content("~/public/user/dashboard")'"
+                                 src="@Url.Content("~/Areas/Public/Images/Layout/btn_close_off.jpg")" width="20" height="20" />
+                        </text>
+                    }
+                </td>
+
+            </tr>
+            <tr>
+                <td colspan="2" style="font-size: 20px;"></td>
+                <td width="22%">&nbsp;</td>
+                <td width="22%" align="right" style="color: #CDCDCD;"></td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <div id="printableArea">
+                        @if (ViewBag.Result == "Approved")
+                        {
+                            Html.RenderPartial("_PartialConfirmation", Model);
+                        }
+                        else if (ViewBag.Result == "Paypal Ok")
+                        {
+                            <div id="paypal_iframe">
+                                @Html.Raw(@ViewBag.PaypalIFrame)
+                            </div>
+                        }
+                        else if (ViewBag.Result == "NelNet Ok")
+                        {
+
+                            <div id="nelnet_iframe">
+                                @Html.Raw(@ViewBag.NelNetIframe)
+                            </div>
+                        }
+                        else
+                        {
+                            <table>
+                                <tr>
+                                    <td colspan="3">&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" style="text-align: center"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">&nbsp;</td>
+                                </tr>
+                            </table>
+                        }
+                    </div>
+                </td>
+            </tr>
+            @if (ViewBag.Result != "Approved")
+            {
+
+                <tr>
+                    <td colspan="4">
+                        @ViewBag.Result
+                        <input type="hidden" value="1234" id="txtCoupon" />
+                        <input type="hidden" value="@ViewBag.Amount" id="hiddenOrderTotal" />
+                        <a href="javascript:cart.ShowPaymentPage('@chkout.PaymentTotal','@chkout.OrderNumber','','@chkout.PaymentCaller');"
+                           class="simpleCart_checkout hudbtn primary right" style="height: 25px; width: 150px; font-size: 16px; vertical-align: central; text-align: center;">Go Back</a>
+                    </td>
+                </tr>
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4">
+                        <div style="width: 50%;margin-left: 75px;">
+                            <a href="javascript:cart.printreceipt(@Json.Encode(!string.IsNullOrEmpty(Model.SingleRoster.MasterOrderNumber) ? Model.SingleRoster.MasterOrderNumber : Model.OrderNumber));"
+                               class="simpleCart_checkout hudbtn primary right" style="height: 25px; width: 150px; font-size: 16px; vertical-align: central; text-align: center;">Print @(TerminologyHelper.Instance.GetTermCapital(TermsEnum.Receipt))</a>
+                        </div>
+                        <div style="display: none;">
+                            @{Html.RenderAction("Empty", "Cart");}
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="height: 80px;">
+                        <script type="text/javascript">
+                            $('#cart-info').text('Empty');
+                        </script>
+                        <div>
+                            <div style="float: left; margin-left: 125px;">
+                                @if (AuthorizationHelper.CurrentAdminUser != null || AuthorizationHelper.CurrentSubAdminUser != null)
+                                {
+                                    <text>
+                                    </text>
+                                }
+                                else
+                                {<text>
+                                        <a href="javascript:cart.backToBrowse(true);"
+                                           class="simpleCart_checkout hudbtn primary" style="height: 28px; width: 290px; font-size: 16px; vertical-align: central; text-align: center;">@layoutConfig.LayoutButtons.ContinueShoppingCourse</a>
+                                </text>
+                            }
+                            </div>
+                            <div style="float: right; margin-right: 125px;">
+                                @if (String.IsNullOrEmpty(chkout.ReturnLink))
+                                {
+                                    if (AuthorizationHelper.CurrentSupervisorUser != null)
+                                    {
+                                        <text>
+                                            <a href="@Url.Content("~/public/supervisor")"
+                                               class="simpleCart_checkout hudbtn primary" style="height: 28px; width: 290px; font-size: 16px; vertical-align: central; text-align: center;">Back To User Home</a>
+                                        </text>
+                                    }
+                                    else if (AuthorizationHelper.CurrentAdminUser != null || AuthorizationHelper.CurrentSubAdminUser != null)
+                                    {
+                                        <text>
+                                        </text>
+                                    }
+                                    else
+                                    {
+                                        <text>
+                                            <a href="@Url.Content("~/public/user/dashboard")"
+                                               class="simpleCart_checkout hudbtn primary" style="height: 28px; width: 290px; font-size: 16px; vertical-align: central; text-align: center;">Back To User Home</a>
+                                        </text>
+                                    }
+                                }
+                                else
+                                {
+                                    <text>
+                                        <a href='@Url.Content(chkout.ReturnLink)/portal.asp#{"navigation":"reports-review-orders","param":null}'
+                                           class="simpleCart_checkout hudbtn primary" style="height: 28px; width: 290px; font-size: 16px; vertical-align: central; text-align: center;">Back To User Home</a>
+                                    </text>
+                                }
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                @Html.Raw(ViewBag.GoogleAnalyticsSetUpScript != null || ViewBag.GoogleAnalyticsSetUpScript != "" ? ViewBag.GoogleAnalyticsSetUpScript : "")
+            }
+
+            <tr>
+                <td colspan="3">&nbsp;</td>
+            </tr>
+        </tbody>
+    </table>
+}
+
+else
+{
+    if (ViewBag.IsPaygovpayment)
+    {
+        @Html.Raw(ViewBag.Result)
+    }
+    else if (ViewBag.IsTouchnetRedirect)
+    {
+        <form method="post" name="frmSubmit" id="frmSubmit" action="@ViewBag.touchnetserver">
+            <input type="hidden" name="UPAY_SITE_ID" value="@ViewBag.touchnetsiteid">
+            <input type="hidden" name="TICKET_NAME" value="@ViewBag.TicketName" />
+            <input type="hidden" name="TICKET" value="@ViewBag.Ticket">
+            Redirecting...<br>
+        </form>
+    }
+    else if (ViewBag.IsBBPayGateRedirect)
+    {
+        <form method="post" name="frmBBPayGateRedirect" id="frmBBPayGateRedirect" action="@ViewBag.BBPaygateTredirectURL">
+
+            Redirecting...<br>
+        </form>
+        <script type="text/javascript">
+            $('#frmBBPayGateRedirect').submit();
+        </script>
+    }
+    else if (ViewBag.IsAuthorizedRedirect)
+    {
+        <form name="frmSubmit" id="frmSubmit" action="@ViewBag.AuthorizeRedirectLink" method="POST">
+            <input type="hidden" name="x_login" value="@ViewBag.ANLogin" />
+            <input type="hidden" name="x_amount" value="@ViewBag.Amount" />
+            @if (chkout.PaymentCaller == "payclockhours")
+            {
+                <input type="hidden" name="x_description" value="Course Registration:@chkout.TranscriptID" />
+                <input type="hidden" name="x_invoice_num" value="@chkout.TranscriptID" />
+            }
+            else
+            {
+                <input type="hidden" name="x_description" value="Course Registration:@ViewBag.Description" />
+                <input type="hidden" name="x_invoice_num" value="@ViewBag.Invoice" />
+            }
+            <input type="hidden" name="x_fp_sequence" value="@ViewBag.AuthorizeRedirectSequnce" />
+            <input type="hidden" name="x_fp_timestamp" value="@ViewBag.TimeStamp" />
+            <input type="hidden" name="x_fp_hash" value="@ViewBag.Fingerprint" />
+
+            <!--<input type="hidden" name="x_test_request" value="@ViewBag.ANTesting" />-->
+
+            <input type="hidden" name="x_relay_response" VALUE="TRUE">
+            <input type="hidden" name="x_relay_always" VALUE="TRUE">
+            @*
+                <input type="hidden" name="x_receipt_link_method" value="LINK" />
+                <input type="hidden" name="x_receipt_link_text" value="Return to registration page" />
+                <input type="hidden" name="x_receipt_link_url" value="@ViewBag.ReceiptLink" />
+            *@
+            <input type="hidden" name="x_show_form" value="PAYMENT_FORM" />
+
+            <input type="hidden" name="x_relay_url" value="@ViewBag.RelayLink" />
+            <input type="hidden" name="x_logo_url" value="@ViewBag.x_logo_url" />
+            @if (ViewBag.passUser == true)
+            {
+                <input type="hidden" name="x_address" value="@ViewBag.x_address" />
+                <input type="hidden" name="x_city" value="@ViewBag.x_city" />
+                <input type="hidden" name="x_state" value="@ViewBag.x_state" />
+                <input type="hidden" name="x_zip" value="@ViewBag.x_zip" />
+                <input type="hidden" name="x_country" value="@ViewBag.x_country" />
+            }
+            Redirecting...<br>
+            <table border="0" style="border-collapse:collapse;" cellspacing="0">
+                <tr>
+                    <td height="700"><img src="/images/share/2x700spacer.gif" /></td>
+                </tr>
+            </table>
+            <script language="javascript">
+
+            </script>
+        </form>
+    }
+    else if (ViewBag.UseCashNetRedirect)
+    {
+        <form action="@ViewBag.cashnetserver" id="CashnetForm" method="POST" enctype="application/x-www-form-urlencoded">
+            <p>
+                <span>
+                    <br>
+                    <input type="hidden" name="name_g" value="@ViewBag.FullName"><br>
+                    <input type="hidden" name="addr_g" value="@ViewBag.Address"><br>
+                    <input type="hidden" name="city_g" value="@ViewBag.City"><br>
+                    <input type="hidden" name="desc1" value="@ViewBag.cashnetItemCodeDesc"><br>
+                    <input type="hidden" name="state_g" value="@ViewBag.State"><br>
+                    <input type="hidden" name="zip_g" value="@ViewBag.Zip"><br>
+                    <input type="hidden" name="user_email_g" value="@ViewBag.emailaddress"><br>
+                    <input type="hidden" name="itemcode1" value="@ViewBag.cashnetItemCode"><br>
+                    <input type="hidden" name="custcode" value="@ViewBag.cashnetCustomerCode"><br>
+                    <input type="hidden" name="amount1" value="@ViewBag.Amount"><br>
+                    <input type="hidden" name="gl1" value="@ViewBag.ConfirmationNumber"><br>
+                    <input type="hidden" name="signouturl" value="@ViewBag.RedirectLink"><br>
+
+                    <span style="display:none"><input type="hidden" name="itemcnt" value="1"></span><br>
+                    Redirecting.....
+        </form>
+        <script type="text/javascript">
+            $('#CashnetForm').submit();
+        </script>
+
+    }
+
+    else if (ViewBag.UseRevTrak != null && ViewBag.UseRevTrak)
+    {
+
+        <script>
+    var handler = Hexea.configure({
+        pcct: "yourPCCTGoesHere",
+        onPayment: function(payment) {
+            console.log(payment);
+            $.ajax({
+                url: config.getUrl('public/Payments/PaymentRevtrak'),
+                type: 'json',
+                method: 'POST',
+                data: {
+                    PaymentId : courseId,
+                    Amount: Amount
+                }
+            });
+        }
+    });
+
+        handler.open({
+            amount:'@ViewBag.Amount',
+        });
+        </script>
+
+    }
+    else if (ViewBag.IsChasePayment)
+    {
+        <!-- old implementation of chase payment -->
+        <form name="frmSubmit" id="frmSubmit" action="@ViewBag.ChasePaymentServer" method="POST">
+            <input type="hidden" name="hostedSecureID" value="@ViewBag.hostedSecureID" />
+            <input type="hidden" name="content_template_url" value="@ViewBag.ChaseTemplateUrl" />
+            <input type="hidden" name="return_url" value="@ViewBag.ChaseReturnUrl" />
+            <input type="hidden" name="hosted_tokenize" value="store_authorize" />
+            <input type="hidden" name="total_amt" value="@ViewBag.Amount" />
+            <input type="hidden" name="amount" value="@ViewBag.Amount" />
+            <input type="hidden" name="formtype" value="1" />
+            <input type="hidden" name="order_id" value="@ViewBag.ConfirmationNumber" />
+            <input type="hidden" name="allowed_types" value="MasterCard|Visa|American Express|Discover" />
+            <input type="hidden" name="required" value="all" />
+            <input type="hidden" name="order_desc" value="Gosignmeup Registration" />
+            <input type="hidden" name="collectAddress" value="2" />
+            Redirecting...<br>
+        </form>
+    }
+    else if (ViewBag.IsNelNet)
+    {
+        if (NelNetNoIframe == "true")
+        {
+            if (AuthorizationHelper.CurrentAdminUser != null || AuthorizationHelper.CurrentSubAdminUser != null)
+            {
+                <text>
+                    <div onclick="window.open('@ViewBag.NelNetSource');" id="go2Paymentform" style="font-size: 20px;">Opening Payment. Please close this dialog after payment is made.</div>
+                    <script>
+                        $('#go2Paymentform').trigger('click');
+                    </script>
+
+                </text>
+            }
+            else
+            {
+                <text>
+                    <div onclick="top.window.location='@ViewBag.NelNetSource'" id="go2Paymentform" style="font-size: 20px;">**Redirecting to Payment Form......</div>
+                    <script>
+                        $('#go2Paymentform').trigger('click');
+                    </script>
+
+                </text>
+            }
+        }
+        else
+        {
+            <iframe id="nelnet-payment" frameborder="0" height="550" width="100%" scrolling="auto" src="@ViewBag.NelNetSource" style="margin-top: 10px;"></iframe>
+        }
+    }
+    else if (ViewBag.UseIpay)
+    {
+        <div>
+            @{Html.RenderAction("IPayGeneratePaymentLink", "Cart");}
+        </div>
+    }
+    else if (ViewBag.IsConverge)
+    {
+        <form name="frmSubmit" id="ConvergefrmSubmit" action="@ViewBag.ConvergePaymentServer" method="POST">
+            <input type="hidden" name="ssl_amount" value="@ViewBag.Amount">
+            <input type="hidden" name="ssl_merchant_id" value="@ViewBag.ConvergeMerchantID" />
+            <input type="hidden" name="ssl_user_id" value="@ViewBag.ConvergeUserID" />
+            <input type="hidden" name="ssl_pin" value="@ViewBag.ConvergePIN" />
+            <input type="hidden" name="ssl_invoice_number" value="@ViewBag.InvoiceNumber" />
+            <input type="hidden" name="ssl_first_name" value="@ViewBag.FirstName" />
+            <input type="hidden" name="ssl_last_name" value="@ViewBag.LastName" />
+            <input type="hidden" name="ssl_avs_address" value="@ViewBag.Address" />
+            <input type="hidden" name="ssl_city" value="@ViewBag.City" />
+            <input type="hidden" name="ssl_state" value="@ViewBag.State" />
+            <input type="hidden" name="ssl_avs_zip" value="@ViewBag.Zip" />
+            <input type="hidden" name="ssl_country" value="@ViewBag.Country" />
+            <input type="hidden" name="ssl_description" value="Online Registration for courses/events" />
+            <input type="hidden" name="ssl_invoice_number" value="@ViewBag.InvoiceNumber" />
+            <input type="hidden" name="ssl_transaction_type" value="ccsale" />
+            <input type="hidden" name="ssl_show_form" value="true">
+            <input type="hidden" name="ssl_result_format" value="HTML" />
+            <input type="hidden" name="ssl_cvv2cvc2_indicator" value="1">
+            <input type="hidden" name="ssl_receipt_link_method" value="POST" />
+            <input type="hidden" name="ssl_receipt_link_url" value="@ViewBag.RedirectLink" />
+            <input type="hidden" name="ssl_receipt_link_text" value="Click to Continue">
+            Redirecting to Converge Payment Portal...<br>
+        </form>
+        <script type="text/javascript">
+            $('#ConvergefrmSubmit').submit();
+        </script>
+    }
+    else if (ViewBag.IsSpreedly)
+    {
+        <script type="text/javascript">
+            document.location = "/public/cart/SpreedlyIframe";
+        </script>
+    }
+    else
+    {
+        <!--<div>Test me up. for future integration</div>-->
+        @Html.Raw(ViewBag.Result)
+    }
+}
+

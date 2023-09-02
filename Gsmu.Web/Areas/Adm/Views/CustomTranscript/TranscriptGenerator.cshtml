@@ -1,0 +1,466 @@
+﻿@{
+    Layout = null;
+}
+@using Gsmu.Api.Data.School.CustomTranscriptModel
+@model CustomTranscriptModel
+<!doctype html>
+<html lang="en">
+<head>
+    @{
+        var pdfwidth = Model.PdfWidth + "px";
+        var pdfheight = Model.PdfHeight + "px";
+        var PdfMarginTop = Model.PdfMarginTop + "px";
+        var PdfMarginBottom = Model.PdfMarginBottom + "px";
+        var PdfMarginLeft = Model.PdfMarginLeft + "px";
+        var PdfMarginRight = Model.PdfMarginRight + "px";
+        var Boundx = Model.BoundX + "px";
+        var Boundy = Model.BoundY + "px";
+        var selectedasDefault = "";
+        var gridsortdefault = "";
+        if (Model.DefaultTranscript == 1)
+        {
+            selectedasDefault = "selected";
+        }
+        var selectedUploadedLogo = "";
+        if (Model.SelectedUploadeLogo == 1)
+        {
+            selectedUploadedLogo = "selected";
+        }
+
+        var Landscape = "";
+        var Portrait = "";
+        if (Model.PdfHeight == "595")
+        {
+            Landscape = "selected";
+        }
+        else
+        {
+            Portrait = "selected";
+        }
+
+    }
+    <meta charset="utf-8">
+    <title>Transcript Generator </title>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryui")
+
+    <script src="/Scripts.GSMU/Custom Tools/TranscriptGenerator.js"></script>
+    <link rel="stylesheet" href="/Styles/jquery-ui.css">
+
+    <style>
+
+        #availablef {
+            list-style-type: none;
+            margin: 10px;
+            padding: 0;
+            float: left;
+            margin-right: 10px;
+            display: table;
+            width: 100%;
+        }
+
+        #selectedf {
+            list-style-type: none;
+            margin: 0px;
+            padding: 0;
+            float: left;
+            margin-right: 10px;
+            display: table;
+            width: 100%;
+        }
+
+        .availablef.list, .availablef.list {
+            clear: both;
+            display: inline;
+        }
+
+        #selectedf li {
+            display: inline;
+            list-style-type: none;
+            display: table-cell;
+        }
+
+        #availablef li {
+            list-style-type: none;
+            width: 200px;
+        }
+
+        .floatingObjectDefault {
+            z-index: 0;
+            position: absolute;
+            opacity: .8;
+            font-family: helvetica,arial;
+            cursor: move;
+            border: 1px solid;
+            background-color: white;
+        }
+
+        .pin {
+            background-color: white;
+            color: white;
+            width: 0.2px;
+        }
+
+        html, TD, body, div, p {
+            font-family: Calibri,Tahoma,Verdana,Arial,helvetica;
+            font-size: 100%;
+        }
+    </style>
+    <script>
+        $(function () {
+
+            $("#selectedf, #availablef").sortable({
+                connectWith: "ul",
+                items: '> li:not(.pin,.pin2)',
+                dropOnEmpty: true,
+                stop: function (event, ui) {
+
+                    $('.selectedfields').each(function () {
+                        result = "";
+                        $(this).find("li").each(function () {
+                            //  alert($(this).text())
+                        });
+                    });
+                }
+            });
+
+            $("#selectedf, #availablef").disableSelection();
+        });
+    </script>
+</head>
+<body style="height:1000px; overflow">
+    <input type="hidden" value="@Model.transcriptid" id="transid"/>
+    <div id="dialog-form-SelectTrans" title="Select or Create Transcript Template">
+        <a onclick=""return confirm('Are you sure you want to create a new Transcript?')"" href='javascript:CreateNewCertificate()'>Create New Custom Transcript</a>
+        <br />
+        <select name="pickCert" onchange="window.location.href='/adm/CustomTranscript/TranscriptGenerator?tid='+this.value">
+            <option value="0">Select Transcript to Edit</option>
+            @foreach(var trans in Model.CustomTranscriptList)
+                    {
+                        <text>
+                            <option value="@trans.customtranid">@trans.transtitle</option>
+                        </text>
+            }
+        </select>
+    </div>
+
+    <div id="dialog-form">
+        <fieldset>
+            <div style="display: none;" id="divDisplayText">
+                <label for="name">Display Text</label><br>
+                <input type="text" name="name" id="name" class="text ui-widget-content ui-corner-all" />
+            </div>
+            <div>
+                <label for="txtFontSize">Font Size</label><br>
+                <input type="text" name="txtFontSize" id="txtFontSize" class="text ui-widget-content ui-corner-all" style="width: 50px;">
+            </div>
+            <div style="display: block;" id="divAlign">
+                Text Alignment:<br>
+                <select name="selectedAlignment" id="selectedAlignment">
+                    <option value="left">Left</option>
+                    <option value="right">Right</option>
+                    <option value="center">Center</option>
+                </select>
+            </div>
+            <div id="optionalText" style="display:none;">Display Text: <br />
+                    <input type="text" value="@Model.OptionalTextValue" id="optionalTextValue" class="text ui-widget-content ui-corner-all" style="width:400px;" />
+            </div>
+            <div id="customFieldList" style="display:none;">
+                Student Customfield:<br />
+                Select Field:  <br />
+                               <select name="selectedstudfield1" id="selectedstudfield1">
+                                   <option value="">None</option>
+                                   <option value="studentID">StudentID</option>
+                                   <option value="address">Address</option>
+                                   <option value="city">City</option>
+                                   <option value="state">State</option>
+                                   <option value="zip">Zip</option>
+                                   <option value="district">District</option>
+                                   <option value="school">School</option>
+                                   <option value="grade">Grade</option>
+                                   <option value="StudRegField1">StudRegField1</option>
+                                   <option value="StudRegField2">StudRegField2</option>
+                                   <option value="StudRegField3">StudRegField3</option>
+                                   <option value="StudRegField4">StudRegField4</option>
+                                   <option value="StudRegField5">StudRegField5</option>
+                                   <option value="StudRegField6">StudRegField6</option>
+                                   <option value="StudRegField7">StudRegField7</option>
+                                   <option value="StudRegField8">StudRegField8</option>
+                                   <option value="StudRegField9">StudRegField9</option>
+                                   <option value="StudRegField10">StudRegField10</option>
+                                   <option value="ReadOnlyStudRegField1">ReadOnlyStudRegField1</option>
+                                   <option value="ReadOnlyStudRegField2">ReadOnlyStudRegField2</option>
+                                   <option value="ReadOnlyStudRegField3">ReadOnlyStudRegField3</option>
+                                   <option value="ReadOnlyStudRegField4">ReadOnlyStudRegField4</option>
+                                   <option value="HiddenStudRegField1">HiddenStudRegField1</option>
+                                   <option value="HiddenStudRegField2">HiddenStudRegField2</option>
+                                   <option value="HiddenStudRegField3">HiddenStudRegField3</option>
+                                   <option value="HiddenStudRegField4">HiddenStudRegField4</option>
+                                   <option value="districtextra">District + extra info</option>
+                                   <option value="schoolextra">School + extra info</option>
+                                   <option value="gradeextra">Grade + extra info</option>
+                               </select>
+            </div>
+
+        </fieldset>
+    </div>
+
+
+    <div id="dialog-form-pdf" title="Set PDF Properties">
+
+        <table>
+            <tr>
+                <td>Description:
+                </td>
+                <td>
+
+                    <input type="text" value="@Model.PdfTitle " name="txtCertTitle" id="txtCertTitle" class="text ui-widget-content ui-corner-all" />
+                </td>
+            </tr>
+            <tr>
+                <td>Page Layout:
+                </td>
+                <td>
+                    <table>
+                        <tr>
+                            <td>
+                                <select name="selectedLayout" id="selectedLayout" onchange="selectedindex_changed1()">
+                                    <option value="0" @Portrait>Portrait</option>
+                                    <option value="1" @Landscape>Landscape</option>
+
+                                </select>
+                                <br />
+                                <input type="hidden" style="width: 60px;" name="txtwidth" id="txtwidth" class="text ui-widget-content ui-corner-all" />
+                            </td>
+                            <td>
+                                <br />
+                                <input type="hidden" style="width: 60px;" name="txtheight" id="txtheight" class="text ui-widget-content ui-corner-all" />
+                            </td>
+                            
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td>PDF Size</td>
+
+                <td>
+                    <table>
+                        <tr>
+                            <td>width:
+                                <br />
+                                <input type="text" value="@Model.PdfWidth" style="width: 60px;" name="txtboundx" id="txtboundx" class="text ui-widget-content ui-corner-all" />
+                            </td>
+                            <td>height:<br />
+                                <input type="text" value="@Model.PdfHeight" style="width: 60px;" name="txtboundy" id="txtboundy" class="text ui-widget-content ui-corner-all" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>margin</td>
+                <td>
+                    <table>
+                        <tr>
+                            <td>top:
+                                <br />
+                                <input value="@Model.PdfMarginTop" type="text" style="width: 60px;" name="txttop" id="txttop" class="text ui-widget-content ui-corner-all" />
+                            </td>
+                            <td>bottom:<br />
+                                <input value="@Model.PdfMarginBottom" type="text" style="width: 60px;" name="txtbottom" id="txtbottom" class="text ui-widget-content ui-corner-all" />
+                            </td>
+                            <td>left:
+                                <br />
+                                <input value="@Model.PdfMarginLeft" type="text" style="width: 60px;" name="txtleft" id="txtleft" class="text ui-widget-content ui-corner-all" />
+                            </td>
+                            <td>right:<br />
+                                <input type="text" value="@Model.PdfMarginRight" style="width: 60px;" name="txtright" id="txtright" class="text ui-widget-content ui-corner-all" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+
+
+
+        </table>
+    </div>
+    <div id="dialog-form-TransSettings" title="Transcript Settings">
+        <fieldset style="margin: 10px;" class="ui-widget-content ui-corner-all ui-helper-clearfix">
+            <table>
+                <tr>
+                    <td>Include Uploaded Logo:
+                    </td>
+                    <td>
+                        <select name="useUploadedLogo">
+                            <option value="0">No</option>
+                            <option value="1" @selectedUploadedLogo>Yes</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Default Transcript
+                    </td>
+                    <td>
+                        <select name="defaultcertTemp" id="defaultcertTemp">
+                            <option value="0">No</option>
+                            <option value="1" @selectedasDefault>Yes</option>
+
+                            >Yes</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Default Sorted Field</td>
+                    <td>
+                        <div>
+                             <select name="drpDefaultSorting" id="drpDefaultSorting">
+                                @foreach(var field in Model.ListSelectedFields.OrderBy(item => item.textDisplay)){
+                                    if(Model.CourseGridDefaultFieldSorting == field.id){
+                                            gridsortdefault="selected";
+                                     }
+                                    else{
+                                            gridsortdefault="";
+                                    }
+                                    if(!field.id.Contains("customfield")){
+                                                <option value="@field.id" @gridsortdefault>@field.textDisplay</option>
+                                    }
+                                }
+                                @foreach(var field in Model.ListAvailableFields.OrderBy(item => item.textDisplay)){
+                                    if(Model.CourseGridDefaultFieldSorting == field.id){
+                                            gridsortdefault="selected";
+                                     }
+                                    else{
+                                            gridsortdefault="";
+                                    }
+                                    if(!field.id.Contains("customfield")){
+                                        <option value="@field.id" @gridsortdefault>@field.textDisplay</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+</td>
+</tr>
+                <tr>
+                    <td colspan="2">
+                        <span class="smdetails">* Make this transcript a default for all course if not selected within.</span>
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+        <fieldset style="margin: 10px;" class="ui-widget-content ui-corner-all ui-helper-clearfix">
+            <div>
+                Check to Set Active Objects:
+				<table>
+                    <tr>
+                        <td style="vertical-align: text-top;">
+                            <label>
+                                <input type="checkbox" id="chkHeader1" name="chkHeader1" value="divHeader1" />Header
+                            </label>
+                            <br />
+                            <label>
+                                <input type="checkbox" id="chkOptionalText" name="chkHeader2" value="divHeader1" />Optional Text</label><br />
+                            <label>
+                                <input type="checkbox" id="chkStudentName" value="divHeader1" checked="checked" disabled="disabled" />Student Name</label><br />
+                            <label>
+                                <input type="checkbox" id="chkStudentAddress" value="divHeader1" />Student Address</label><br />
+
+                            <label>
+                                <input type="checkbox" id="chkCustomField1" value="divHeader1" />Custom Field 1</label><br />
+                            <label>
+                                <input type="checkbox" id="chkCustomField2" value="divHeader1" />Custom Field 2</label><br />
+                            <label>
+                                <input type="checkbox" id="chkCustomField3" value="divHeader1" />Custom Field 3</label><br />
+                            <label>
+                                <input type="checkbox" id="chkDatePrint" value="divHeader1" />Date Print</label><br />
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+        </fieldset>
+    </div>
+    <center>
+    <!-- HORIZONTAL BUTTON MENU -->
+	<fieldset style="margin:10px; align-content:center;" class="ui-widget-content ui-corner-all ui-helper-clearfix">
+		<legend style="background-color: #aaaaaa; text-align:center; align-items:center;">Actions</legend>
+				<input type="button" value="Select Transcript " id="btnSelect" class="fg-button ui-state-default ui-corner-all" style="width:120px; height:35px;cursor: pointer;"  />
+				<input type="button" value="PDF Settings" id="btnPdfSet" class="fg-button ui-state-default ui-corner-all" style="width:100px; height:35px;cursor: pointer;"  />
+				<input type="button" value="Transcript Settings" id="btnTransSet" class="fg-button ui-state-default ui-corner-all" style="width:120px; height:35px;cursor: pointer;"  />
+				<input type='button' id="Update" name='Update' value='Save'  class="fg-button ui-state-default ui-corner-all" style="width:100px; height:35px;cursor: pointer;"  />
+				<input type="button" value="Clear" onClick="window.location.href = '/adm/CustomTranscript/TranscriptGenerator?tid=@Model.transcriptid'" class="fg-button ui-state-default ui-corner-all" style="width:100px; height:35px;cursor: pointer;"  />
+          		<div style=" height:10px; width:10px;"></div>
+				<input type="checkbox" id="chkObjectDimension" value="true" checked="true">Show Object Dimension </input><br />
+	</fieldset>
+	<!-- END HORIZONTAL BUTTON MENU -->
+	<fieldset style="margin:10px; " class="ui-widget-content ui-corner-all ui-helper-clearfix">
+        <legend style="background-color: #aaaaaa">Transcript Preview for [@Model.PdfTitle]</legend>
+    <div style=" float:left;">
+    <div id="PDFFrame" style="border: 1px solid black; width: @pdfwidth; height:@pdfheight; background-color:#B2B2B2;">
+        <div id="PDFDocs" style=" background-image:url('/admin/images/pdfimages/@Model.BackgroundImage'); background-color: white; background-size: 756px 576px; width:  @Boundx; height: @Boundy; border: solid 1px; margin-top: @PdfMarginTop; margin-bottom: @PdfMarginBottom; margin-left: @PdfMarginLeft; margin-right: @PdfMarginRight; background-repeat: no-repeat;"
+            class="">
+            <img width="100%" height="100%" alt="Missing background image." src="/admin/images/pdfimages/@Model.BackgroundImage" />
+                <div style="margin:2px; visibility:@Model.useHeader; top:@Model.HeaderY; left:@Model.HeaderX; width:@Model.HeaderW; height:@Model.HeaderH; text-align:@Model.HeaderAlign; vertical-align:center; font-size:@Model.HeaderFont;" class="floatingObjectDefault" id="divHeader">[Header]<div  id="divHeaderValue">@Model.OptionalHeaderText</div>
+                     
+                </div>
+                <div style ="margin:2px; visibility:@Model.useOptionalText; top:@Model.OptionalTextY; left:@Model.OptionalTextX; width:@Model.OptionalTextW; height:@Model.OptionalTextH; text-align:@Model.OptionalTextAlign; vertical-align:center; font-size:@Model.OptionalTextFont;" class="floatingObjectDefault" id="divOptionalText">[Optional Text]<div  id="divOptionalTextValue">@Model.OptionalTextValue</div></div>
+
+                <div style ="margin:2px; visibility:visible; top:@Model.StudentNameY; left:@Model.StudentNameX; width:@Model.StudentNameW; height:@Model.StudentNameH; text-align:@Model.StudentNameAlign; vertical-align:center; font-size:@Model.StudentNameFont;" class="floatingObjectDefault" id="divStudentName">
+                    Student Name
+                </div>
+                <div style ="margin:2px; visibility:@Model.useStudentAddress; top:@Model.StudentAddressY; left:@Model.StudentAddressX; width:@Model.StudentAddressW; height:@Model.StudentAddressH; text-align:@Model.StudentAddressAlign; vertical-align:center; font-size:@Model.StudentAddressFont;" class="floatingObjectDefault" id="divStudentAddress">
+                    Student Address
+                </div>
+
+                <div style ="margin:2px; visibility:@Model.useCustomField1; top:@Model.CustomField1Y; left:@Model.CustomField1X; width:@Model.CustomField1W; height:@Model.CustomField1H; text-align:@Model.CustomField1Align; vertical-align:center; font-size:@Model.CustomField1Font;"  class="floatingObjectDefault" id="divCustomField1"><div id="divCustomField1Value">@Model.CustomField1Selected</div></div>
+                <div style ="margin:2px; visibility:@Model.useCustomField2; top:@Model.CustomField2Y; left:@Model.CustomField2X; width:@Model.CustomField2W; height:@Model.CustomField2H; text-align:@Model.CustomField2Align; vertical-align:center; font-size:@Model.CustomField2Font;"  class="floatingObjectDefault" id="divCustomField2"><div id="divCustomField2Value">@Model.CustomField2Selected</div></div>
+                <div style ="margin:2px; visibility:@Model.useCustomField3; top:@Model.CustomField3Y; left:@Model.CustomField3X; width:@Model.CustomField3W; height:@Model.CustomField3H; text-align:@Model.CustomField3Align; vertical-align:center; font-size:@Model.CustomField3Font;"  class="floatingObjectDefault" id="divCustomField3"><div id="divCustomField3Value">@Model.CustomField3Selected</div></div>
+                <div style ="margin:2px; visibility:@Model.useDatePrint; top:@Model.DatePrintY; left:@Model.DatePrintX; width:@Model.DatePrintW; height:@Model.DatePrintH; text-align:@Model.DatePrinttAlign; vertical-align:center; font-size:@Model.DatePrintFont;"  class="floatingObjectDefault" id="divDatePrint">
+                   Date Print
+                </div>
+                <div style=" margin:2px; text-align: center; width:@Model.CourseGridW; height:@Model.CourseGridH; top:@Model.CourseGridY; left:@Model.CourseGridX;" class="floatingObjectDefault" id="coursedetails">
+                    Course Datails Area
+                    <ul id="selectedf" class="selectedfields" style="width:100%;background-color:grey;">
+                        <li class="pin">.</li>
+                            @foreach(var field in Model.ListSelectedFields){
+                                <text>
+                                 <li id="@field.id" value="" class="ui-state-default">@field.textDisplay</li>
+                                </text>
+                            }
+                    </ul>
+
+                    <br style="clear: both">
+                </div>
+
+        </div>
+
+    </div>
+        @using (Html.BeginForm("UploadImage", "CustomTranscript", FormMethod.Post, 
+                            new { enctype = "multipart/form-data" }))
+            {  
+                <label for="file">Upload Image:</label> 
+                <input type="file" name="file" id="file" style="width: 50%;" /> 
+                <input type="hidden" name="transid" id="transid" value="@Model.transcriptid"/> 
+                <input type="submit" value="Upload" class="submit" /> 
+            }
+</div>
+<div style="float:left;">
+
+                    <ul id="availablef" class="availablefields">
+                        <li class="pin2">Available Course Fields<br />*<i>Roster Data</i></li>
+                            @foreach(var field in Model.ListAvailableFields){
+                                <text>
+                                 <li id="@field.id" value="" class="ui-state-default">@field.textDisplay</li>
+                                </text>
+                            }
+                    </ul>
+
+</div>
+</fieldset>
+</center>
+</body>
+</html>

@@ -1,0 +1,20 @@
+﻿@{
+    Layout = null;
+}
+<div id="current-courselist">
+    <div class="panel panel-default">
+        <div class="panel-heading gsmu-sub-panel-heading">
+            <div class="panel-title ext-js-title clearfix">
+                Current Course List
+                <div class="pull-right">
+                    <button type="button" onclick="courseList.showPastCourse();" id="course-past-btn" class="btn btn-xs btn-info">Show Past</button>
+                    <button type="button" onclick="courseList.saveCoursePreRequisites();" id="course-prereq-btn" class="btn btn-xs btn-success">Save</button>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body gsmu-sub-panel-body panel-collapse collapse in">
+            <table id="current-courselist-table" style="width:100%;font-size:11px!important" class="table table-striped table-hover"></table>
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/Areas/Public/Scripts/Course/Widgets/CourseList.js")

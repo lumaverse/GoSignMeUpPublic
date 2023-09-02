@@ -1,0 +1,17 @@
+﻿@using auth = Gsmu.Api.Authorization;
+@using student = Gsmu.Api.Data.School.Student;
+@using data = Gsmu.Api.Data;
+
+@if (auth.AuthorizationHelper.CurrentUser.LoggedInUserType == auth.LoggedInUserType.Student && student.MembershipHelper.MembershipEnabled && student.MembershipHelper.AllowMembersSeeTheirMembershiptype)
+{
+    <u>@(data.GrammarHelper.Capital(student.MembershipHelper.MembershipName)) status:</u> 
+    <strong>@auth.AuthorizationHelper.CurrentUser.MembershipLabel</strong>
+    
+    if (!string.IsNullOrWhiteSpace(auth.AuthorizationHelper.CurrentUser.MembershipComment))
+    {
+        <text>
+            - @auth.AuthorizationHelper.CurrentUser.MembershipComment
+        </text>
+    }
+}
+

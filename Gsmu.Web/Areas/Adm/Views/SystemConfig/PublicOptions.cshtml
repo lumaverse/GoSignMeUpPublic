@@ -1,0 +1,533 @@
+﻿@using Gsmu.Api.Data
+@model Gsmu.Api.Data.ViewModels.SystemConfig.PublicOptionsViewModel
+
+@{
+    Layout = "~/Areas/Adm/Views/Shared/_Layout.cshtml";
+}
+
+@if (!string.IsNullOrEmpty(ViewBag.ExtJSMode) && (ViewBag.ExtJSMode == "1"))
+{
+    @Scripts.Render("~/Areas/Adm/Scripts/SystemConfig/PublicOptionsComponent.js")
+    <script type="text/javascript">
+        Ext.onReady(function() {
+            var cmp = new PublicOptionsComponent({
+                containerId: 'systemconfig-publicoptions-component-container',
+                Data: @Html.Raw(Json.Encode(Model))
+                });
+        });
+    </script>
+    <div id="systemconfig-publicoptions-component-container">
+    </div>
+}
+else
+{
+    @Scripts.Render("~/Areas/Adm/Scripts/SystemConfig/PublicOptionsComponent.js")
+    using (Html.BeginForm("SavePublicOptions", "SystemConfig", FormMethod.Post, new { id = "public-options-form" }))
+    {
+    <div class="container-fluid">
+        <div class="col-lg-12">
+            <div class="panel panel-default" id="accordion">
+                <div class="panel-heading gsmu-main-panel-heading">
+                    <div class="pull-left heading-title">
+                        <img src="/Images/Icons/FamFamFam/world.png" /> Public Options
+                    </div>
+                    <div class="pull-right heading-buttons">
+                        <button type="button" onclick="publicOptionsModule.savePublicOptions(this)" class="gsmu-panel-header-button btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i>&nbsp; Save</button>
+                    </div>
+                    <div class="gsmu-spacer"></div> <!--make sure to include spacer if panel header contains both pull left and right-->
+                </div>
+                <div class="panel-body gsmu-main-body gsmu-form">
+                    <div class="panel panel-default">
+                        <div class="panel-heading gsmu-sub-panel-heading">
+                            <div class="panel-title">
+                                <img src="/Images/Icons/FamFamFam/lock.png" /> Common Login Settings
+                                <span class="pull-right clickable">
+                                    <a href="#commonPanel" data-toggle="collapse" data-parent="#accordion" title="" class="btn-icon btn-xs glyphicon glyphicon-chevron-up"></a>
+                                </span>
+                            </div>
+                        </div>
+                        <div id="commonPanel" class="panel-body gsmu-sub-panel-body panel-collapse collapse in">
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    System Time Zone Hour Offset
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.DropDownListFor(model => model.SystemTimeZoneHour, Model.SystemTimeZoneHourList, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Log-in Authentication Option
+                                </div>
+                                <div class="col-lg-8">
+                                    @if (Model.LoginAuthOption == 0)
+                                    {
+                                        <label class="radio-inline">@Html.RadioButtonFor(model => model.LoginAuthOption, 0, new { @checked = true }) Default</label>
+                                    }
+                                    else
+                                    {
+                                        <label class="radio-inline">@Html.RadioButtonFor(model => model.LoginAuthOption, 0) Default</label>
+                                    }
+                                    <br />
+                                    @if (Model.LoginAuthOption == 1)
+                                    {
+                                        <label class="radio-inline">@Html.RadioButtonFor(model => model.LoginAuthOption, 1, new { @checked = true }) Email</label>
+                                    }
+                                    else
+                                    {
+                                        <label class="radio-inline">@Html.RadioButtonFor(model => model.LoginAuthOption, 1) Email</label>
+                                    }
+                                    <br />
+                                    @if (Model.LoginAuthOption == 2)
+                                    {
+                                        <label class="radio-inline">@Html.RadioButtonFor(model => model.LoginAuthOption, 2, new { @checked = true }) Allow to user either Username or Email</label>
+                                    }
+                                    else
+                                    {
+                                        <label class="radio-inline">@Html.RadioButtonFor(model => model.LoginAuthOption, 2) Allow to user either Username or Email</label>
+                                    }
+
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Log-in Startup Page
+                                </div>
+                                <div class="col-lg-8">
+                                    @if (Model.StartupPage == 0)
+                                    {
+                                        <label class="radio-inline">@Html.RadioButtonFor(model => model.StartupPage, 0, new { @checked = true }) Default</label>
+                                    }
+                                    else
+                                    {
+                                        <label class="radio-inline">@Html.RadioButtonFor(model => model.StartupPage, 0) Default</label>
+                                    }
+                                    <br />
+                                    @if (Model.StartupPage == 1)
+                                    {
+                                        <label class="radio-inline">@Html.RadioButtonFor(model => model.StartupPage, 1, new { @checked = true }) Browse Courses</label>
+                                    }
+                                    else
+                                    {
+                                        <label class="radio-inline">@Html.RadioButtonFor(model => model.StartupPage, 1) Browse Courses</label>
+                                    }
+                                    <br />
+                                    @if (Model.StartupPage == 2)
+                                    {
+                                        <label class="radio-inline">@Html.RadioButtonFor(model => model.StartupPage, 2, new { @checked = true }) Other</label>
+                                    }
+                                    else
+                                    {
+                                        <label class="radio-inline">@Html.RadioButtonFor(model => model.StartupPage, 2) Other</label>
+                                    }
+                                    <br /><br />
+                                    @Html.EditorFor(model => model.OtherStrtupPage, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Common / Matching Login For Public Areas
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.DropDownListFor(model => model.AllowPublicBreakCommonLogin, Model.PolarAnswers, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Auto Populate Password for Instructor & Supervisor from Student
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.DropDownListFor(model => model.AutoPopulatePassword4CommonLogin, Model.PolarAnswers, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Auto update basic data for Instructor
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.DropDownListFor(model => model.AllowCrossUserUpdate, Model.PolarAnswers, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Prevent users from Sign up / check-out
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.DropDownListFor(model => model.PublicSignupAbilityOff, Model.PolarAnswers, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Pretext Username for #Mask
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.EditorFor(model => model.StudentRegisterMaskFiveInitText, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading gsmu-sub-panel-heading">
+                            <div class="panel-title">
+                                <img src="/Images/Icons/FamFamFam/lock_break.png" /> Required Login Settings
+                                <span class="pull-right clickable">
+                                    <a href="#requiredPanel" data-toggle="collapse" data-parent="#accordion" title="" class="btn-icon btn-xs glyphicon glyphicon-chevron-up"></a>
+                                </span>
+                            </div>
+                        </div>
+                        <div id="requiredPanel" class="panel-body gsmu-sub-panel-body panel-collapse collapse in">
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Require student accounts to have unique email addresses
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.DropDownListFor(model => model.ForceLogin, Model.PolarAnswers, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Force Update account after login
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.DropDownListFor(model => model.ForceAccountUpdate, Model.PolarAnswers, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Allow Student Multiple Sign Up
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.DropDownListFor(model => model.AllowStudentMultiEnroll, Model.PolarAnswers, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Multiple Sign Up Custom Text
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.EditorFor(model => model.MultipleSignUpCustomText, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Student Multiple Sign Up in Strict Mode
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.DropDownListFor(model => model.RestrictStudentMultiSignup, Model.PolarAnswers, new { @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading gsmu-sub-panel-heading">
+                            <div class="panel-title">
+                                <img src="/Images/Icons/FamFamFam/coins.png" /> Payor Settings
+                                <span class="pull-right clickable">
+                                    <a href="#payorPanel" data-toggle="collapse" data-parent="#accordion" title="" class="btn-icon btn-xs glyphicon glyphicon-chevron-up"></a>
+                                </span>
+                            </div>
+                        </div>
+                        <div id="payorPanel" class="panel-body gsmu-sub-body panel-collapse collapse in">
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Allow Payor (Multiple Students under one Payor)
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.DropDownListFor(model => model.AllowParentLevel, Model.PolarAnswers, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Parent Level Title
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.EditorFor(model => model.ParentLevelTitle, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Child Level Title
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.EditorFor(model => model.ChildLevelTitle, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Have Public Release Form (Must have Allow Payor set to Yes)
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.DropDownListFor(model => model.AllowReleaseForm, Model.PolarAnswers, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Release Form Title
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.EditorFor(model => model.ReleaseFormTitle, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Release Form Text
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.EditorFor(model => model.ReleaseFormText, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Automatically Mark Zero Cost Public Orders as Paid-In-Full So they are Auto-Approved
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.DropDownListFor(model => model.AutoApproveZeroOrder, Model.PolarAnswers, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Hide Specific Links On The Public Side
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.DropDownListFor(model => model.PublicHideLinks, Model.PublicHideLinksList, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Reverse The Students Name in the Cart Area
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.DropDownListFor(model => model.NameDisplayStyle, Model.NameDisplayStyleList, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Students To Be Shown In The Public Supervisor Area
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.DropDownListFor(model => model.SupervisorExcludeInactive, Model.SupervisorExcludeInactiveList, new { @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading gsmu-sub-panel-heading">
+                            <div class="panel-title">
+                                <img src="/Images/Icons/socialmediaicons/google-16x16.png" /> Google SSO Panel
+                                <span class="pull-right clickable">
+                                    <a href="#googlePanel" data-toggle="collapse" data-parent="#accordion" title="" class="btn-icon btn-xs glyphicon glyphicon-chevron-up"></a>
+                                </span>
+                            </div>
+                        </div>
+                        <div id="googlePanel" class="panel-body gsmu-sub-body panel-collapse collapse in">
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-12 well">
+                                    Note: For information on how to enable integration contact GoSignMeUp! <br /> <a href="#">Google API Console</a>
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Google authentication redirect url
+                                </div>
+                                <div class="col-lg-8">
+                                    <div><a href="@Model.AspSiteGoogleRedirectUrl" id="aspsite-google-redirect-url">@Model.AspSiteGoogleRedirectUrl</a></div>
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Google SSO Enabled
+                                </div>
+                                <div class="col-lg-8">
+                                    @if (Model.GoogleSSOEnabled == 1)
+                                    {
+                                        <label class="radio-inline"><input type="radio" name="GoogleSSOEnabled" value="1" checked="checked" />On</label><br />
+                                        <label class="radio-inline"><input type="radio" name="GoogleSSOEnabled" value="0" />Off</label><br />
+                                    }
+                                    else
+                                    {
+                                        <label class="radio-inline"><input type="radio" name="GoogleSSOEnabled" value="1" />On</label><br />
+                                        <label class="radio-inline"><input type="radio" name="GoogleSSOEnabled" value="0" checked="checked" />Off</label><br />
+                                    }
+                                    
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Google SSO Client ID
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.EditorFor(model => model.GoogleSSOClientId, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Google SSO Client Secret
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.EditorFor(model => model.GoogleSSOClientSecret, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading gsmu-sub-panel-heading">
+                            <div class="panel-title">
+                                <img src="/Images/IntegrationPartners/shibbolethicon.png" /> Shibboleth SSO Panel
+                                <span class="pull-right clickable">
+                                    <a href="#shibbolethPanel" data-toggle="collapse" data-parent="#accordion" title="" class="btn-icon btn-xs glyphicon glyphicon-chevron-up"></a>
+                                </span>
+                            </div>
+                        </div>
+                        <div id="shibbolethPanel" class="panel-body gsmu-sub-panel-body panel-collapse collapse in">
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Shibboleth SSO Enabled
+                                </div>
+                                <div class="col-lg-8">
+                                    @if (Model.ShibbolethSSOEnabled == 1)
+                                    {
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethSSOEnabled" value="1" checked="checked" />On</label><br />
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethSSOEnabled" value="0" />Off</label><br />
+                                    }
+                                    else
+                                    {
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethSSOEnabled" value="1" />On</label><br />
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethSSOEnabled" value="0" checked="checked" />Off</label><br />
+                                    }
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Shibboleth Allow GSMU Authentication
+                                </div>
+                                <div class="col-lg-8">
+                                    @if (Model.ShibbolethAllowGSMULogin == 1)
+                                    {
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethAllowGSMULogin" value="1" checked="checked" />On</label><br />
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethAllowGSMULogin" value="0" />Off</label><br />
+                                    }
+                                    else
+                                    {
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethAllowGSMULogin" value="1" />On</label><br />
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethAllowGSMULogin" value="0" checked="checked" />Off</label><br />
+                                    }
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Shibboleth SSO Required Log in
+                                </div>
+                                <div class="col-lg-8">
+                                    @if (Model.ShibbolethRequiredLogin == 1)
+                                    {
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethRequiredLogin" value="1" checked="checked" />On</label><br />
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethRequiredLogin" value="0" />Off</label><br />
+                                    }
+                                    else
+                                    {
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethRequiredLogin" value="1" />On</label><br />
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethRequiredLogin" value="0" checked="checked" />Off</label><br />
+                                    }
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Only allow GSMU Users to Log in
+                                </div>
+                                <div class="col-lg-8">
+                                    @if (Model.ShibbolethSSOGSMUOnly == 1)
+                                    {
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethSSOGSMUOnly" value="1" checked="checked" />On</label><br />
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethSSOGSMUOnly" value="0" />Off</label><br />
+                                    }
+                                    else
+                                    {
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethSSOGSMUOnly" value="1" />On</label><br />
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethSSOGSMUOnly" value="0" checked="checked" />Off</label><br />
+                                    }
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Only allow active Users to Log in
+                                </div>
+                                <div class="col-lg-8">
+                                    @if (Model.ShibbolethSSOGSMUActive == 1)
+                                    {
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethSSOGSMUActive" value="1" checked="checked" />On</label><br />
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethSSOGSMUActive" value="0" />Off</label><br />
+                                    }
+                                    else
+                                    {
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethSSOGSMUActive" value="1" />On</label><br />
+                                        <label class="radio-inline"><input type="radio" name="ShibbolethSSOGSMUActive" value="0" checked="checked" />Off</label><br />
+                                    }
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Shibboleth SSO Log out Link
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.EditorFor(model => model.ShibbolethLogOutLink, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Shibboleth Session ID Attribute
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.EditorFor(model => model.ShibbolethSessionIdAttribute, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Shibboleth Department Attribute
+                                </div>
+                                <div class="col-lg-8">
+                                    @Html.EditorFor(model => model.ShibbolethDepartmentAttribute, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                            <div class="row form-group form-group-sm">
+                                <div class="col-lg-4 control-label">
+                                    Departments
+                                </div>
+                                <div class="col-lg-8">
+                                    <input type="text" class="form-control" name="Department" id="Department" /><br />
+                                    <input type="hidden" name="CurrentShibbolethDepartmentAttribute" id="CurrentShibbolethDepartmentAttribute" value="@Model.CurrentShibbolethDepartmentAttribute" />
+                                    <div class="col-lg-8">
+                                        <table id="department-grid" class="row table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th class="text-right">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                        <div class="row">
+                                            <button class="btn btn-success" type="button" onclick="publicOptionsModule.addDepartment()"><i class="glyphicon glyphicon-plus"></i>&nbsp;Add</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="pull-left footer-buttons">
+                        <button onclick="publicOptionsModule.backToIndex()" type="button" class="gsmu-panel-footer-button btn btn-default"><i class="glyphicon glyphicon-step-backward"></i>&nbsp; Back</button>
+                    </div>
+                    <div class="pull-right footer-buttons">
+                        <button onclick="publicOptionsModule.savePublicOptions(this)" type="button" class="gsmu-panel-footer-button btn btn-primary"><i class="glyphicon glyphicon-floppy-disk"></i>&nbsp; Save</button>
+                    </div>
+                    <div class="gsmu-spacer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+}
+
+

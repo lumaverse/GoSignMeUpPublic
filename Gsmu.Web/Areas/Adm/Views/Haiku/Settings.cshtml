@@ -1,0 +1,40 @@
+﻿@using haiku = Gsmu.Api.Integration.Haiku;
+@using Gsmu.Api.Data;
+@using Gsmu.Api.Language;
+@using Gsmu.Api.Integration.Haiku.Responses;
+@using System.Xml.Serialization;
+@{
+    ViewBag.Title = "Haiku Settings";
+}
+
+
+@section Head {
+
+@*
+<link rel="stylesheet" href="@Url.Content("~/Areas/Public/Styles/HaikuAdmin.css")"/>
+*@
+@Scripts.Render("~/Areas/Adm/Scripts/Haiku/HaikuSettings.js")    
+    
+    <script type="text/javascript">
+        Ext.onReady(function() {
+            var component = new HaikuSettings({
+                containerId: 'haiku-settings-panel',
+                settings: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(haiku.Configuration.Instance, Newtonsoft.Json.Formatting.Indented))
+            });
+        });
+    </script>
+
+}
+
+@*
+@section TopMiddle {
+}
+*@
+
+@*
+@section sidebar {
+
+}
+*@
+
+<div id="haiku-settings-panel"></div>

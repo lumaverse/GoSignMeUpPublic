@@ -1,0 +1,117 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1800
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gsmu.Api", "Gsmu.Api\Gsmu.Api.csproj", "{18895C8D-8010-4B53-919A-A5B7FCBC3157}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gsmu.Web", "Gsmu.Web\Gsmu.Web.csproj", "{3E2E43F2-5502-48A6-89B2-83F6B8BC531D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{46475143-ED3F-45AF-9378-8245AF48514F} = {46475143-ED3F-45AF-9378-8245AF48514F}
+		{6342D8AE-5AFC-48B1-994E-CA8F67B6A71F} = {6342D8AE-5AFC-48B1-994E-CA8F67B6A71F}
+		{AA53E8CB-C98A-4D48-87C0-388913B66B4F} = {AA53E8CB-C98A-4D48-87C0-388913B66B4F}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B0411A55-4B86-4971-9397-A2932C924F9A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionResources", "SolutionResources", "{B8E401A3-3442-4357-AD9F-3FF024898D1A}"
+	ProjectSection(SolutionItems) = preProject
+		resources\GenerateExtjsModelInMSSQL.SQL = resources\GenerateExtjsModelInMSSQL.SQL
+		resources\gosignmeupSSL2016-Password-Contact-Lang.pfx = resources\gosignmeupSSL2016-Password-Contact-Lang.pfx
+		Ssh Host Key Fingerprint SFTP .txt = Ssh Host Key Fingerprint SFTP .txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{B4341D34-7A8B-4D86-A4B9-DC3F91BE620B}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gsmu.Service.Models", "Gsmu.Service.Models\Gsmu.Service.Models.csproj", "{AA53E8CB-C98A-4D48-87C0-388913B66B4F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gsmu.Service.BusinessLogic", "Gsmu.Service.BusinessLogic\Gsmu.Service.BusinessLogic.csproj", "{6342D8AE-5AFC-48B1-994E-CA8F67B6A71F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{18895C8D-8010-4B53-919A-A5B7FCBC3157} = {18895C8D-8010-4B53-919A-A5B7FCBC3157}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gsmu.Service.Interface", "Gsmu.Service.Interface\Gsmu.Service.Interface.csproj", "{46475143-ED3F-45AF-9378-8245AF48514F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{18895C8D-8010-4B53-919A-A5B7FCBC3157} = {18895C8D-8010-4B53-919A-A5B7FCBC3157}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gsmu.Service.API", "Gsmu.Service.API\Gsmu.Service.API.csproj", "{A5E18893-C739-4932-A6B3-A0645E379021}"
+	ProjectSection(ProjectDependencies) = postProject
+		{46475143-ED3F-45AF-9378-8245AF48514F} = {46475143-ED3F-45AF-9378-8245AF48514F}
+		{6342D8AE-5AFC-48B1-994E-CA8F67B6A71F} = {6342D8AE-5AFC-48B1-994E-CA8F67B6A71F}
+		{AA53E8CB-C98A-4D48-87C0-388913B66B4F} = {AA53E8CB-C98A-4D48-87C0-388913B66B4F}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackBoardAPI", "E:\websites\blackboardAPI\BlackBoardAPI\BlackBoardAPI.csproj", "{73BADD96-F241-4FC9-8A35-D192D37F123F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{18895C8D-8010-4B53-919A-A5B7FCBC3157}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18895C8D-8010-4B53-919A-A5B7FCBC3157}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18895C8D-8010-4B53-919A-A5B7FCBC3157}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{18895C8D-8010-4B53-919A-A5B7FCBC3157}.Debug|x86.Build.0 = Debug|Any CPU
+		{18895C8D-8010-4B53-919A-A5B7FCBC3157}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{18895C8D-8010-4B53-919A-A5B7FCBC3157}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{18895C8D-8010-4B53-919A-A5B7FCBC3157}.Release|x86.ActiveCfg = Release|Any CPU
+		{18895C8D-8010-4B53-919A-A5B7FCBC3157}.Release|x86.Build.0 = Release|Any CPU
+		{3E2E43F2-5502-48A6-89B2-83F6B8BC531D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E2E43F2-5502-48A6-89B2-83F6B8BC531D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E2E43F2-5502-48A6-89B2-83F6B8BC531D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3E2E43F2-5502-48A6-89B2-83F6B8BC531D}.Debug|x86.Build.0 = Debug|Any CPU
+		{3E2E43F2-5502-48A6-89B2-83F6B8BC531D}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E2E43F2-5502-48A6-89B2-83F6B8BC531D}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{3E2E43F2-5502-48A6-89B2-83F6B8BC531D}.Release|x86.ActiveCfg = Release|Any CPU
+		{3E2E43F2-5502-48A6-89B2-83F6B8BC531D}.Release|x86.Build.0 = Release|Any CPU
+		{AA53E8CB-C98A-4D48-87C0-388913B66B4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA53E8CB-C98A-4D48-87C0-388913B66B4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA53E8CB-C98A-4D48-87C0-388913B66B4F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AA53E8CB-C98A-4D48-87C0-388913B66B4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA53E8CB-C98A-4D48-87C0-388913B66B4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA53E8CB-C98A-4D48-87C0-388913B66B4F}.Release|x86.ActiveCfg = Release|Any CPU
+		{6342D8AE-5AFC-48B1-994E-CA8F67B6A71F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6342D8AE-5AFC-48B1-994E-CA8F67B6A71F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6342D8AE-5AFC-48B1-994E-CA8F67B6A71F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6342D8AE-5AFC-48B1-994E-CA8F67B6A71F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6342D8AE-5AFC-48B1-994E-CA8F67B6A71F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6342D8AE-5AFC-48B1-994E-CA8F67B6A71F}.Release|x86.ActiveCfg = Release|Any CPU
+		{46475143-ED3F-45AF-9378-8245AF48514F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46475143-ED3F-45AF-9378-8245AF48514F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46475143-ED3F-45AF-9378-8245AF48514F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{46475143-ED3F-45AF-9378-8245AF48514F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46475143-ED3F-45AF-9378-8245AF48514F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46475143-ED3F-45AF-9378-8245AF48514F}.Release|x86.ActiveCfg = Release|Any CPU
+		{A5E18893-C739-4932-A6B3-A0645E379021}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5E18893-C739-4932-A6B3-A0645E379021}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5E18893-C739-4932-A6B3-A0645E379021}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A5E18893-C739-4932-A6B3-A0645E379021}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5E18893-C739-4932-A6B3-A0645E379021}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5E18893-C739-4932-A6B3-A0645E379021}.Release|x86.ActiveCfg = Release|Any CPU
+		{73BADD96-F241-4FC9-8A35-D192D37F123F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73BADD96-F241-4FC9-8A35-D192D37F123F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73BADD96-F241-4FC9-8A35-D192D37F123F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{73BADD96-F241-4FC9-8A35-D192D37F123F}.Debug|x86.Build.0 = Debug|Any CPU
+		{73BADD96-F241-4FC9-8A35-D192D37F123F}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{73BADD96-F241-4FC9-8A35-D192D37F123F}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{73BADD96-F241-4FC9-8A35-D192D37F123F}.Release|x86.ActiveCfg = Release|Any CPU
+		{73BADD96-F241-4FC9-8A35-D192D37F123F}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B8E401A3-3442-4357-AD9F-3FF024898D1A} = {B0411A55-4B86-4971-9397-A2932C924F9A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3CA5A2FD-C124-4A44-953F-F921CF87ABEF}
+		VisualSVNWorkingCopyRoot = .
+	EndGlobalSection
+EndGlobal

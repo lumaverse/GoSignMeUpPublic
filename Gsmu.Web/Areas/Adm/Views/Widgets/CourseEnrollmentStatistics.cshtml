@@ -1,0 +1,86 @@
+﻿<div id="widget-course-enrollment-statistics">
+    <div class="panel panel-default">
+        <div class="panel-heading gsmu-sub-panel-heading">
+            <div class="panel-title pull-left">
+                Enrollment Statistics
+            </div>
+            <div class="pull-right">
+                <div id="course-enrollment-stat-editor-btns">
+                    <div>
+                        <button type="button" class="btn btn-warning btn-xs edit" onclick="courseEnrollmentStatEditor.initEditor()"><span class="glyphicon glyphicon-pencil"></span></button>
+                        <button type="button" class="btn btn-success btn-xs save" onclick="courseEnrollmentStatEditor.save()"><span class="glyphicon glyphicon-ok"></span></button>
+                        <button type="button" class="btn btn-danger btn-xs cancel" onclick="courseEnrollmentStatEditor.initView()"><span class="glyphicon glyphicon-remove"></span></button>
+                    </div>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <div class="panel-body gsmu-sub-panel-body large-panel scroll-y panel-collapse collapse in">
+            <ul class="nav nav-tabs">
+                <li role="presentation" class="active"><a href="#course-enrollment-stat-summary" data-toggle="tab">Summary</a></li>
+                <li role="presentation"><a href="#course-enrollment-stat-date" data-toggle="tab">Enrollment by Date</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="course-enrollment-stat-summary" class="tab-pane fade in active">
+                    <div class="col-md-7 col-sm-7">
+                        <canvas id="course-enrollment-statistics-graph"></canvas>
+                    </div>
+                    <div class="col-md-5 col-sm-7 pad-x-0">
+                        <div id="course-enrollment-statistics-info">
+                            <div id="course-enrollment-stat-enrolled" class="dashboard-status-widget">
+                                <span class="widget-status-header">ENROLLED</span><br />
+                                <div class="pull-right"> <span id="enrolled-count" style="font-size:25px">0</span></div>
+                                <div class="pull-left">Max : &nbsp;<span id="enrolled-max" class="pull-right">0</span></div><br />
+                                <div class="pull-left">Open : &nbsp;<span id="open-seats-left" class="pull-right">0</span></div>
+                            </div>
+                            <div id="course-enrollment-stat-waiting" class="dashboard-status-widget">
+                                <span class="widget-status-header">WAITING</span> <br />
+                                <div class="pull-right"> <span id="waiting-count" style="font-size:25px">0</span></div>
+                                <div class="pull-left">Max : &nbsp;<span id="waiting-max" class="pull-right">0</span></div><br />
+                                <div class="pull-left">Available : &nbsp;<span id="wait-list-left" class="pull-right">0</span></div>
+                            </div>
+                            <div id="course-enrollment-stat-cancelled" class="dashboard-status-widget">
+                                <span class="widget-status-header">CANCELLED</span> <br />
+                                <div class="pull-right"> <span id="cancelled-count" style="font-size:25px">0</span></div>
+                            </div>
+                            <div id="course-enrollment-stat-transcripted" class="dashboard-status-widget">
+                                <span class="widget-status-header">TRANSCRIPTED</span> <br />
+                                <div class="pull-right"> <span id="transcripted-count" style="font-size:25px">0</span></div>
+                            </div>
+                        </div>
+                        <div id="course-enrollment-statistics-editor">
+                            <div id="course-desc-content-editor">
+                                <div class="form-group-sm col-md-8 pad-x-0 pull-left">
+                                    <div class="pad-bot-5">
+                                        <div class="pad-bot-5">Max Enroll Limit : </div>
+                                        <input type="number" class="form-control input-group-sm" placeholder="Max Enroll Limit" id="course-enrollment-max-enroll" name="MaxEnroll" />
+                                    </div>
+                                    <div class="">
+                                        <div class="pad-bot-5">Max Wait List Limit : </div>
+                                        <input type="number" class="form-control input-group-sm" placeholder="Max Wait List Limit" id="course-enrollment-max-wait" name="MaxWait" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="course-enrollment-stat-date" class="tab-pane fade in">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-2" style="vertical-align: middle;line-height: 35px;">Filter Date : </div>
+                            <div class="col-md-8">
+                                <select id="course-enrollment-stat-date-filter" data-live-search="true" class="form-control">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">&nbsp;</div>
+                        <div class="row">
+                            <canvas id="course-enrollment-statistics-enrollment-by-date"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/Areas/Adm/Scripts/Widgets/CourseEnrollmentStatistics.js")

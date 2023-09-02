@@ -1,0 +1,182 @@
+﻿<div id="widget-course-integration">
+    <div class="panel panel-default">
+        <div class="panel-heading gsmu-sub-panel-heading">
+            <div class="panel-title">
+                Integration
+            </div>
+        </div>
+        <div class="panel-body gsmu-sub-panel-body medium-panel scroll-y panel-collapse collapse in">
+            <div class="row form-group form-group-sm">
+                <div class="col-lg-12">
+                    <div class="row pad-x-10 pad-bot-10">
+                        <div class="course-integration-lti-action">
+                            <div>
+                                <select class="form-control selectpicker">
+                                    <option>Select...</option>
+                                    <option>Export Course & Roster</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row pad-x-10 pad-bot-10">
+                        <div class="course-integration-lms-haiku">
+                            <div class="integration-title"><span id="lms-haiku-name">PowerSchool Learning</span></div>
+                            <div>Learning class Id : <span id="lms-haiku-class-id">n / a</span></div>
+                            <div>Learning import Id : <span id="lms-haiku-import-id">n / a</span></div>
+                            <div>Integrated with Learning : <span id="lms-haiku-integrated-with">n / a</span></div>
+                            <div>Last time Learning sync : <span id="lms-haiku-last-time-sync">n / a</span></div>
+                            <div>Learning integration enabled? : <span id="lms-haiku-integration-enabled">n / a</span></div>
+                            <div>Learning last result : <span id="lms-haiku-last-result">n / a</span></div>
+                            <div>Errors during integration : <span id="lms-haiku-errors-integration">n / a</span></div>
+                        </div>
+                    </div>
+                    <div class="row pad-x-10 pad-bot-10">
+                        <div class="course-integration-lms-blackboard pad-bot-10">
+                            <div id="black-board-integration">
+                                <div class="integration-title"><span class="strong">Blackboard Integration</span></div>
+                                <div>Last run : <span id="lms-blackboard-last-run">n / a</span></div>
+                                <div>Duration : <span id="lms-blackboard-duration">n / a</span></div>
+                            </div>
+                            <div id="black-board-course">
+                                <div class="integration-title"><span class="strong">Blackboard Course</span></div>
+                                <div>Last integrated : <span id="lms-blackboard-last-integration">n / a</span></div>
+                                <div>Integration state : <span id="lms-blackboard-integration-state">n / a</span></div>
+                                <div>Last grade integration : <span id="lms-blackboard-last-grade-integration">n / a</span></div>
+                                <div>Auto enroll : <span id="lms-blackboard-auto-enroll">n / a</span></div>
+                                <div>Course cloned : <span id="lms-blackboard-course-cloned">n / a</span></div>
+                                <div>Server index : <span id="lms-blackboard-server-index">n / a</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row pad-x-10 pad-bot-10">
+                        <div class="course-integration-icon-legend">
+                            <div class="course-integ-icon-legend">Icon Legend</div>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <td>Helius</td>
+                                        <td>Learning</td>
+                                        <td>Canvas</td>
+                                        <td>Blackboard</td>
+                                        <td>Status</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><img src="~/Images/Icons/gsmu/heliusoff.png" /></td>
+                                        <td><img src="~/Images/Icons/gsmu/haikuoff.png" /></td>
+                                        <td><img src="~/Images/Icons/gsmu/canvasoff.png" /></td>
+                                        <td><img src="~/Images/Icons/gsmu/blackboardoff.png" /></td>
+                                        <td>Off</td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="~/Images/Icons/gsmu/helius.png" /></td>
+                                        <td><img src="~/Images/Icons/gsmu/haiku.png" /></td>
+                                        <td><img src="~/Images/Icons/gsmu/canvas.png" /></td>
+                                        <td><img src="~/Images/Icons/gsmu/blackboard.png" /></td>
+                                        <td>Connected</td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="~/Images/Icons/gsmu/heliusdisc.png" /></td>
+                                        <td><img src="~/Images/Icons/gsmu/haikudisc.png" /></td>
+                                        <td><img src="~/Images/Icons/gsmu/canvasdisc.png" /></td>
+                                        <td><img src="~/Images/Icons/gsmu/blackboarddisc.png" /></td>
+                                        <td>Disabled</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="course-integration-haiku-result-dialog">
+    <div class="modal fade" id="haiku-modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Haiku Result</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="col-lg-4">Course Id :</td>
+                                <td><span id="haiku-result-course-id"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Id :</td>
+                                <td><span id="haiku-result-id"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Import Id :</td>
+                                <td><span id="haiku-result-import-id"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Code :</td>
+                                <td><span id="haiku-result-code"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Name :</td>
+                                <td><span id="haiku-result-name"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Short Name :</td>
+                                <td><span id="haiku-result-short-name"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Description :</td>
+                                <td><span id="haiku-result-description"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Active :</td>
+                                <td><span id="haiku-result-active"></span></td>
+                            </tr>
+                            <tr>
+                                <td>End Date :</td>
+                                <td><span id="haiku-result-end-date"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Sync Status :</td>
+                                <td><span id="haiku-result-sync-status"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Is GSMU Course :</td>
+                                <td><span id="haiku-result-is-gsmu"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Organization :</td>
+                                <td><span id="haiku-result-organization"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Teacher ID :</td>
+                                <td><span id="haiku-result-teacher-id"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Use Dynamic Roster :</td>
+                                <td><span id="haiku-result-dynamic-roster"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Year :</td>
+                                <td><span id="haiku-result-year"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/Areas/Adm/Scripts/Widgets/CourseIntegration.js")

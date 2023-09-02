@@ -1,0 +1,39 @@
+﻿
+<div id="widget-course-descriptions">
+    <div class="panel panel-default">
+        <div class="panel-heading gsmu-sub-panel-heading">
+            <div class="panel-title pull-left">Descriptions</div>
+            <div class="pull-right">
+                <div id="course-descriptions-editor-btns">
+                    <div>
+                        <button type="button" class="btn btn-warning btn-xs edit" onclick="courseDescriptionsEditor.initEditor()"><span class="glyphicon glyphicon-pencil"></span></button>
+                        <button type="button" class="btn btn-success btn-xs save" onclick="courseDescriptionsEditor.save()"><span class="glyphicon glyphicon-ok"></span></button>
+                        <button type="button" class="btn btn-danger btn-xs cancel" onclick="courseDescriptionsEditor.initView()"><span class="glyphicon glyphicon-remove"></span></button>
+                    </div>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <div class="panel-body gsmu-sub-panel-body small-panel panel-collapse collapse in">
+            <ul class="nav nav-tabs">
+                <li role="presentation" class="active"><a href="#course-description-long" data-toggle="tab">Long</a></li>
+                <li role="presentation"><a href="#course-description-short" data-toggle="tab">Short</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="course-description-long" class="tab-pane active">
+                    <div class="tab-pane-content">
+                        <div id="course-description-long-content"></div>
+                        <input type="hidden" id="course-description-long-input" name="Description" />
+                    </div>
+                </div>
+                <div id="course-description-short" class="tab-pane">
+                    <div class="tab-pane-content">
+                        <div id="course-description-short-content"></div>
+                        <input type="hidden" id="course-description-short-input" name="ShortDescription" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/Areas/Adm/Scripts/Widgets/CourseDescriptions.js")

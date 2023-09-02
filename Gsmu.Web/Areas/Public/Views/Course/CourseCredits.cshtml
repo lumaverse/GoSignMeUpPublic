@@ -1,0 +1,28 @@
+﻿@model Gsmu.Api.Data.School.Course.CourseModel
+@{
+    var courseModel = Model;
+    var course = courseModel.Course;
+    var csetting = courseModel.CourseSettings;
+    
+    var wgname = "Credits";
+    var wgcontainer = "Course" + wgname + "Container";
+    var wgcontainerDet = "Course" + wgname + "ContainerDet";
+}
+
+
+<div id="@wgcontainer" class="course-widgetbox" style=" min-height:100px;">
+    <div class="course-widgetbox-smheader">
+    @wgname
+    </div>
+   <div id="@wgcontainerDet" style="padding:5px;margin:5px; ">
+
+    @if (courseModel.Credits.Count > 0) {
+        <text>
+          @{Html.RenderPartial("ListingCredits", courseModel, new ViewDataDictionary { {"Inline", true}});}
+       </text>
+    }else{
+       <text>Credits Not Available</text>
+    }
+
+    </div>
+</div>

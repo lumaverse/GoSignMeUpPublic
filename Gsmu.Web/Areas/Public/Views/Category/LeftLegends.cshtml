@@ -1,0 +1,52 @@
+﻿@using Gsmu.Api.Data
+@if (ViewBag.EnabledColor)
+{
+<div style="padding-top: 20px;float: left;width: 100%;margin-left: -5px;">	
+    <table style="border-collapse: separate;border-spacing: 5px;width: 100%;">
+        <tr>
+            <td colspan="2" style="background-color: #E4E4E4; vertical-align: center;">
+                <div style="margin: 3px; vertical-align: center; font-size: 15px;">Color Legend</div>
+            </td>
+        </tr>
+        @foreach (var colorcode in ViewBag.ColorCode)
+        {
+            <tr>
+                <td style="background-color:#@Html.Raw(colorcode.CourseCategoryColor); width:10px;height20px;">
+                    <div></div>
+                </td>
+                <td>@Html.Raw(colorcode.CourseCategoryName)</td>
+            </tr>
+        }
+    </table>
+</div>    
+}
+<div style="padding-top: 20px;float: left;width: 100%;margin-left: -5px;">	
+    <table style="border-collapse: separate;border-spacing: 5px;width: 100%;">
+    @{
+        var legendheader = true;
+    }
+
+    @foreach (var icon in ViewBag.Icons)
+    {
+        if (legendheader)
+        {
+        <tr>
+            <td colspan="2" style="background-color: #E4E4E4; vertical-align: center;">
+                <div style="margin: 3px; vertical-align: center; font-size: 15px;">Icon Legend</div>
+            </td>
+
+        </tr>
+        }
+        <tr>
+            <td>
+                <div>
+                    <img style="width:20px; height:20px;" src="@(Url.Content(WebConfiguration.CourseIconsVirtualDirectoryVirtual))/@(Html.Raw(icon.IconImage))" alt="" />
+                </div>
+            </td>
+            <td>@Html.Raw(icon.IconTitle)</td>
+        </tr>
+        
+        legendheader = false;
+    }
+    </table>
+</div>    

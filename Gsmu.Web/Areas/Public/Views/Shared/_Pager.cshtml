@@ -1,0 +1,141 @@
+﻿@model Gsmu.Api.Data.ViewModels.Grid.GridPagerModel
+@{
+    if (TempData["pagerIndex"] == null)
+    {
+        TempData["pagerIndex"] = 0;
+    }
+    var pagerIndex = (int)TempData["pagerIndex"];
+    TempData["pagerIndex"] = pagerIndex + 1;
+}
+<table class="pager">
+    <tr>
+        @if (Model.TotalPages > 1)
+        {
+            if (!Model.IsFirstPage)
+            {
+                <td class="pager-row pager-action" title="First page" onclick="@Model.GetPagerCallbackFunction(1)">
+                    <<
+                </td>
+            }
+            else
+            {
+                <td class="pager-row pager-action-off" title="This is the first page">
+                    <<
+                </td>
+            }
+            if (Model.HasPrevousPage)
+            {
+                <td class="pager-row pager-action" title="Previous page" onclick="@Model.GetPagerCallbackFunction(Model.Page - 1)">
+                    Previous
+                </td>
+            }
+            else
+            {
+                <td class="pager-row pager-action-off" title="This is the first page">
+                    Previous
+                </td>
+            }
+            <td class="pager-row pager-row-spacer">
+                <span id="current-page@(pagerIndex)"></span>
+            </td>
+            <td class="pager-row">
+                of @Model.TotalPages
+            </td>
+            if (Model.HasNextPage)
+            {
+                <td class="pager-row pager-action pager-row-spacer" title="Next page" onclick="@Model.GetPagerCallbackFunction(Model.Page + 1)">
+                    Next
+                </td>
+            }
+            else
+            {
+                <td class="pager-row pager-action-off pager-row-spacer" title="This is the last page">
+                    Next
+                </td>
+            }
+            if (!Model.IsLastPage)
+            {
+                <td class="pager-row pager-action" title="Last page" onclick="@Model.GetPagerCallbackFunction(Model.TotalPages)">
+                    >>
+                </td>
+            }
+            else
+            {
+                <td class="pager-row pager-action-off" title="This is the last page">
+                    >>
+                </td>
+            }
+        }
+
+
+        <td class="pager-row pager-row-spacer">
+            Total: @Model.TotalCount
+        </td>
+
+        <td class="pager-row pager-row-spacer">
+            Page size: 
+        </td>
+        <td class="pager-row">
+            <span id="page-size@(pagerIndex)"></span>
+        </td>
+    </tr>
+</table>
+
+<script type="text/javascript">
+
+    Ext.onReady(function() {
+        Ext.onReady(function () {
+            var totalPages = @(Model.TotalPages);
+            var totalCount = @(Model.TotalCount);
+            var pageSize = @(Model.PageSize);
+            var pagerTemplate = '@HttpUtility.JavaScriptStringEncode(Model.PagerCallbackTemplate)';
+            var currentPageContainer = Ext.get('current-page@(pagerIndex)');
+            var pageSizeContainer = Ext.get('page-size@(pagerIndex)');
+
+            var currentPage = Ext.create('Ext.form.field.Number', {
+                renderTo: currentPageContainer,
+                fieldLabel: 'Input page number to navigate. Between 1 to '+ totalPages,
+                hideLabel: true,
+                minValue: 1,
+                maxvalue: totalPages,
+                value: @Model.Page,
+                width: 50,
+                grow: true
+            });
+
+            var pageSize = Ext.create('Ext.form.field.Number', {
+                renderTo: pageSizeContainer,
+                fieldLabel: 'Input search result per page. Total Count: '+ totalCount,
+                hideLabel: true,
+                minValue: 1,
+                maxValue: totalCount,
+                value: @Model.PageSize,
+                width: 50,
+                grow: true
+            });
+
+            var paginate = function (page, perPage) {
+                var result = pagerTemplate.replace('{0}', page).replace('{1}', perPage);
+                return result;
+            }
+
+            currentPage.on('change', function () {
+                eval(
+                    paginate(currentPage.getValue(), pageSize.getValue())
+                );
+            }, this, {
+                buffer: 1000
+            });
+
+            pageSize.on('change', function () {
+                eval(
+                    paginate(currentPage.getValue(), pageSize.getValue())
+                );
+            }, this, {
+                buffer: 1000
+            });
+
+        });
+    });
+
+</script>

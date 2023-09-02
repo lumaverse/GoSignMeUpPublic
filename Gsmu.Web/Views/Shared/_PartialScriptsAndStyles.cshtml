@@ -1,0 +1,111 @@
+﻿@using Gsmu.Api.Data
+
+@{
+    
+    /*
+<script type="text/javascript">
+    var Ext = Ext || {};
+    Ext.manifest = { // the same content as "app.json"
+        compatibility: {
+            ext: '4.2'
+        }
+    }
+</script>
+     */
+}
+
+<script type="text/javascript" src="@Html.Raw(Gsmu.Api.Data.WebConfiguration.GoogleMapsUrl)"></script>
+        <script src="https://paybutton.connexpoint.com/payments.js"></script>
+@Scripts.Render("~/DynamicScripts/Terminology")
+
+@if (Gsmu.Api.Data.WebConfiguration.DevelopmentMode)
+{
+    @Styles.Render("~/Components/ExtJs5.1/resources/ext-theme-gray/ext-theme-gray-all-debug.css")
+    @Scripts.Render("~/Components/ExtJs5.1/ext-all-debug.js")    
+}
+else
+{
+    @Styles.Render("~/Components/ExtJs5.1/resources/ext-theme-gray/ext-theme-gray-all.css")
+    @Scripts.Render("~/Components/ExtJs5.1/ext-all.js")    
+}
+
+@if (Request.Browser.Browser.ToLower() == "ie" && Request.Browser.MajorVersion < 9)
+{
+    @Scripts.Render("~/Components/jquery-1.8.3.min.js")
+    @Styles.Render("~/Areas/Public/Styles/Layout-IE8.css")    
+}
+else
+{
+    @Scripts.Render("~/bundles/jquery")    
+}
+
+@Styles.Render("~/Content/jquery.jgrowl.css")
+@*@Styles.Render("~/Content/css/app.css")*@
+@Scripts.Render("~/Scripts/bootstrap.min.js")
+@*@Scripts.Render("~/Content/bower_components/jquery/dist/jquery.js")
+@Scripts.Render("~/Content/bower_components/bootstrap-sass/assets/javascripts/bootstrap.js")*@
+@Scripts.Render("~/Content/scripts/ui.js")
+
+@if (Gsmu.Api.Data.WebConfiguration.DevelopmentMode)
+{
+    @Scripts.Render("~/Scripts/jquery.jgrowl.min.js")
+    @Scripts.Render("~/Scripts/jquery.placeholder.min.js")
+}
+else
+{
+    @Scripts.Render("~/Scripts/jquery.jgrowl.min.js")
+    @Scripts.Render("~/Scripts/jquery.placeholder.js")
+}
+
+
+@Scripts.Render("~/Areas/Public/Scripts/Course/CourseSearch.js")
+@Scripts.Render("~/bundles/jqueryval")
+@Scripts.Render("~/bundles/jqueryui")
+
+@Scripts.Render("~/Scripts/DataTables/jquery.dataTables.min.js")
+@Scripts.Render("~/Scripts/DataTables/dataTables.bootstrap.min.js")
+@Scripts.Render("~/Scripts/DataTables/dataTables.responsive.min.js")
+@Scripts.Render("~/Scripts/DataTables/responsive.bootstrap.min.js")
+@Scripts.Render("~/Scripts/moment.min.js")
+@Scripts.Render("~/Scripts/bootbox.min.js")
+
+
+@Styles.Render("~/Styles/common")
+@Styles.Render("~/Content/themes/base/css")
+
+@Styles.Render("~/Content/font-awesome.min.css")
+@Styles.Render("~/Content/DataTables/css/dataTables.bootstrap.min.css")
+@Styles.Render("~/Content/DataTables/css/responsive.bootstrap.min.css")
+@Styles.Render("~/Content/DataTables/css/responsive.dataTables.min.css")
+@Styles.Render("~/Content/plugins/bootstnipp-button.css")
+@Styles.Render("~/Content/bootstrap.css")
+
+@Scripts.Render("~/bundles/gsmu-base")
+
+<script type="text/javascript">
+    var config = null;
+
+    config = new Config({
+        root: '@Url.Content("~")',
+        dotNetSiteUrl: @Html.Raw(Json.Encode(Settings.Instance.GetMasterInfo4().DotNetSiteRootUrl)),
+        aspSiteUrl: @Html.Raw(Json.Encode(Settings.Instance.GetMasterInfo4().AspSiteRootUrl)),
+        sessionCookie: @Html.Json(WebConfiguration.SessionCookieName)
+    });
+
+    Ext.Loader.setConfig({
+        enabled: true,
+        paths: {
+            // gsmuhtml editor class loading issue
+            'Gsmu': config.getUrl('Scripts.Gsmu/ExtJs'),
+            'Skirtle': config.getUrl('Components/skirtlesden.com'),
+            'Skirtle.grid.column': config.getUrl('Components/skirtlesden.com')
+        }
+    });
+
+</script>
+
+@Scripts.Render("~/bundles/gsmu-models")
+@Scripts.Render("~/bundles/gsmu-extjs")
+@Scripts.Render("~/Scripts/jscolor.js")
+
+

@@ -1,0 +1,23 @@
+﻿@{
+var name="Answer"+ ViewBag.QuestionId;
+var namecomment="Comment"+ ViewBag.QuestionId;
+}
+                    <table>	
+                         @foreach(var item in  ViewBag.Choices){
+						     <tr class="bodystyle">
+								<td>
+
+								          <input type="checkbox" name="@name" value="@item.AnswerRank"> @Html.Raw(item.AnswerText)                                          
+								</td>
+                            </tr>
+                         }
+
+                     </table>
+@if((ViewBag.withComment==1) || (ViewBag.withComment==-1)){
+<div>
+Comments:
+  <textarea style="width:100%" cols="65" rows="5" name="@namecomment" id="@namecomment" type="text"></textarea>
+</div>
+}
+
+       

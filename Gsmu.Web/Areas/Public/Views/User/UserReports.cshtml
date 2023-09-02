@@ -1,0 +1,93 @@
+﻿@using Gsmu.Api.Data;
+@using Gsmu.Api.Data.School.User;
+@using Gsmu.Api.Data.School.Terminology;
+@model UserModel
+
+@{
+    string cmd = ViewBag.cmd;
+
+    string formTitle = "Reports";
+    var userModel = Model;   
+    var usr = new UserInfo();
+    usr = userModel.CommonUserInfo;
+    var usrID = (usr==null ? 0 : usr.userid);
+
+
+}
+@Scripts.Render("~/Areas/Public/Scripts/ExtFieldValidation.js")
+<script type="text/javascript">
+    //destroy first main panel if exist for the edit mode
+    var reportCmp = Ext.getCmp('UserDashboardReports');
+    if (reportCmp != null) {reportCmp.destroy();}
+
+    var tempmsg = "Function not yet available"
+
+    var UserReportsLoginHistory = function (titl, txt) {
+        Ext.Msg.alert("Reports", tempmsg);
+    }
+
+    var UserReportsTranscript = function (UserID) {
+        
+    }
+
+
+    var styllabl = 'style="font-size:12px; color:#000000; text-decoration:none;"';
+    var btns = '<div class="portlet-content" style="background-color:#FFFFFF"><table id="widget-action-table"  style="height:100px;">';
+    //Login History
+    btns += '<tr><td><img src="/Areas/Public/Images/Icons/action-clock.png"/></td>';
+    btns += '<td><a ' + styllabl + ' href="javascript: UserReportsLoginHistory()">Login History</a></td></tr>';
+
+    //Transcript
+    btns += '<tr><td><img src="/Areas/Public/Images/Icons/action-transcript.png"/></td>';
+    btns += '<td><a ' + styllabl + 'href="javascript: parent.PortalUserGird.prototype.buildPortalViewTrancripts('+ @(usr != null ? usr.userid : 0) +')">' + @Html.Raw(Json.Encode(TerminologyHelper.Instance.GetTermCapital(TermsEnum.Transcript))) + '</a></td></tr>';
+
+    btns += '</table></div>'
+
+    var UserReportshtml = btns;
+
+
+    Ext.onReady(function () {
+
+        Ext.create('Ext.Panel', {
+            id:'UserDashboardReports',
+            frame: true,
+            renderTo: Ext.get('Reportsrender'),
+            layout: 'anchor',
+            autoScroll: false,
+            title: 'Reports',
+            tools: [
+                {
+                    hidden: (dasboardadminmode ? false : true),
+                    type: 'cross',
+                    tooltip: 'Delete this widget ',
+                    handler: function (e, toolEl, panel, tc) {
+                        DeleteUserWidget(GetwidgetColIDbyPlID('UserDashboardReports'), GetwidgetIDbyPlID('UserDashboardReports'));
+                    }
+                }
+            ],
+            html: UserReportshtml
+
+        });
+
+    });
+
+    reloadUserReportsForm = function(cmd,userid,usergroup) {
+
+        Ext.Ajax.request({
+            url: config.getUrl('public/user/UserReports'),
+            params: {
+                cmd: cmd,
+                userid: userid,
+                usergroup: usergroup
+            },
+            success: function (data) {
+                $("#UserReportsContainer").html(data.responseText);
+            }
+        })
+    }
+
+</script>
+
+<div id="Reportsrender" style="position:relative;min-height:100px; padding-bottom:20px"></div>
+
+

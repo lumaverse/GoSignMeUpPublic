@@ -1,0 +1,26 @@
+﻿@using Gsmu.Api.Data
+@using Gsmu.Api.Data.School.Student
+@using json = Newtonsoft.Json
+
+@{
+
+    var mi = Settings.Instance.GetMasterInfo();
+    var mi3 = Settings.Instance.GetMasterInfo3();
+
+    ViewBag.Title = "Settings &raquo; System Settings &raquo; Checkout Settings";
+}
+
+@section Head {    
+    @Scripts.Render("~/Areas/Adm/Scripts/Checkout/CheckoutComponent.js")
+
+
+    <script type="text/javascript">
+        Ext.onReady(function () {
+            var cmp = new CheckoutComponent();
+        });
+    </script>
+}
+
+<div id="checkout-component-container">
+
+</div>

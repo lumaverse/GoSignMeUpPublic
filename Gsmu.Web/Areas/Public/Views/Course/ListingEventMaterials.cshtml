@@ -1,0 +1,91 @@
+﻿@model Gsmu.Api.Data.School.Course.CourseModel
+@using Gsmu.Api.Commerce.ShoppingCart
+@using Gsmu.Api.Data.ViewModels.Layout
+@using Gsmu.Api.Data.School.Terminology;
+
+@using Gsmu.Api.Authorization
+@using Gsmu.Api.Language
+@using Gsmu.Api.Data
+@using Gsmu.Api.Data.School
+@using Gsmu.Api.Data.School.Entities
+
+@{
+    var course = Model;
+    var materials = Model.Materials;
+    var materialWord = @Gsmu.Api.Data.GrammarHelper.GetConditionallyPluralizedWord(materials.Count, TerminologyHelper.Instance.GetTermCapital(TermsEnum.Material));
+    var materialsRequired = ((Model.Course.MaterialsRequired == -1 && materials.Count > 0));
+    var checkeditem = "";
+    var selectiontype = Model.Course.MaterialsRequired;
+    var guid = Guid.NewGuid().ToString("N");
+    var modifier = ViewData["Modifier"] != null ? ViewData["Modifier"].ToString() : string.Empty;
+    var readOnly = ViewData["ReadOnly"] != null ? (bool)ViewData["ReadOnly"] : false;
+    var fade = ViewData["Fade"] != null && (bool)ViewData["Fade"] == true ? true : false;
+    var render = ViewData["FieldConfig"] == null ? false : (ViewData["FieldConfig"] as GridSearchColumns).Material;
+    var containerId = "course-materials-container-" + Model.Course.COURSEID + modifier;
+    render = !string.IsNullOrEmpty(modifier) || render;
+    var autoselectmaterial = Settings.Instance.GetMasterInfo3().materialdefault;
+    var allow_quantity_purchase = Settings.Instance.GetMasterInfo4().allow_quantity_purchase;
+    var hide_payment_info = Settings.Instance.GetMasterInfo2().HidePaymentInfo;
+    var _materiallist = Model.Materials;
+}
+
+@if (materialsRequired)
+{
+    checkeditem = "checked";
+}
+@if (CourseShoppingCart.Instance.ContainsCourse(Model.CourseId))
+{
+    _materiallist = CourseShoppingCart.Instance.GetCourseItem(Model.Course.COURSEID).Materials;
+
+}
+else
+{
+    _materiallist = null;
+}
+<div class="course-widgetbox-smheader">@materialWord</div>
+@foreach (var material in materials)
+{
+    var priceIsHidden = (hide_payment_info != 0) || (material.hidematerialprice == -1 && material.hidematerialprice != null) ? "none" : "block";
+    if (_materiallist != null)
+    {
+        foreach (var _material in _materiallist)
+        {
+            if (_material.productID == material.productID)
+            {
+                checkeditem = "checked";
+            }
+        }
+    }
+    if (selectiontype == 2)
+    {
+        <text>
+            <div style="float:left; width:100%">
+                <label>
+                    <div style="float:left;"><input class="EventMaterial @course.CourseId" type="radio" name="@course.CourseId" value="@material.productID" @checkeditem></div>
+                    <div style="float:left; padding-left: 10px;">@material.product_name </div>&nbsp;&nbsp;
+                    <div style="float:left;margin-left: 10px;  display:@priceIsHidden"> (price: @string.Format("{0:c}", material.price))</div>
+                </label>
+            </div>
+            <input class="EventMaterialQty @course.CourseId" type="hidden" value="1" />
+
+        </text>
+    }
+    else
+    {
+        <text>
+            <div style="float:left; width:100%">
+                <label>
+                    <div style="float:left;"><input class="EventMaterial @course.CourseId" type="checkbox" name="@material.productID" value="@material.productID" @checkeditem></div>
+                    <div style="float:left; padding-left: 10px;">@material.product_name </div>&nbsp;&nbsp;
+                    <div style="float:left;margin-left: 10px;  display:@priceIsHidden"> (price: @string.Format("{0:c}", material.price))</div>
+                </label>
+            </div>
+            <input class="EventMaterialQty @course.CourseId" type="hidden" value="1" />
+
+        </text>
+    }
+    checkeditem = "";
+}
+
+</text>
+<div id="@containerId" class="extjs-hide-menu-theme @(fade ? "item-fade" : "" )"></div>

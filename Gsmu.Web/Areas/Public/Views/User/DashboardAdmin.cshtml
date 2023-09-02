@@ -1,0 +1,79 @@
+﻿@using Gsmu.Api.Data.School;
+@using Gsmu.Api.Data.School.User;
+@model UserModel
+@{
+    var userModel = Model;
+    ViewBag.Title = "Dashboard";
+    int userid = ViewBag.userid;
+    string usergroup = ViewBag.abv;
+    string cmd = ViewBag.cmd;
+
+    DataLists dlists = new DataLists();
+    UserWidget userwidgets = new UserWidget();
+
+    switch (usergroup)
+    {
+    case "IT":
+        userwidgets = dlists.UserWidgets("InstructorsDashAdmin");
+        
+    break;
+    case "SP":
+        userwidgets = dlists.UserWidgets("SupervisorsDashAdmin");
+
+    break;
+    default:
+        userwidgets = dlists.UserWidgets("StudentsDashAdmin");
+
+    break;
+    }
+
+
+}
+
+<script>
+    var UsrAdmin = true;
+    var widgt = {}
+    widgt = eval(@Html.Raw(Json.Encode(userwidgets)));
+
+
+    Ext.onReady(function () {
+
+
+        @if(userid > 0){
+        <text>
+        loadAllWidgetFields('view', '@usergroup');
+        </text>
+        }
+    });
+
+</script>
+<div id="SectionWrapper">
+
+    <div style="width:100%; overflow:auto; padding:0px">
+
+    @foreach (var col in userwidgets.Column)
+    {
+        string WidthPer = col.WidthPer.ToString() + "%";
+    <text>
+
+        <div style="width:@WidthPer ;float: left; padding:10px">
+
+            @foreach (var wdgt in userwidgets.Widgets.Where(cl => cl.ColID == col.ID).OrderBy(l => l.DispSort))
+            {
+                string containerID = wdgt.ID.ToString();   
+            <text>
+	        <div id="@containerID"></div>
+            </text>
+            }
+
+        </div>
+
+    </text>
+    }
+
+    </div>
+
+</div>
+
+
+

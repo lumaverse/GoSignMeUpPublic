@@ -1,0 +1,124 @@
+﻿@using Gsmu.Api.Data;
+@model Gsmu.Api.Data.School.Course.CourseModel
+@{
+    var courseModel = Model;
+    var course = courseModel.Course;
+    var times = courseModel.CourseTimes;
+    var materials = courseModel.Materials;
+    var maincat = courseModel.MainCategory;
+    var subcat = courseModel.SubCategory;
+    var csetting = courseModel.CourseSettings;
+
+    var courseImg = "";
+    var courseImgminwidth = "5px";
+    if (!string.IsNullOrEmpty(course.TileImageUrl))
+    {
+        courseImg = "<img src='" + course.TileImageUrl + "'  style='max-height:28px' />&nbsp;&nbsp;";
+        courseImgminwidth = "40px";
+    }
+}
+<script type="text/javascript">
+    var sliderHeightval = 180;
+    var slidermaxlimit = 50;
+    var sliderHeight = sliderHeightval + "px";
+    var curht = 0;
+    //var slidedownbtn = "<a><img src='../../Areas/Public/Images/Layout/slidedown.png' /> READ MORE <img src='../../Areas/Public/Images/Layout/slidedown.png' /></a>";
+    var slidedownbtn = "<a>&#8744; &nbsp;&nbsp;&nbsp;READ MORE&nbsp;&nbsp;&nbsp; &#8744;</a>";
+    var slideupbtn = "<a>&#8743; &nbsp;&nbsp;&nbsp;&nbsp;SEE LESS&nbsp;&nbsp;&nbsp;&nbsp; &#8743;</a>";
+    //var slideupbtn = "<a><img src='../../Areas/Public/Images/Layout/slideup.png' /> SEE LESS <img src='../../Areas/Public/Images/Layout/slideup.png' /></a>";
+
+    $(document).ready(function () {
+        $('.slider').each(function () {
+            var current = $(this);
+            current.attr("box_h", current.height() + 20);
+            curht = current.height();
+        });
+
+        if (curht <= sliderHeightval) {
+            $(".contslider_menu").css("display", "none");
+        } else {
+            if (curht > (sliderHeightval + slidermaxlimit)) {
+                $(".slider").css("height", sliderHeight);
+                $(".slider_menu").html(slidedownbtn);
+                $(".slider_menu a").attr("title", "click to expand");
+                $(".contslider_menu").css("color", "#0000ff");
+                $(".slider_menu a").click(function () { openSlider() })
+            } else{
+                $(".contslider_menu").css("display", "none");
+            }
+        }
+
+    });
+
+    function openSlider() {
+        var open_height = $(".slider").attr("box_h") + "px";
+        $(".slider").animate({ "height": open_height }, { duration: "slow" });
+
+        $(".slider_menu").html(slideupbtn);
+        $(".slider_menu a").click(function () { closeSlider() })
+        $(".slider_menu a").attr("title", "click to hide");
+        setTimeout(function () {
+            $("#CourseNameDescContainerDesc").css("overflow-y", "auto");
+            var window = Ext.getCmp('CourseDetailsWindow');
+            var maxHeight = 0;
+            $(".course-widgetbox").each(function () {
+                var thisH = $(this).height();
+                var thisT = $(this).position().top;
+                var thisTH = thisH + thisT;
+                if (thisTH > maxHeight) { maxHeight = thisTH; }
+            });
+            maxHeight = maxHeight + 20;
+            window.setHeight(maxHeight);
+
+        }, 1000);
+    }
+
+    function closeSlider() {
+        $(".slider").animate({ "height": sliderHeight }, { duration: "slow" });
+        //expand
+        setTimeout(function () {
+            $("#CourseNameDescContainerDesc").scrollTop(0);
+            $("#CourseNameDescContainerDesc").css("overflow-y", "hidden");
+            var window = Ext.getCmp('CourseDetailsWindow');
+            var maxHeight = 0;
+            $(".course-widgetbox").each(function () {
+                var thisH = $(this).height();
+                var thisT = $(this).position().top;
+                var thisTH = thisH + thisT;
+                if (thisTH > maxHeight) { maxHeight = thisTH; }
+            });
+            maxHeight = maxHeight + 20;
+            window.setHeight(maxHeight);
+
+        }, 1000);
+        $(".slider_menu").html(slidedownbtn);
+        $(".slider_menu a").click(function () { openSlider() })
+        $(".slider_menu a").attr("title", "click to expand");
+    }
+
+</script>
+
+<div id="CourseNameDescContainer" class="course-widgetbox" style="position: inherit; min-height: 180px; padding:5px">
+    <div id="CourseNameDescContainerTitl" style="float:left; width:100%; min-height: 35px; font-size: 20px; font-weight: bold; padding: 5px; border-bottom: 1px solid #ddd; border-bottom-color: gray;">
+        @if (Settings.Instance.GetMasterInfo2().HideCourseNumber == 0)
+        {
+            <div style="float: left; height: 30px; color: #222222">@Html.Raw(course.COURSENUM)&nbsp;&nbsp;</div>
+        }
+        <div style="float: left; min-height: 30px;">@Html.Raw(course.COURSENAME)</div>
+        <div style="float:right; padding-bottom:5px">
+                @{Html.RenderPartial("ListingIcons", courseModel);}
+        </div>
+
+    </div>
+    <div id="CourseNameDescContainerDesc" style="padding: 10px; overflow: hidden;" class="slider">
+        @Html.Raw(course.DESCRIPTION)
+    </div>
+    <div style="height: 20px" class="contslider_menu">
+        <div style="float: right; width: 100%; text-align: center; margin-right: 0px; padding-top: 3px; margin-top: 3px; font-size:11px; cursor: pointer; height:20px; background-color: #D3D3D3;" class="slider_menu">
+            <a>&#8744;</a>
+        </div>
+    </div>
+
+</div>
+
+

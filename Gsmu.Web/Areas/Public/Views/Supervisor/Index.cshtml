@@ -1,0 +1,168 @@
+﻿@using Gsmu.Api.Data
+@using Gsmu.Api.Data.School.Terminology
+@using Gsmu.Api.Authorization
+@{
+    ViewBag.Title = TerminologyHelper.Instance.GetTermCapital(TermsEnum.Supervisor) + " Dashboard";
+    string transcriptnetUrl = Settings.Instance.GetMasterInfo4().AspSiteRootUrl + "/students_transcriptnet.asp?sid=";
+    var CertificationsOnOff = Settings.Instance.GetMasterInfo2().CertificationsOnOff;
+}
+
+@section Head {
+    @Scripts.Render("~/bundles/public-supervisor")
+
+    <style type="text/css">
+        .widget-field {
+            font-size: 11px !important;
+            font-weight: bold;
+        }
+
+		body.embedded .grad_stud_right {
+			width: 962px !important;
+		}
+
+		.grad_stud_right {
+			width: 962px !important;
+		}
+    </style>
+
+    @if(ViewBag.AdminView==true)
+    {
+    <text>
+
+<style>
+    .grad_stud_top_info, .navbar-static, hr {
+        display: none !important;
+    }
+
+    .grad_stud_table_1{ 
+        padding: 0px !important;
+    }
+    .grad_stud_main{
+        padding-top: 0px !important;
+    }
+
+    .grad_stud_top_site {
+        display: none;
+    }
+
+    .grad_stud_top_all {
+        display: none;
+    }
+    .grad_stud_top {
+        display: none !important;
+    }
+    .navbar {
+        display: none !important;
+    }
+
+    .cart-info-container {
+        display: none;
+    }
+
+    .grad_stud_footer {
+        display: none;
+    }
+
+    .grad_stud_footer2 {
+        display: none;
+    }
+
+    #grad_stud_title {
+        display: none;
+    }
+
+    #layout-footer-container {
+        display: none;
+    }
+
+    #layout-welcomeuser {
+        display: none;
+    }
+
+    .grad_stud_main2 {
+        background:none;
+        padding:0px;
+    }
+
+    .grad_stud_main {
+        border:none;
+    }
+
+    .grad_stud_table_1 {
+        background: none;
+    }
+
+    BODY {
+        background:none;
+        /*margin: 0px;
+        padding: 10px;*/
+    }
+    
+    
+
+</style>
+    </text>
+    }
+
+
+    <script type="text/javascript">
+        var classicurl = '@transcriptnetUrl';
+        var supervisorterm = "@TerminologyHelper.Instance.GetTermCapital(TermsEnum.Supervisor)";
+        var username = "@ViewBag.UserName";
+        var certificationsettings = "@CertificationsOnOff";
+        var AllowEnrollment='@ViewBag.AllowEnrollment';
+        var supervisorsessionId = '@AuthorizationHelper.CurrentSupervisorUser.UserSessionId';
+        var enrollToWaitList = '@WebConfiguration.EnrollToWaitList';
+
+        //SERVICE API ACCESS
+        var sessionId = supervisorsessionId;
+        var tokenRaw = encodeURIComponent(btoa(username + ':' + sessionId.trim()));
+        var roleRaw = encodeURIComponent(btoa('supervisor'));
+        localStorage.setItem('token', JSON.stringify(tokenRaw));
+        localStorage.setItem('role', JSON.stringify(roleRaw));
+
+        var options = {
+            containers: {
+                left: 'supervisor-left',
+                center: 'supervisor-center'
+
+            },
+            noProfileImage: config.getUrl(@Html.Json(Url.Content(WebConfiguration.NoProfileImageVirtualPath))),
+            profileImagePath: config.getUrl(@Html.Json(Url.Content(WebConfiguration.SupervisorProfileImageVirtualDirectory))),
+            profileImageMaxWidth: @Html.Json(WebConfiguration.ProfileImageWidgetWidth),
+            profileImageMaxHeight: @Html.Json(WebConfiguration.ProfileImageWidgetHeight),
+            widgets: {
+                left: ['SupervisorIdentityWidget' , 'SupervisorInformationWidget'],
+                center: ['SupervisorStudentListWidget','SupervisorEmailListandReportWidget'],
+                right: []                    
+            }
+        };
+            
+        var dashboard = new SupervisorDashboard(options);
+    </script>
+}
+<!--
+        <div style="float: left; width: 280px;" id="supervisor-left" class="supervisor-column">
+        </div>
+
+        <div style="float: left; width: 675px; margin-left: 5px; padding-right: -10px; margin-top:-5px;" id="supervisor-center" class="supervisor-column">
+        </div>
+
+
+-->
+
+<div style="float: left; width: 280px;" id="supervisor-left" class="supervisor-column">
+</div>
+
+<div style="float: left; width: 675px; margin-left: 5px; padding-right: -10px; margin-top:-5px;" id="supervisor-center" class="supervisor-column">
+</div>
+<br />
+@*@if (WebConfiguration.EnrollToWaitList)
+{
+    <div class="col-sm-12" style="padding-top:10px">
+        <div class="row">
+            @RenderPage("../../Views/Supervisor/StudentsWaitingList.cshtml")
+        </div>
+    </div>
+}*@
+

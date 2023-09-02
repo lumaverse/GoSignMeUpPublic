@@ -1,0 +1,169 @@
+﻿@{
+    ViewBag.Title = "Account Recovery for " + ViewBag.Type_Text;
+}
+
+@if(ViewBag.tokenstatus =="validtoken"){
+
+    var resettoken = Request.QueryString["resettoken"];
+    var username = Request.QueryString["username"];
+    var stype = Request.QueryString["stype"];   
+
+@Scripts.Render("~/Areas/Public/Scripts/ExtFieldValidation.js")
+<script type="text/javascript">
+
+    Ext.onReady(function () {
+
+        Ext.create('Ext.form.Panel', {
+            id: 'recovpassExtForm',
+            border: false,
+            width: 250,
+            renderTo: Ext.get('recovpass'),
+            bodyPadding: 10,
+            fieldDefaults: {
+                labelWidth: 125,
+                msgTarget: 'under',
+                autoFitErrors: true
+
+            },
+            defaultType: 'textfield',
+            items: [{
+                xtype: 'hidden',
+                name: 'resettoken',
+                value: '@resettoken'
+            }, {
+                xtype: 'hidden',
+                name: 'stype',
+                value: '@stype'
+            }, {
+                xtype: 'label',
+                text: 'Username'
+            }, {
+                xtype: 'hidden',
+                name: 'username',
+                value: '@username'
+            }, {
+                name: 'shwusername',
+                value: '@username',
+                disabled: true
+            }, {
+                xtype: 'label',
+                text: 'Password'
+            }, {
+                name: 'firstpassword',
+                id: 'firstpasswordResetPass',
+                vtype: 'password',
+                inputType: 'password',
+                allowBlank: false,
+                msgTarget: 'none',  // don't use the default built in error message display
+                validateOnBlur: true,
+                validateOnChange: true,
+                customizedvalidation:true,
+                validator: function(value){
+                    var field = Ext.getCmp('firstpasswordResetPass');
+                    return checkPasswordFormat(field.getValue(), field, 'reset');
+                }
+            }, {
+                xtype: 'displayfield', //for displaying custom error
+                id: 'errdisp' + 'firstpasswordResetPass',
+                submitValue: false,
+                hidden: true,
+                labelSeparator: "",
+                fieldLabel: '',
+                labelWidth: 0,
+                value: ''
+
+
+            }, {
+                xtype: 'label',
+                text: 'Retype Password'
+            }, {
+                name: 'secondpassword',
+                vtype: 'password',
+                inputType: 'password',
+                allowBlank: false,
+                initialPassField: 'firstpasswordResetPass',
+                msgTarget: 'none',
+            },{
+                xtype: 'displayfield', //for displaying custom error
+                id: 'errdisp' + '_psscnfmid',
+                submitValue: false,
+                hidden: true,
+                fieldCls: 'errorStyle',
+                labelSeparator: "",
+                fieldLabel: '',
+                labelWidth: 0,
+                value: '',
+            }, {
+                xtype: 'label',
+                text: ' '
+            }]
+        });
+
+    });
+
+
+
+    function ResetPass() {
+
+        var form = Ext.getCmp('recovpassExtForm').getForm();
+    if (form.isValid()) {
+
+        form.submit({
+            url: '/public/user/ResetPass',
+            method: 'POST',
+            waitMsg: 'Processing...',
+            success: function (form, action) {
+                $("#RecovrPassMsg").html("<h2>" + action.result.msg + "</h2>");
+                $("#RecovrPassWrap").hide();
+                $("#RecovrPassMsg").fadeIn("slow");
+
+            },
+            failure: function (form, action) {
+                $("#RecovrPassMsg").html("<h2>" + action.result.msg + "</h2>");
+                $("#RecovrPassWrap").hide();
+                $("#RecovrPassMsg").fadeIn("slow");
+            }
+        });
+    }
+
+}
+    
+</script>
+
+<div id="RecovrPassMsg" style="display:none; text-align:center; height:300px; padding:70px;"></div>
+
+<div id="RecovrPassWrap" style="position:relative;min-height:300px;direction:ltr">
+
+<div style="padding:0 44px"><h2>Password Reset</h2>
+    <div id="ErrorMsg" style="color:red; display:none;line-height:18px;"></div>
+    
+<p></p>
+	<div style="position:relative">
+			<div id="hideable-box1" style="display:block">
+			  <div>
+				<p></p>
+				  <div style="font-size:11px;color:#666;line-height:18px"
+				  >To reset your password, enter the new password.</div>
+					<p></p>
+                        <div id="recovpass"></div>
+			  </div>
+			</div>
+	</div>
+
+<p></p>
+<p></p>
+<p>&nbsp;</p>
+
+    <input type="button" name="sgnBt" value="Submit" class="btn btn-prim sd-sgnBtn" onclick="ResetPass()">
+
+</div>
+<p></p>
+<p></p>
+
+</div>
+}
+else
+{
+ <div style="display:block; text-align:center; height:300px; padding:70px;"><h2> @Html.Raw(ViewBag.tokenstatus) </h2></div>  
+}
+

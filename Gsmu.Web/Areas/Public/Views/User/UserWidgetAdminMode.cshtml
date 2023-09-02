@@ -1,0 +1,111 @@
+﻿@using Gsmu.Api.Data;
+@{
+    //check for blank settings
+    int lenStudentsDashViewEdit = Settings.Instance.GetMasterInfo4().StudentsDashViewEdit.Length;
+    int lenStudentsDashAddnew = Settings.Instance.GetMasterInfo4().StudentsDashAddnew.Length;
+    int lenStudentsDashAdmin = Settings.Instance.GetMasterInfo4().StudentsDashAdmin.Length;
+
+    int lenInstructorsDashViewEdit = Settings.Instance.GetMasterInfo4().InstructorsDashViewEdit.Length;
+    int lenInstructorsDashAddnew = Settings.Instance.GetMasterInfo4().InstructorsDashAddnew.Length;
+    int lenInstructorsDashAdmin = Settings.Instance.GetMasterInfo4().InstructorsDashAdmin.Length;
+    
+}
+
+@section Head {
+    @Scripts.Render("~/Areas/Public/Scripts/ExtFieldValidation.js")
+    @{Html.RenderPartial("UserWidgetStores");}
+}
+
+<script>
+    var UserWidgetAdminModes = Ext.create('Ext.data.Store', {
+        fields: ['vlu', 'txt'],
+        data: [
+            { "vlu": "StudentsDashAddnew", "txt": "Student Registration" },
+            { "vlu": "StudentsDashViewEdit", "txt": "Student Dashboard Edit or View" },
+            { "vlu": "StudentsDashAdmin", "txt": "Student Admin View" },
+
+            { "vlu": "InstructorsDashAddnew", "txt": "Instructor Registration" },
+            { "vlu": "InstructorsDashViewEdit", "txt": "Instructor Dashboard Edit or View" },
+            { "vlu": "InstructorsDashAdmin", "txt": "Instructor Admin View" },
+        ]
+    });
+
+
+
+    Ext.onReady(function () {
+        var loadMask = new Ext.LoadMask(Ext.getBody(), { msg: 'Loading...' });
+        window.LAYOUT.MaskLayout('Loading...');
+
+        Ext.create('Ext.form.ComboBox', {
+            fieldLabel: '<strong>EDIT MODE</strong>',
+            emptyText: 'Select from the list',
+            labelWidth: 80,
+            width: 300,
+            store: UserWidgetAdminModes,
+            editable: true,
+            queryMode: 'local',
+            displayField: 'txt',
+            valueField: 'vlu',
+            renderTo: Ext.get('usermenutab'),
+            listeners: {
+                select: function (combo, record, index) {
+                    //alert(combo.getValue())
+
+                    //Ext.get('editmodecont').setLoading(true);
+                    window.LAYOUT.MaskLayout('Loading...');
+
+                    Ext.Ajax.request({
+                        waitMsg: 'Loading...',
+                        url: config.getUrl('public/user/DashboardEdit'),
+                        params: {
+                            mode: combo.getValue(),
+                            partialview: 'true'
+                        },
+                        success: function (response) {
+                            $("#maindashboardeditcont").html(response.responseText);
+                            window.LAYOUT.UnmaskLayout();
+                        }
+                    });
+
+                }
+            }
+
+        });
+
+
+
+
+        Ext.Ajax.request({
+            waitMsg: 'Loading...',
+            url: config.getUrl('public/user/InitializeUserWidgetSettings'),
+            params: {
+                resetcmd: 'NONE',
+            },
+            success: function (response) {
+                window.LAYOUT.UnmaskLayout();
+            }
+        });
+
+
+        //window.LAYOUT.UnmaskLayout();
+
+
+
+
+
+
+    });
+
+
+
+
+
+
+</script>
+
+
+
+<div style="width:100%;">
+    <div id="usermenutab" style="margin-left:20px"></div>
+    <div id="maindashboardeditcont" style="width:100%;"></div>
+</div>

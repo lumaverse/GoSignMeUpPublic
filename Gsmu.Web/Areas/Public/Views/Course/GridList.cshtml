@@ -1,0 +1,386 @@
+﻿@using Gsmu.Api.Commerce.ShoppingCart;
+@using Gsmu.Api.Data.School
+@using Gsmu.Api.Data.School.Entities
+@using Gsmu.Api.Data
+@using Gsmu.Api.Data.ViewModels.Grid
+@using Gsmu.Api.Data.ViewModels.Layout
+@using Gsmu.Api.Data.School.Course
+@using Gsmu.Api.Data.School.Terminology;
+@model GridModel<CourseModel>
+
+@{
+    string PubDateFormat =  Settings.Instance.GetPubDateFormat();
+    var showCourseNum = ((Settings.Instance.GetMasterInfo2().HideCourseNumber == 0) ? true : false);
+}
+
+@if (Model.TotalCount < 1)
+{
+    <div class="grid-message">
+        Sorry, there are no new courses with the selected options. Please check back at a later time.
+    </div>
+}
+else
+{
+    var config = LayoutManager.PublicLayoutConfiguration.SearchColumns.Grid;
+
+    var columns = new List<GridColumnModel>();
+
+    if (config.CourseId)
+    {
+        columns.Add(new GridColumnModel()
+        {
+            ColumnName = "ID",
+            SortField = CourseOrderByField.CourseId,
+            Style = "width: 30px;"
+        });
+    }
+    
+    if ((config.CourseNumber) && (showCourseNum))
+    {
+        columns.Add(new GridColumnModel()
+        {
+            ColumnName = "Course#",
+            SortField = CourseOrderByField.CourseNum,
+            Style = "width: 30px;"
+        });
+    }
+
+    columns.Add(new GridColumnModel()
+    {
+        ColumnName =  TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course)+" name",
+        SortField = CourseOrderByField.CourseName
+    });
+
+    if (config.CourseStart)
+    {
+        columns.Add(new GridColumnModel()
+        {
+            ColumnName = "Start date",
+            SortField = CourseOrderByField.CourseStart,
+            Style = "text-align: right;"
+        });
+
+        columns.Add(new GridColumnModel()
+        {
+            ColumnName = "Time",
+            SortField = CourseOrderByField.CourseTime,
+            Style = "text-align: right;"
+        });
+    }
+
+    if (config.Location)
+    {
+        columns.Add(new GridColumnModel()
+        {
+            ColumnName = "Location",
+            SortField = CourseOrderByField.Location,
+            Style = ""
+        });
+    }
+
+    columns.Add(new GridColumnModel()
+    {
+        ColumnName = "Default sort&nbsp;",
+        SortField = CourseOrderByField.SystemDefault,
+        Style = ""
+    });
+
+    var ascending = Url.Content("~/" + Gsmu.Api.Data.WebConfiguration.PublicCourseBrowseAscendingImage);
+    var descending = Url.Content("~/" + Gsmu.Api.Data.WebConfiguration.PublicCourseBrowseDescendingImage);
+    var orderByField = (CourseOrderByField)Model.OrderByField;
+
+    <table style="border: none; width: 97%; border-collapse: collapse; margin:10px;">
+        <tr class="grid-column-row">
+            @foreach (var column in columns)
+            {
+                var sortable = string.Empty;
+                var sortableAction = string.Empty;
+                if (column.SortField != null)
+                {
+                    sortable = "grid-column-sortable";
+                    sortableAction = string.Format(Model.SorterCallbackTemplate, column.SortField);
+                    sortableAction = "onclick=\"" + sortableAction + "\"";
+                }
+                var style = string.Empty;
+                if (column.Style != null)
+                {
+                    style = string.Format("style=\"{0}\"", column.Style);
+                }
+                <td class="grid-column @(sortable)" @Html.Raw(sortableAction) @Html.Raw(style)>
+
+                    @if (
+                    column.SortField != null && orderByField != null &&
+                    orderByField == (CourseOrderByField)column.SortField
+                )
+                    {
+                        <div class="grid-order-direction-icon">
+                            @if (Model.OrderByDirection == OrderByDirection.Ascending)
+                            {
+                                <img src="@ascending" />
+                            }
+                            else
+                            {
+                                <img src="@descending" />
+                            }
+                        </div>
+                    }
+
+                    @Html.Raw(column.ColumnName)
+                </td>
+            }
+        </tr>
+        @foreach (var courseModel in Model.Result)
+        {
+            var course = courseModel.Course;
+            var times = courseModel.CourseTimes;
+            var bgcolor = "auto";
+            Course_Time start = times.Count() > 0 ? times.First() : null;
+            var courseStartEndTimeDisplay = (courseModel.Course.StartEndTimeDisplay != null ? courseModel.Course.StartEndTimeDisplay.Trim() : string.Empty);
+            //var showCartButton = (course.CoursesType == 0 || (course.CoursesType == 1 && string.IsNullOrWhiteSpace(course.ContactName) || string.IsNullOrWhiteSpace(course.ContactPhone)))
+            //var hasCourseTypeText = ((course.CourseTypeAltVerbiage != null && course.CourseTypeAltVerbiage.Trim().Length > 0) ? true : false);
+            if (ViewBag.EnabledColor)
+            {
+                foreach (var colorcode in ViewBag.ColorCode)
+                {
+                    if (colorcode.CourseCategoryID == course.CourseColorGrouping)
+                    {
+                        bgcolor = "#" + colorcode.CourseCategoryColor;
+                    }
+                }
+            }
+        
+            <tr data-course-id="@course.COURSEID" class="grid-row" style="height: auto !important; background-color:@Html.Raw(bgcolor);" data-course-name="@HttpUtility.HtmlEncode(course.COURSENAME)" id="grid-row-@course.COURSEID">
+
+                @if (config.CourseId)
+                {
+                    <td style="vertical-align: middle;">
+                        @Html.Raw(course.COURSEID)
+                    </td>
+                }
+
+                @if ((config.CourseNumber) && (showCourseNum))
+                {
+                    <td style="vertical-align: middle; padding-left: 3px;">
+                        @Html.Raw(course.COURSENUM)
+                    </td>
+                }
+
+                <td style="font-size: 14px; font-weight: bold; text-decoration: underline; color: black; cursor: pointer; vertical-align: middle;"  onclick="window.CourseSearchInstance.ShowCourseDetails(@course.COURSEID)">
+                    @Html.Raw(course.COURSENAME)
+                </td>
+
+                @if (config.CourseStart)
+                {
+                    if (courseStartEndTimeDisplay.Length > 0)
+                    {
+                        <td colspan="2" style="vertical-align: middle; text-align: left;" onclick="window.CourseSearchInstance.ShowCourseDetails(@course.COURSEID)">
+                            @Html.Raw(courseStartEndTimeDisplay)
+                        </td>
+                    }
+                    else
+                    {
+                        <td style="vertical-align: middle; text-align: right;">
+                            @if (start == null)
+                            {
+                                <text>n/a</text>
+                            }
+                            else
+                            {
+                                @(start.COURSEDATE.HasValue ? start.COURSEDATE.Value.ToString(PubDateFormat) : "")
+                            }
+                        </td>
+                        <td style="vertical-align: middle; text-align: right;">
+                            @if (start == null)
+                            {
+                                <text>n/a</text>
+                            }
+                            else
+                            {
+                                @(start.STARTTIME.HasValue ? start.STARTTIME.Value.ToShortTimeString() : "")
+                            }
+                        </td>
+                    }
+                }
+
+                @if (config.Location)
+                {
+                    <td>
+                        <div id="grid-list-location-@course.COURSEID" style="padding: 3px;">
+                        </div>
+                        <script type="text/javascript">
+                            Ext.onReady(function() {
+                                var field = Ext.get('grid-list-location-' + @course.COURSEID);
+
+                                var data= {
+                                    location: @Html.Raw(Json.Encode(course.LOCATION)),
+                                    country: @Html.Raw(Json.Encode(course.Country)),
+                                    street: @Html.Raw(Json.Encode(course.STREET)),
+                                    city: @Html.Raw(Json.Encode(course.CITY)),
+                                    state: @Html.Raw(Json.Encode(course.STATE)),
+                                    zip: @Html.Raw(Json.Encode(course.ZIP)),
+                                    locationurl: @Html.Raw(Json.Encode(course.LOCATIONURL)),
+                                    locationadditionalinfo: @Html.Raw(Json.Encode(course.LocationAdditionalInfo)),
+                                    room: @Html.Raw(Json.Encode(course.ROOM)),
+                                    roomdirection: @Html.Raw(Json.Encode(course.RoomDirection))
+                                };
+
+                                window.COURSELOCATIONGENERATOR.generate(data, field, field, {
+                                    offset: [0, -8],
+                                    extraCssClass: 'gsmu-tooltip-removable'
+                                });
+                            });
+                        </script>
+                    </td>                        
+                }
+                
+                @if (course.CoursesType == 0)
+                {
+                    <td style="text-align: center; white-space: nowrap; position: relative;">
+                        @{Html.RenderPartial("ListingCartButton", courseModel, new ViewDataDictionary { { "style", "" }, { "AddToCartDisplayCourse", true } });}
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        &nbsp;
+                    </td>
+                }
+            </tr>
+            <tr class="grid-detail-row grid-row" data-course-id="@course.COURSEID"  id="grid-detail-@course.COURSEID" style="background-color:@Html.Raw(bgcolor);">
+                <td colspan="@(columns.Count)">
+                    @if (config.Icons)
+                    {
+                        <div style="float: left;">
+                            @{Html.RenderPartial("ListingIcons", courseModel);}
+                        </div>
+                    }
+                    
+                    @if (course.CoursesType == 1 && (!string.IsNullOrWhiteSpace(course.ContactName) || !string.IsNullOrWhiteSpace(course.ContactPhone)))
+                    {
+                        <div style="float: left;">
+                            <span style="font-weight: bold;">Register by contacting:</span>&nbsp;&nbsp;&nbsp;@course.ContactName&nbsp;&nbsp;&nbsp;@course.ContactPhone
+                        </div>
+                    }
+                    
+                    @if (course.CoursesType == 2 && !string.IsNullOrWhiteSpace(course.CourseTypeAltVerbiage))
+                    {
+
+                        string course_type_alt = course.CourseTypeAltVerbiage;
+                       <div style="float: left;">
+                            @if(course_type_alt.ToString().Length > 50)
+                            {
+                                @Html.Raw(course_type_alt.ToString().Insert(50,"<br />"))
+                            }
+                            else
+                            {
+                                @Html.Raw(course.CourseTypeAltVerbiage)
+                            }
+                        </div>
+                    }
+                    @if(courseModel.CertificateProgram!=""){
+                        <div style="text-decoration:none; font-weight:lighter; font-size:12px;">
+                                 <span style="font-weight: bold;">Certification Program:</span>
+                                @Html.Raw(courseModel.CertificateProgram)</div>
+
+                    }
+                    @if (Settings.Instance.GetMasterInfo3().FastTrackCoursesOn > 0 && courseModel.BundledCourses.Count > 0)
+                    {
+                        <div style="float: left;">
+                            <span style="font-weight: bold;">@Settings.Instance.GetMasterInfo3().FastTrackLabel Courses:&nbsp;</span>
+                            @{
+                                var html = string.Empty;
+                                foreach (Course c in courseModel.BundledCourses)
+                                {
+                                    if (courseModel.BundledCourses.IndexOf(c) > 0)
+                                    {
+                                        html += ", ";
+                                    }
+                                    html += "<a href=\"javascript:window.CourseSearchInstance.ShowCourseDetails(" + c.COURSEID + ");\">" + c.COURSENUM + " " + c.COURSENAME + "</a>";
+                                }
+                            }
+                            @Html.Raw(html);
+                        </div>
+                    }
+
+                    @if (config.Price)
+                    {
+                        <div style="float: right;">
+                          @{Html.RenderPartial("ListingPrices", courseModel, new ViewDataDictionary { { "ReadOnly", true } });}
+                        </div>
+                    }
+                    else
+                    {
+                        <div style="float: right; display:none;">
+                          @{Html.RenderPartial("ListingPrices", courseModel, new ViewDataDictionary { { "ReadOnly", true } });}
+                        </div>
+                    }
+
+                    <div style="float: right;padding-right:5px">
+                        @{Html.RenderPartial("ListingMaterials", courseModel, new ViewDataDictionary { { "ReadOnly", true }, { "FieldConfig", config } });}
+                    </div>
+
+                    @if (config.Credit)
+                    {
+                        <div style="float: right;">
+                            @{Html.RenderPartial("ListingCredits", courseModel);}
+                        </div>
+                    }
+
+                    @if (config.PreRequisite)
+                    {
+                        <div style="float: right;">
+                            @{Html.RenderPartial("ListingPrerequisite", courseModel);}
+                        </div>
+                    }
+
+                </td>
+            </tr>
+        }
+    </table>
+    
+    <script type="text/javascript">
+        Ext.onReady(function() {
+            Ext.onReady(function () {
+
+                var rows = Ext.query('.grid-row');
+                var currentDetail = null;
+                var currentRow = null;
+
+                /*
+                var details = Ext.query('.grid-detail-row');
+                Ext.Array.forEach(details, function (element, index, array) {
+                    var row = Ext.get(element);
+                    row.enableDisplayMode();
+                    row.hide();
+                });
+                */
+
+                Ext.Array.forEach(rows, function (element, index, array) {
+                    var row = Ext.get(element);
+                    row.on('mouseover', function (evt, el, o) {
+                        if (currentDetail != null) {
+                            currentDetail.removeCls('grid-detail-hover');
+                            //currentDetail.hide();
+                        }
+                        if (currentRow != null) {
+                            currentRow.removeCls('grid-detail-hover');
+                        }
+                        var id = row.getAttribute('data-course-id');
+                        currentRow = Ext.get('grid-row-' + id);
+                        currentDetail = Ext.get('grid-detail-' + id)
+                        if (currentDetail != null) {
+                            currentRow.addCls('grid-detail-hover');
+                            currentDetail.addCls('grid-detail-hover');
+                            //currentDetail.show();
+                        }
+                    });
+                });
+            });
+        });
+
+    </script>
+
+    Html.RenderPartial("_Pager", Model as GridPagerModel);
+
+}
+

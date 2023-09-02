@@ -1,0 +1,27 @@
+﻿
+@{
+    ViewBag.Title = "Confirmation";
+}
+<br />
+   <input type="hidden" value="@Html.Raw(ViewBag.OrderNo)" id="OrderNumber" style="width:530px;" class="textbox-cc" />
+   <input type="hidden" value="@Html.Raw(ViewBag.OrderTotal)" id="OrderTotal" style="width:530px;" class="textbox-cc" />
+<div id="confirmationprint">
+@if(ViewBag.Result=="000")
+{
+    <div>Processing Receipt...</div>
+}
+</div>
+<br />
+@Html.Raw(ViewBag.GoogleAnalyticsSetUpScript != null || ViewBag.GoogleAnalyticsSetUpScript != "" ? ViewBag.GoogleAnalyticsSetUpScript : "")
+@if(ViewBag.Result=="000")
+{
+    <script>
+     Cart.prototype.ShowConfirmationPageforPaygov();
+    </script>
+}
+else
+{
+        <script>
+            window.location.assign("/")
+    </script>
+}

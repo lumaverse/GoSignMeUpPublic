@@ -1,0 +1,233 @@
+﻿@using Gsmu.Api.Data;
+@using Gsmu.Api.Data.School.User;
+@using Gsmu.Api.Data.School.Terminology;
+@model UserModel
+@{
+    string jsPubDateFormat = Settings.Instance.GetJsPubDateFormat();
+}
+<script type="text/javascript">
+
+    var reportCmp = Ext.getCmp('OtherUserDashCourse');
+    if (reportCmp != null) { reportCmp.destroy(); }
+
+    var store_otherusercourses = Ext.create('Ext.data.Store', {
+        autoLoad: true,
+        autoSync: true,
+        pageSize: 5,
+        remoteFilter: true,
+        remoteSort: true,
+        remoteSort: true,
+        groupField: 'OrderNumber',
+        fields: [
+            { name: 'OrderNumber', type: 'string' },
+            { name: 'MasterOrderNumber', type: 'string' },
+            { name: 'coursename', type: 'string' },
+            { name: 'Amount', type: 'string' },
+            {
+                name: 'dateadded', type: 'string'
+            },
+            { name: 'CustomCreditHours', type: 'string' },
+             { name: 'CourseDate', type: 'date', dateFormat: '@jsPubDateFormat' },
+        ],
+        proxy: {
+            type: 'ajax',
+            url: config.getUrl('public/User/OtherUserEnrolledCourses'),
+            reader: {
+                type: 'json',
+                rootProperty: 'Result',
+                totalProperty: 'TotalCount',
+                listeners: {
+                    exception: function (reader, response, error, opts) {
+                        log(error);
+                    }
+                }
+            }
+        }
+    });
+    var otherusercombotpl = new Ext.XTemplate(
+        '<div style="width:90px; border: 1px solid grey; height: 20px; padding: 0px;"><div style="color:grey;float: left;width: 55px; margin-top:2px;">&nbsp;&nbsp;select...</div><div style="float: left; text-align:right; width: 30px; margin-top:2px;">&#9660;&nbsp;</div></div>'
+    );
+    var otherusercoursedashmenudta = [];
+    otherusercoursedashmenudta.push({ vlu: 'cancelcourse', labl: 'Cancel ' + '@TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course)' });
+    otherusercoursedashmenudta.push({ vlu: 'printreciept', labl: 'Print Receipt' });
+    otherusercoursedashmenudta.push({ vlu: 'viewcoursework', labl: 'View ' + '@TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course)' + ' Work' });
+
+    var otherusercoursedashmenu = Ext.create('Ext.data.Store', {
+        fields: ['vlu', 'labl'],
+        data: otherusercoursedashmenudta
+    });
+    var otherusers_searchField = Ext.create('Ext.form.field.Text', {
+        region: 'north',
+        emptyText: 'Search',
+        width: 500,
+    });
+
+    otherusers_searchField.on('change', function (that, value, oldValue, options) {
+        store_otherusercourses.filter(
+            [{ id: 'keyword', property: 'keyword', value: value }]
+        );
+    }, otherusers_searchField, {
+        buffer: 500
+    });
+    var OtherUserCoursesFormvar = Ext.create('Ext.grid.Panel', {
+        id: 'OtherUserEnrolledCoursesWidgetGrid',
+        dockedItems: [
+            {
+                xtype: 'pagingtoolbar',
+                store: store_otherusercourses,
+                dock: 'top',
+                displayInfo: true
+            }
+        ],
+        store: store_otherusercourses,
+        border: false,
+        autoScroll: true,
+        layout: 'fit',
+        emptyText: 'No courses to show',
+        features: [{
+            id: 'OtherUserCourseGroup',
+            ftype: 'groupingsummary',
+            hideGroupedHeader: false,
+            collapsible: false,
+            enableGroupingMenu: false,
+            groupHeaderTpl: [
+                    ' Order Number: {[values.rows[0].data.OrderNumber]}' + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Total Paid: " + "{[values.rows[0].data.FormattedTotalPaid]}"
+            ],
+        }
+        ],
+        columns: [
+            {
+                text: '#',
+                dataIndex: 'courseid',
+                width: 40,
+                align: 'left'
+            },
+            {
+                //on grid view Enrolled
+                text: 'Course Name',
+                dataIndex: 'courseName',
+                flex: 3,
+                align: 'left',
+                type: 'string',
+                sortType: 'asUCText',
+            },
+            {
+                text: 'Name',
+                dataIndex: 'StudentName',
+                //width: 100,
+                flex: 3,
+                hidden: false,
+                align: 'left'
+            },
+            {
+                text: 'MasterOrderNumber',
+                dataIndex: 'MasterOrderNumber',
+                //width: 100,
+                flex: 3,
+                hidden: true,
+                align: 'left'
+            },
+            {
+                text: 'Order Number',
+                dataIndex: 'OrderNumber',
+                hidden: true,
+            },
+            {
+                text: 'Start Date',
+                dataIndex: 'FormatedDate',
+                //flex: 1.2,
+                align: 'right',
+            },
+            {
+                text: 'Order Paid',
+                dataIndex: 'TotalPaid',
+                width: 0,
+                align: 'right',
+                hidden: true,
+                xtype: 'templatecolumn',
+                tpl: '{totalpaid:usMoney}'
+            },
+            {
+                text: 'Actions',
+                xtype: 'templatecolumn',
+                width: 100,
+                tpl: otherusercombotpl,
+                editor: {
+                    xtype: 'combobox',
+                    id: 'otherusercoursedashmenucombo',
+                    forceSelection: true,
+                    editable: false,
+                    store: otherusercoursedashmenu,
+                    emptyText: 'select...',
+                    displayField: 'labl',
+                    valueField: 'vlu',
+                    listeners: {
+                        'focus': function (fld) { this.onTriggerClick(); },
+                        'change': function (field, selectedValue) {
+
+                            var ucwg = Ext.getCmp('OtherUserEnrolledCoursesWidgetGrid');
+                            var selection = ucwg.getSelectionModel().getSelection()[0];
+                            var rosterid = selection.get('Rosterid');
+                            var courseid = selection.get('courseid');
+                            var ordernumber = selection.get('OrderNumber');
+                            var masterordernumber = selection.get('masterordernumber');
+                            var cmd = this.value;
+                            membership.UserAction(courseid, ordernumber, this, cmd, rosterid, 0, this)
+                        }
+                    }
+                }
+
+            },
+            // This type of controll is not working in safari and IE
+            //{
+            //    text: 'Action',
+            //    dataIndex: 'courseid',
+            //    xtype: 'templatecolumn',
+            //    tpl: actiondiv //using html for option dropdown
+            //},
+        ],
+        plugins: [
+            Ext.create('Ext.grid.plugin.CellEditing', {
+                clicksToEdit: 1
+            })
+        ],
+        listeners: {
+            itemclick: function (dv, record, item, index, e) {
+                var ucwg = Ext.getCmp('OtherUserEnrolledCoursesWidgetGrid');
+                var selection = ucwg.getSelectionModel().getSelection()[0];
+                var ordernumber = selection.get('ordernumber');
+                var cmbostore = Ext.getCmp('otherusercoursedashmenucombo').getStore();
+                cmbostore.reload();
+
+
+            }
+        }
+    });
+
+
+    Ext.create('Ext.Panel', {
+        id: 'OtherUserDashCourse',
+        frame: true,
+        renderTo: Ext.get('otherusercoursesrender'),
+        layout: 'anchor',
+        autoScroll: false,
+        title: 'Other @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Student) @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Enrollment)',
+        items: [otherusers_searchField, OtherUserCoursesFormvar],
+        tools: [
+            {
+                hidden: (dasboardadminmode ? false : true),
+                type: 'cross',
+                tooltip: 'Delete this widget ',
+                handler: function (e, toolEl, panel, tc) {
+                    DeleteUserWidget(GetwidgetColIDbyPlID('OtherUserDashCourse'), GetwidgetIDbyPlID('OtherUserDashCourse'));
+                }
+            }
+        ],
+        html: ''
+
+    });
+
+
+
+</script>
+<div id="otherusercoursesrender" style="position: relative; min-height: 100px; padding-bottom: 20px"></div>

@@ -1,0 +1,144 @@
+@using Gsmu.Api.Data
+@using Gsmu.Api.Data.School;
+@using Gsmu.Api.Data.School.Terminology
+@using Gsmu.Api.Authorization
+@{
+    ViewBag.Title = TerminologyHelper.Instance.GetTermCapital(TermsEnum.Instructor) + " Dashboard";
+    string transcriptnetUrl = Settings.Instance.GetMasterInfo4().AspSiteRootUrl + "/students_transcriptnet.asp?sid=";
+    var CertificationsOnOff = Settings.Instance.GetMasterInfo2().CertificationsOnOff;
+    DataLists dlists = new DataLists();
+}
+
+@section Head {
+    @Scripts.Render("~/bundles/public-instructor")
+    <style type="text/css">
+        .widget-field {
+            font-size: 11px !important;
+            font-weight: bold;
+        }
+
+		body.embedded .grad_stud_right {
+			width: 962px !important;
+		}
+
+		.grad_stud_right {
+			width: 962px !important;
+		}
+    </style>
+
+    <script type="text/javascript">
+        var district_Label = "";
+        var school_Label = "";
+        var grade_label = "";
+        var hideDist = true;
+        var hideSch = true;
+        var hideGrade = true;
+        var instructorsessionId = '@AuthorizationHelper.CurrentInstructorUser.UserSessionId';
+        var allowstudentenroll = '@ViewBag.allowstudentenroll';
+        var allowstudentaddedit ='@ViewBag.allowstudentaddedit';
+        var allowcourserequests ='@Settings.Instance.GetMasterInfo3().AllowCourseRequests';
+        var HideCertificateLink = '@ViewBag.HideCertificateLink';
+        var CurrentInstructorId = '@ViewBag.CurrentInstructorId' ;
+        var HideManagerRoomInPublic = '@ViewBag.HideManagerRoomInPublic';
+        var HasSubAdminAccount = '@ViewBag.HasSubAdminAccount';
+        var AllowInstructortoTakeAttendace = '@ViewBag.AllowInstructortoTakeAttendace';
+        var classicurl = '@transcriptnetUrl';
+        var supervisorterm = "@TerminologyHelper.Instance.GetTermCapital(TermsEnum.Supervisor)";
+        var username = "@ViewBag.UserName";
+        var certificationsettings = "@CertificationsOnOff";
+        var options = {
+            containers: {
+                left: 'supervisor-left',
+                center: 'supervisor-center'
+
+            },
+            noProfileImage: config.getUrl(@Html.Json(Url.Content(WebConfiguration.NoProfileImageVirtualPath))),
+            profileImagePath: config.getUrl(@Html.Json(Url.Content(WebConfiguration.InstructorProfileImageVirtualDirectory))),
+            profileImageMaxWidth: @Html.Json(WebConfiguration.ProfileImageWidgetWidth),
+            profileImageMaxHeight: @Html.Json(WebConfiguration.ProfileImageWidgetHeight),
+            widgets: {
+                left: ['InstructorIdentityWidget' , 'InstructorInformationWidget'],
+                center: ['InstructorCourseListWidget','InstructorEmailListandReportWidget'],
+                right: []
+            }
+        };
+        //var replaced = $("body").html().replace(/My Account/g,'The ALL new string');
+       // $("body").html(replaced);
+        var dashboard = new InstructorDashboard(options);
+        var studentTerm =  ' @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Student)';
+        var insadminPath = 'admin/'
+
+
+        var ListOfDistrict = [];
+        var ListOfSchool = [];
+        var ListOfGrade = [];
+
+        //SERVICE API ACCESS
+        var sessionId = instructorsessionId;
+        var tokenRaw = encodeURIComponent(btoa(username + ':' + sessionId.trim()));
+        var roleRaw = encodeURIComponent(btoa('instructor'));
+        localStorage.setItem('token', JSON.stringify(tokenRaw));
+        localStorage.setItem('role', JSON.stringify(roleRaw));
+
+@{
+    foreach(var district in dlists.Districts){
+        <text>
+                    ListOfDistrict.push({ vlu: '@district.DISTID', labl: '@district.DISTRICT1' });
+        </text>
+    }
+
+    foreach(var school in dlists.Schools){
+        <text>
+                    ListOfSchool.push({ vlu: '@school.ID', labl: '@school.LOCATION',district:'@school.District' });
+        </text>
+    }
+    foreach(var gradelevel in dlists.GradeLevels){
+        <text>
+                    ListOfGrade.push({ vlu: '@gradelevel.GRADEID', labl: '@gradelevel.GRADE',school:'@gradelevel.SchoolId' });
+        </text>
+    }
+    if(ViewBag.VisibleStudentDISTRICT){
+        <text>
+                hideDist = false;
+        </text>
+    }
+    if(ViewBag.VisibleStudentSCHOOL){
+        <text>
+                hideSch = false;
+        </text>
+    }
+    if(ViewBag.VisibleStudentGRADE){
+        <text>
+                hideGrade = false;
+        </text>
+    }
+
+}
+
+        var DistrictStore = Ext.create('Ext.data.Store', {
+            fields: ['vlu', 'labl'],
+            data: ListOfDistrict
+        });
+
+        var SchoolStore = Ext.create('Ext.data.Store', {
+            fields: ['vlu', 'labl'],
+            data: ListOfSchool
+        });
+        var GradeLevelStore = Ext.create('Ext.data.Store', {
+            fields: ['vlu', 'labl'],
+            data: ListOfGrade
+        });
+
+
+
+    </script>
+
+
+}
+
+<div style="float: left; width: 280px;" id="supervisor-left" class="supervisor-column">
+</div>
+
+<div style="float: left; width: 675px; margin-left: 5px; padding-right: -10px; margin-top:-5px;" id="supervisor-center" class="supervisor-column">
+</div>
+

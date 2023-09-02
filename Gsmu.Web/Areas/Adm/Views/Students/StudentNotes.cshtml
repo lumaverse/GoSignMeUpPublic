@@ -1,0 +1,20 @@
+﻿<div id="students-notes">
+    <div class="loader">Loading...</div>
+    <script id="student-notes-template" type="x-tmpl-mustache">
+        <div class="modal-header popover-title">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h5 class="modal-title gsmu-popop-header">
+                Student Notes for : {{ StudentNotesFor }}
+            </h5>
+        </div>
+        <div class="modal-body popover-content">
+            <textarea id="student-notes-input" class="form-control" placeholder="Add / Edit Notes">{{ Notes }}</textarea>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-success btn-sm" onclick="StudentsNotes.saveNote()">Save Changes</button>
+            <button type="button" class="btn btn-secondary btn-sm">Reset</button>
+            <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+        </div>
+    </script>
+</div>
+<script src="~/Areas/Adm/Scripts/Students/StudentsNotes.js"></script>

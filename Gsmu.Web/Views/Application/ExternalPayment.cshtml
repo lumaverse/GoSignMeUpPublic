@@ -1,0 +1,64 @@
+﻿
+@{
+    ViewBag.Title = "ExternalPayment";
+    Layout = "~/Areas/Public/Views/Shared/_Layout.cshtml";
+}
+
+<h2>ExternalPayment</h2>
+<div style="height:900px;">Payment</div>
+<script>
+    var OrderNumber = "@ViewBag.OrderNo";
+    var OrderTotal = "@ViewBag.Amount";
+    var TranscriptID = "@ViewBag.TranscriptId";
+    var Courseid = "@ViewBag.cid";
+    var showotherpayment = "@ViewBag.showotherpayment";
+    $(document).scrollTop($(document).height()-100);
+    Ext.Ajax.request({
+        url: config.getUrl('public/cart/Payment'),
+        params: {
+            OrderNumber: OrderNumber,
+            OrderTotal: OrderTotal,
+            PaymentTotal: OrderTotal,
+            TranscriptID: TranscriptID,
+            credithourspayment: '@ViewBag.credithourspayment',
+            fromadmin: true,
+            showotherpayment:showotherpayment,
+            Courseid: Courseid
+        },
+        success: function (data) {
+
+            popWindow_paymenthours = Ext.create('Ext.form.Panel', {
+                floating: true,
+                //centered: true,
+                modal: true,
+                width: 970,
+                closable: true,
+                defaultType: 'textfield',
+                bodyPadding: 10,
+                html: data.responseText,
+
+                renderTo: Ext.getBody(),
+                listeners: {
+                    close: function () {
+
+                        //  window.history.back();
+                        @if(ViewBag.showotherpayment=="false"){
+                            <text>
+                            document.location = '@Url.Content(ViewBag.returnsite)'+'/portal.asp#{"navigation":"reports-review-orders","param":null}';
+                            </text>
+                        }
+                        else{
+                        <text>
+                        document.location = '@Url.Content(ViewBag.returnsite)';
+                        </text>
+                        }
+                   }
+                }
+
+            });
+            popWindow_paymenthours.show();
+        }
+    })
+
+</script>
+

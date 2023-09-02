@@ -1,0 +1,42 @@
+﻿<div id="widget-course-social-networking">
+    <div class="panel panel-default">
+        <div class="panel-heading gsmu-sub-panel-heading">
+            <div class="panel-title pull-left">
+                Social Networking
+            </div>
+            <div class="pull-right">
+                <div id="course-social-btns">
+                    <div>
+                        <button type="button" onClick="courseFacebook.navigateToCourseComments()" class="btn btn-default btn-xs attach" onclick=""><span class="fa fa-cog"></span></button>
+                    </div>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <div class="panel-body gsmu-sub-panel-body panel-collapse collapse in">
+            <div class="row form-group form-group-sm">
+                <div class="col-lg-12">
+                    <div id="facebookButtons" class="facebookSection">
+                        <button type="button" class="uiButton uiButtonPrimary" value="Login to Facebook" id="loginButton" onclick="facebookAPI.login();">Login to Facebook</button>
+                        <button type="button" class="uiButton uiButtonPrimary" value="Logout to Facebook" id="logoutButton" onclick="facebookAPI.logout();">Logout to Facebook</button>
+                    </div>
+                    <div class="facebookSection" id="pagecontainerlabel">
+                        <label style="padding-left: 3px;font-size: 16px;font-weight: bold;">Select Target Page:</label>
+                        <br />
+                        <button type="button" class="uiButton uiButtonPrimary" id="pagelink" href="#" onClick="facebookAPI.loadManagedPageList(facebookAPI.managedPageList)">Retrieve Current Page(s)</button>
+                    </div>
+                    <div class="facebookSection" id="pagecontainer" style="display:none;">
+                        <div id="facebookPagesSection">
+                            <label>Select Target Page:</label>
+                            <br />
+                            <select style="font-size: 13px;margin-top: 3px;" id="fbpageslist"></select>
+                            <br />
+                        </div>
+                        <button type="button" class="uiButton uiButtonPrimary " style="margin-top: 5px;width:99%" id="testpost" onclick="facebookAPI.shareToWall()" alt="post on facebook wall"><img src="../../Images/Icons/socialmediaicons/FB-f-Logo__white_29.png" class="facebookLogo" alt="">Post Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/Areas/Adm/Scripts/Widgets/CourseSocialNetworking.js")

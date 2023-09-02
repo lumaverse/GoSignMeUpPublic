@@ -1,0 +1,56 @@
+﻿@using Gsmu.Api.Data.School;
+@using Gsmu.Api.Data.School.User;
+@using Gsmu.Api.Data.ViewModels.Layout;
+@model UserModel
+@{
+    ViewBag.Title = "Edit Student Info";
+    DataLists dlists = new DataLists();
+    UserWidget userwidgets = dlists.UserWidgets("StudentsDashViewEdit");
+
+    int iwgt = 0;
+    string formId = "";
+}
+
+@section Head {
+    @Scripts.Render("~/Areas/Public/Scripts/ExtFieldValidation.js")
+    @{Html.RenderPartial("../User/UserWidgetStores");}
+}
+
+
+
+<div style="float: left; width:100%">
+    <div style="float: left;width:100%; margin-left:10px">Please enter information required.</div>
+
+    <form id="registuserall" method="post">
+
+        <div style="float: left;width:100%;">
+
+            @foreach (var col in userwidgets.Column)
+            {
+                string WidthPer = col.WidthPer.ToString() + "%";
+
+                <text>
+
+                    <div style="width:@WidthPer ;float: left; padding:10px">
+
+                        @foreach (var wdgt in userwidgets.Widgets.Where(cl => cl.ColID == col.ID).OrderBy(l => l.DispSort))
+                        {
+
+                            <text>
+                                <div>
+                                    @{Html.RenderAction("UserWidget", "user", new { userwidget = userwidgets, widgetmodel = wdgt, cmd = "edit", usergroup = "ST", sid = ViewBag.SelectedUserid });}
+                                </div>
+                            </text>
+                        }
+
+                    </div>
+
+                </text>
+            }
+
+        </div>
+
+
+
+    </form>
+    <br />

@@ -1,0 +1,41 @@
+﻿@using Gsmu.Api.Data
+@model Gsmu.Web.Areas.Public.Controllers.SharerController.CourseSharerModel
+
+@{
+    ViewBag.Title = "Social Media Sharer";
+}
+
+@section Head {
+
+	<meta property="fb:app_id" content="226362114099749">
+	<meta property="og:type" content="article">
+	<meta name="url" property="og:url" content="@Model.CourseLink">
+	<meta name="title" property="og:title" content="@Model.CourseTitle">
+	<meta name="image" property="og:image" content="@Model.TileImage">
+	<meta name="description" property="og:description" content="@Model.Description"><br><br><br><br>
+}
+
+<div id="app-msg" style="color: red;" class="x-hidden"></div>
+<script type="text/javascript">
+    //var courseId = UrlHelper.getUrlVars()["cid"];
+    //$.ajax({
+    //    url: '/Public/Sharer/CourseShareDataByCourseId?courseId=' + courseId,
+   //     method: 'GET',
+   //     type: 'JSON',
+   //     success: function (response) {
+   //         var course = response;
+            //$('meta[name=url]').attr('content', window.location.href);
+            //$('meta[name=title]').attr('content', course.CourseTitle);
+            //$('meta[name=image]').attr('content', course.TileImage ? course.TileImage : '');
+            //$('meta[name=description]').attr('content', course.Description);
+    //    }
+    //});
+</script>
+@if (HttpContext.Current.Request.UrlReferrer != null) {
+    if (HttpContext.Current.Request.UrlReferrer.ToString() != null && HttpContext.Current.Request.UrlReferrer.ToString() =="https://www.facebook.com/") 
+    {
+       Response.Redirect(Settings.Instance.GetMasterInfo4().DotNetSiteRootUrl + "public/Course/browse?courseid=" + Request["cid"]);
+    }
+}
+
+

@@ -1,0 +1,134 @@
+﻿@model Gsmu.Api.Data.School.CourseRoster.OrderModel
+@using Gsmu.Api.Authorization
+@using Gsmu.Api.Web
+
+@{
+    ViewBag.Title = "Order Confirmation";
+}
+
+@section Head {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#paypal_iframe_source").height(1600);
+            @if (Request.QueryString["print"] == "true")
+            {
+                <text>
+                window.print();
+                </text>
+            }
+        });
+        function printConfirmation(order) {
+            var win = window.open(location.pathname + '?order=' + order + '&print=true');
+            //win.print();
+        }
+    </script>
+}
+<link rel="stylesheet" href="@Url.Content("~/Content/Confirmation.css")"/>   
+@if (Request.QueryString["print"] == "paypalDecline")
+{
+    <div style="background-color: #FCF58C;
+    border: 3px dashed #FFFF00;
+    padding: 20px;
+    text-align: center;"><b>Transaction Declined. There's an issue on your credit card information. Please go back and try again.</b></div>
+}
+else
+{
+        if (Request.QueryString["print"] == null)
+        {
+            <div style="float: right; margin-left: 5px;" id="confirmation-toolbar-container">
+                <a href="javascript:printConfirmation(@Json.Encode(Model.OrderNumber));"
+                    class="simpleCart_checkout hudbtn primary right" style="height: 25px; width: 150px; font-size: 16px; vertical-align: central; text-align: center;">Print</a>
+            </div>
+
+            <div style="float: right;" id="facebook-like-container">
+                <div class="fb-like" data-send="true" data-layout="button_count" data-width="450" data-show-faces="true" data-font="trebuchet ms"></div>
+            </div>
+        }
+
+        <div style="clear: both">
+        @Html.Partial("_PartialConfirmation", Model)
+        </div>
+
+        if (Request.QueryString["print"] == null)
+        {
+            <div id="confirmation-print-button-container" style="float: right;">
+      
+                <a href="javascript:printConfirmation(@Json.Encode(Model.OrderNumber));"
+                    class="simpleCart_checkout hudbtn primary right" style="height: 25px; width: 150px; font-size: 16px; vertical-align: central; text-align: center;">Print</a>
+            </div>
+        }
+
+        if (ViewBag.IsPayPalAdvance == true)
+        {
+    
+            <div style="display:none">Html.RenderAction("Empty", "Cart");</div>
+            <div id="confirmation-print-button-container">
+                <table>
+                <tr>
+                <td>
+                <a href="javascript:printConfirmation(@Json.Encode(Model.OrderNumber));"
+                    class="simpleCart_checkout hudbtn primary right" 
+                    style="height: 25px; width: 150px; font-size: 17px; vertical-align: central; text-align: center;
+                    background: -moz-linear-gradient(center top , #97C865 0%, #44933D 100%) repeat scroll 0 0 rgba(0, 0, 0, 0);
+                    border-color: #3D7530;
+                    box-shadow: 0 1px 0 #D8E994 inset;
+                    color: #FFFFFF;
+                    text-decoration: none;
+                    border-radius: 3px;
+                    cursor: pointer;
+                    display: block;
+                    padding: 0 12px;
+                    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+                    top: -5px;
+                    -moz-box-sizing: content-box;">Print</a>
+                </td>
+                <td>       
+                 <a href="javascript:cart.backToBrowse(true);"
+                    class ="simpleCart_checkout hudbtn primary"
+                    style="height: 25px; width: 230px; font-size: 17px; vertical-align: central; text-align: center;
+                    background: -moz-linear-gradient(center top , #97C865 0%, #44933D 100%) repeat scroll 0 0 rgba(0, 0, 0, 0);
+                    border-color: #3D7530;
+                    box-shadow: 0 1px 0 #D8E994 inset;
+                    color: #FFFFFF;
+                    text-decoration: none;
+                    border-radius: 3px;
+                    cursor: pointer;
+                    display: block;
+                    padding: 0 12px;
+                    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+                    top: -5px;
+                    -moz-box-sizing: content-box;">Continue Shopping For Courses</a>
+                </td> 
+                <td>     
+
+                @{
+                    var aref = "~/public/user/dashboard";
+                    if(AuthorizationHelper.CurrentSupervisorUser!=null)
+                    {
+                        aref = "~/public/supervisor";
+                    }
+                }
+                
+                    <a href="@Url.Content(aref)"
+                    class="simpleCart_checkout hudbtn primary"  style="height: 25px; width: 150px; font-size: 17px; vertical-align: central; text-align: center;
+                    background: -moz-linear-gradient(center top , #97C865 0%, #44933D 100%) repeat scroll 0 0 rgba(0, 0, 0, 0);
+                    border-color: #3D7530;
+                    box-shadow: 0 1px 0 #D8E994 inset;
+                    color: #FFFFFF;
+                    text-decoration: none;
+                    border-radius: 3px;
+                    cursor: pointer;
+                    display: block;
+                    padding: 0 12px;
+                    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+                    top: -5px;
+                    -moz-box-sizing: content-box;">Back To User Home</a>
+                </td>
+                </tr>
+            </table>
+            </div>
+    }
+}
+
+
+

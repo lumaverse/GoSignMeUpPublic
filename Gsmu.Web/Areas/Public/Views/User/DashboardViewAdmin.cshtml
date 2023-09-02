@@ -1,0 +1,265 @@
+﻿@using Gsmu.Api.Data.School;
+@using Gsmu.Api.Data.School.User;
+@model UserModel
+@{
+    var userModel = Model;
+    ViewBag.Title = "Dashboard";
+    int userid = ViewBag.userid;
+    string usergroup = ViewBag.abv;
+    string cmd = ViewBag.cmd;
+    string SearchText = ViewBag.SearchText; 
+    string QueryStr = "";
+    string EmptyStr = "Name, username, email, user id"; 
+    if(!String.IsNullOrEmpty(SearchText)){
+           EmptyStr =  SearchText;
+    }
+    switch (usergroup)
+    {
+    case "IT":
+        QueryStr = "InstructorListQuery";
+        
+    break;
+    case "SP":
+        QueryStr = "SupervisorListQuery";
+
+    break;
+    default:
+        QueryStr = "StudentListQuery";
+
+    break;
+    }
+
+
+}
+
+@section Head {
+    @Scripts.Render("~/Areas/Public/Scripts/ExtFieldValidation.js")
+}
+
+@{Html.RenderPartial("UserWidgetStores");}
+
+<style>
+    .grad_stud_top_info {
+        display: none;
+    }
+
+    .grad_stud_top_site {
+        display: none;
+    }
+
+    .grad_stud_top_all {
+        display: none;
+    }
+
+    .cart-info-container {
+        display: none;
+    }
+
+    .grad_stud_footer {
+        display: none;
+    }
+
+    .grad_stud_footer2 {
+        display: none;
+    }
+
+    #grad_stud_title {
+        display: none;
+    }
+
+    #layout-footer-container {
+        display: none;
+    }
+
+    #layout-welcomeuser {
+        display: none;
+    }
+
+    .grad_stud_main2 {
+        background:none;
+        padding:0px;
+    }
+
+    .grad_stud_main {
+        border:none;
+    }
+
+    .grad_stud_table_1 {
+        background: none;
+    }
+
+    BODY {
+        background:none;
+        /*margin: 0px;
+        padding: 10px;*/
+    }
+    
+    
+
+</style>
+<script>
+
+
+    var fldprop={};
+    var UsrAdmin = true;
+    Ext.define('modelUserList', {
+        extend: 'Ext.data.Model',
+        fields: [
+            { name: 'userid', type: 'int', useNull: false },
+            { name: 'first', type: 'string', useNull: false },
+            { name: 'last', type: 'string', useNull: false },
+            { name: 'email', type: 'string', useNull: false },
+            { name: 'username', type: 'string', useNull: false },
+	        {
+	            persist: false,
+	            name: 'fullinfo',
+	            convert: function (v, record) {
+	                return record.data.first + " " + record.data.last + " | " + record.data.username + " | " +  record.data.email + " | " + record.data.userid;
+	            }
+	        }
+
+        ]
+    });
+
+
+
+    var QueryUrl = 'public/user/' + '@QueryStr'
+
+    var storeUserListSearch = Ext.create('Ext.data.Store', {
+        autoLoad: true,
+        autoSync: true,
+        pageSize: 100,
+        remoteFilter: true,
+        remoteSort: true,
+        remoteSort: true,
+        model: 'modelUserList',
+        proxy: {
+            type: 'ajax',
+            url: config.getUrl(QueryUrl),
+            reader: {
+                type: 'json',
+                rootProperty: 'Result',
+                totalProperty: 'TotalCount',
+                listeners: {
+                    exception: function (reader, response, error, opts) {
+                        log(error);
+                    }
+                }
+            }
+        }
+    });
+
+
+
+
+    var UserListSearchButton = Ext.create('Ext.Button', {
+        id: 'UserDashboardsearchButton',
+        height: 30,
+        width: 100,
+        disable: true,
+        text: 'View',
+        handler: function () {
+            var userid = Ext.getCmp('SearchUserIDUserDashboard').getValue();
+            var SearchText = Ext.getCmp('SearchUserIDUserDashboard').getRawValue();
+            //loadDashboardAdmin(userid);
+            window.location.href = "public/user/DashboardViewAdmin?userid="+userid+"&SearchText="+SearchText;
+        }
+    });
+
+
+    var loadDashboardAdmin = function (userid) {
+
+        Ext.Ajax.request({
+            url: config.getUrl('public/user/DashboardAdmin'),
+            params: {
+                abv: '@usergroup',
+                userid: userid
+            },
+            success: function (response) {
+
+                $("#usersearchcontentresult").html(response.responseText);
+
+            }
+        });
+
+
+    };
+
+
+    var UserListSearch = Ext.create('Ext.form.field.ComboBox', {
+        id: 'SearchUserIDUserDashboard',
+        xtype: 'combo',
+        store: storeUserListSearch,
+        minChars: 2,
+        width: 450,
+        height: 30,
+        margin: '0 5 0 5',
+        valueField: 'userid',
+        displayField: 'fullinfo',
+        typeAhead: false,
+        hideTrigger: true,
+        emptyText: '@EmptyStr',
+        listConfig: {
+            loadingText: 'Searching...',
+            emptyText: 'No matching entry found.',
+
+            getInnerTpl: function () {
+                return '{fullinfo}';
+
+            }
+        },
+        pageSize: 100
+
+    });
+
+
+
+    Ext.onReady(function () {
+
+        var searchBar = Ext.create('Ext.panel.Panel', {
+            dock: 'top',
+            renderTo: Ext.get('usercombosearchcontent'),
+            height: 40,
+            border: false,
+            layout: 'hbox',
+            items: [
+                { xtype: 'tbfill' },
+                UserListSearch,
+                UserListSearchButton,
+                {
+                    xtype: 'hidden',
+                    id: 'UserDashboardIDnumber',
+                    value: '@userid'
+                    
+                },
+                { xtype: 'tbfill' }
+            ]
+        });
+
+
+
+        @if(userid > 0){
+            <text>
+            loadDashboardAdmin(@userid);
+            </text>
+        }
+
+        $("#layout-header-content").hide();
+        $(".navbar").hide();
+
+    });
+
+</script>
+<div id="SectionWrapper">
+
+    <div id="usercombosearchcontent"></div>
+
+    <div id="usersearchcontentresult" style="width:100%; overflow:auto; padding:0px">
+
+
+    </div>
+
+</div>
+
+
+

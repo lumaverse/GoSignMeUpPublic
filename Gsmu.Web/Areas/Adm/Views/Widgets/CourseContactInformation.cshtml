@@ -1,0 +1,44 @@
+﻿<div id="widget-contact-information">
+    <div class="panel panel-default">
+        <div class="panel-heading gsmu-sub-panel-heading">
+            <div class="panel-title pull-left">
+                Contact Information
+            </div>
+            <div class="pull-right">
+                <div id="course-contact-editor-btns">
+                    <div>
+                        <button type="button" class="btn btn-warning btn-xs edit" onclick="courseContactEditor.initEditor()"><span class="glyphicon glyphicon-pencil"></span></button>
+                        <button type="button" class="btn btn-success btn-xs save" onclick="courseContactEditor.save()"><span class="glyphicon glyphicon-ok"></span></button>
+                        <button type="button" class="btn btn-danger btn-xs cancel" onclick="courseContactEditor.initView()"><span class="glyphicon glyphicon-remove"></span></button>
+                    </div>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <div class="panel-body gsmu-sub-panel-body panel-collapse collapse in">
+            <div class="row form-group form-group-sm">
+                <div id="course-contact-content" class="col-lg-12">
+                    <div class="row pad-bot-10">
+                        <div class="col-lg-4">Contact Name : </div>
+                        <div class="col-lg-8"><span id="contact-name"></span> </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">Contact Phone Number : </div>
+                        <div class="col-lg-8"><span id="contact-number"></span> </div>
+                    </div>
+                </div>
+                <div id="course-contact-editor" class="col-lg-12">
+                    <div class="row pad-bot-10">
+                        <div class="col-lg-4">Contact Name : </div>
+                        <div class="col-lg-8"><input type="text" class="form-control input-group-sm" data-bind="contact-name" name="ContactName" /></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">Contact Phone # : </div>
+                        <div class="col-lg-8"><input type="text" class="form-control input-group-sm" data-bind="contact-number" name="ContactPhone" /></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/Areas/Adm/Scripts/Widgets/CourseContactInformation.js")

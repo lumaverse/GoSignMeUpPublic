@@ -1,0 +1,177 @@
+﻿/*
+    OUTDATED NEEDS UPDATES BASED ON BrowseLeftcategory
+*/
+
+.course-search-leftcategory-title {
+    font-weight: bolder;
+    font-size: larger;
+}
+
+.course-search-leftcategory-showall {
+    background-color: rgb(128, 128, 128); 
+    background-image: none !important; 
+    padding-left: 5px !important; 
+    width: 224px !important;
+}
+
+.course-search-leftcategory-showall:hover {
+    text-decoration: underline;
+}
+
+.course-search-leftcategory-showall-active {
+    background-color: rgb(0, 0, 0); 
+}
+
+.course-search-leftcategory-close {
+    position: relative;
+    top: 5px;
+    cursor: pointer;
+}
+
+.grad_stud_left ul {
+	list-style-type: none;
+	width: 229px;
+	height: auto;
+	background: transparent;
+	margin: auto;
+	padding: 1px 0px 1px 0px;
+	float: left;
+}
+
+.grad_stud_left img {
+	padding: 0px 0px 3px 0px;
+	float: left;
+}
+
+.grad_stud_left li {
+	width: 206px;
+	/*
+        the reason why we keep this here is that the original graphics are fixed width
+        */
+    height: 34px;
+	/*background: transparent url(../../images/layout/grad_p_off.jpg) left top no-repeat;*/
+	margin: auto;
+	padding: 0px 0px 1px 23px;
+	float: left;
+	color: #ffffff;
+	font-size: 12px;
+	font-family: Arial;
+	font-weight: normal;
+	line-height: 33px;
+	cursor: pointer;
+
+    /*
+        main categories cannot wrap because of the fixed height background that is replaced
+    */
+    text-overflow:ellipsis !important;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.grad_stud_left li:hover {
+    text-decoration: underline;
+	cursor: pointer;
+}
+
+.grad_stud_left li a {
+	color: #ffffff;
+	text-decoration: none;
+	display: block;
+}
+
+.grad_stud_left li a:hover  {
+	text-decoration: none;
+}
+
+.grad_stud_left_li_open {
+	/*background: transparent url(../../images/layout/grad_m_off.jpg) left top no-repeat !important;*/
+}
+
+
+.grad_stud_left_li_open:hover {
+	cursor: pointer;
+}
+
+/* subcategory */
+.grad_stud_left_ul_ul {
+	display: none;
+	padding: 0px;
+	float: left;
+}
+
+.grad_stud_left_ul_ul li.sub {
+	/*
+    width: 219px;
+        */
+    max-width: 200px;
+    width: 200px;
+	min-height: 27px;
+	background: transparent url(../../images/layout/line2.gif) left bottom repeat-x;
+	background-color: rgb(224, 224, 224);
+	margin: auto;
+	padding: 0px 5px 1px 24px;
+	float: left;
+	font-size: 12px;
+	font-family: Arial;
+	font-weight: normal;
+	line-height: 27px;
+	color: #5b5c66;
+	cursor:pointer;
+
+    /*
+        since the background is a repeating line that could be replaced with color
+        we can have auto height here
+        */
+
+    height: auto !important;
+    white-space: normal !important;
+}
+
+.grad_stud_left_ul_ul li.sub:hover {
+}
+
+.grad_stud_left_ul_ul li.sub.left-category-active {
+    color: white;
+    background-color: black;
+}
+
+/* subsubcategory */
+
+li.subsub {
+	display: none;
+	padding: 0px;
+	width: 199px !important;
+    padding-left: 30px;
+	min-height: 27px;
+	/*background: transparent url(../../images/layout/line2.gif) left bottom repeat-x;
+	background-color: rgb(255, 255, 255);*/
+	margin: auto;
+	float: left;
+	font-size: 12px;
+	font-family: Arial;
+	font-weight: normal;
+	line-height: 27px;
+	color: #5b5c66;
+	cursor:pointer;
+    white-space: normal !important;
+    height: auto !important;
+
+}
+
+li.subsub:hover {
+}
+
+/*li.subsub.left-category-active {
+    background-color: #000000;
+    color: #ffffff;    
+}*/
+
+/* sub sub category en */
+
+.grad_stud_li_last {
+	background: transparent none !important;
+}
+
+.left-category-subcategory-parent {
+
+}

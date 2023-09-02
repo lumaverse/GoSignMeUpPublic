@@ -1,0 +1,23 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>SurveyConfirmation</title>
+</head>
+<body>
+   <div style="text-align:center">
+         @Html.Raw(ViewBag.ThankYouMessage)
+    </div>
+    @if (ViewBag.CertificateLink!="")
+    {
+    <div style="text-align:center">
+        <a href="@ViewBag.CertificateLink">View PDF File</a>
+    </div>
+    }
+</body>
+</html>

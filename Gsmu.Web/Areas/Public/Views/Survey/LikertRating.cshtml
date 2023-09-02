@@ -1,0 +1,34 @@
+﻿@{
+var SurveyID="Answer"+ ViewBag.QuestionId;
+var namecomment = "Comment" + ViewBag.QuestionId;
+}
+                    <table>	
+						  <tr class="bodystyle">
+								<td width="120" align="middle" valign="top" class="bodystyle2m">
+								  <input type="radio" name="@SurveyID" value="5"><br>
+								  1
+								</td>
+								<td width="90" align="middle" valign="top" class="bodystyle2m">
+								  <input type="radio" name="@SurveyID" value="4"><br>
+								  2
+								</td>
+								<td width="90" align="middle" valign="top" class="bodystyle2m">
+								  <input type="radio" name="@SurveyID" value="3" checked><br>
+								  3
+								</td>
+								<td width="90" align="middle" valign="top" class="bodystyle2m">
+								  <input type="radio" name="@SurveyID" value="2"><br>
+								  4
+								</td>
+								<td width="110" align="middle" valign="top" class="bodystyle2m">
+								  <input type="radio" name="@SurveyID" value="1"><br>
+								  5
+								</td>
+                        </tr>
+                    </table>
+@if((ViewBag.withComment==1) || (ViewBag.withComment==-1)){
+<div>
+Comments:
+<textarea style="width:100%" cols="65" rows="5" name="@namecomment" id="@namecomment" type="text"></textarea>
+</div>
+}

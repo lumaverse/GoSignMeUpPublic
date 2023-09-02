@@ -1,0 +1,18 @@
+﻿   @{
+    Layout = "";    
+    }   
+<body>
+Ipay Payment Processing...
+</body>
+@if(ViewBag.redirect =="")
+{
+<div>@ViewBag.All</div>
+    
+}
+}
+else
+{
+<script>
+    document.location = "@ViewBag.urlToken";
+</script>
+}

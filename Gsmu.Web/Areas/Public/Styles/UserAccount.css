@@ -1,0 +1,186 @@
+﻿#usertabcontent {
+	margin: 0 0 0 0;
+	padding: 0 0 1em 1em;
+	position: relative;
+	z-index: 2;
+    /*box-shadow: 0 5px 8px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0 5px 8px rgba(0, 0, 0, 0.3); /* FF 3.6 */
+    border: none;
+    margin-top: 0.8em;
+
+	background: white;
+	color: black;
+	/*border: 1px solid #aaa;*/
+	border-right: none;
+	line-height: 1.5em;
+}
+
+#userwarningcontent {
+	margin: 0 1em 0 0;
+    font-size:smaller;
+    text-align:right;
+	color: red;
+}
+
+/* scale back up to a sane default */
+#SectionWrapper {
+	font-size: 127%;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+#firstHeading {
+	margin-bottom: .1em;
+	/* These two rules hack around bug 2013 (fix for more limited bug 11325).
+	   When bug 2013 is fixed properly, they should be removed. */
+	line-height: 1.2em;
+	padding-bottom: 0;
+}
+
+
+.portlet ul {
+    margin: 0 0 0 1.5em;
+    font-size: 100%;
+	line-height: 1.5em;
+	list-style-type: square;
+	list-style-image: url(bullet.gif);
+}
+
+
+#user-menu-tab {
+	position: absolute;
+	left: -3.4em;
+	margin: 0;
+	white-space: nowrap;
+	width: 76%;
+	line-height: 1.1em;
+	overflow: visible;
+	background: none;
+	border-collapse: collapse;
+	padding-left: 1em;
+	list-style: none;
+	font-size: 83%;
+	top: -0.7em;
+
+}
+#user-menu-tab ul {
+	list-style: none;
+}
+#user-menu-tab li {
+	display: inline;
+	border: 1px solid #aaa;
+	border-bottom: none;
+	padding: 0 0 .2em 0;
+	overflow: visible;
+	background: white;
+	
+    /*background-image: -moz-linear-gradient(bottom, #EAF1FB, rgba(255, 255, 255, 0.3));*/
+    /*background-image: -webkit-linear-gradient(bottom, #EAF1FB 0, rgba(255, 255, 255, 0.3) 100%);*/ /* Webkit */
+    /*background-image: -o-linear-gradient(bottom, #EAF1FB 0, rgba(255, 255, 255, 0.3) 100%);*/ /* Opera */
+    /*background-image: -ms-linear-gradient(bottom, #EAF1FB 0, rgba(255, 255, 255, 0.3) 100%);*/ /* IE */
+
+
+
+    border-radius: 5px 5px 0 0;
+    -moz-border-radius: 5px 5px 0 0; /* FF 3.6 */
+    box-shadow: 0 15px 20px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0 15px 20px rgba(0, 0, 0, 0.5); /* FF 3.6 */
+    margin: 0 0.1em 0 0;
+    padding: 0.2em;
+    border: none!important;
+}
+
+#user-menu-tab li:hover {
+    background-image: -moz-radial-gradient(center bottom, ellipse farthest-corner, #FFFFFF, #FFFFFF, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)), -moz-linear-gradient(bottom, #EAF1FB, rgba(255, 255, 255, 0.3));
+    background-image: -webkit-radial-gradient(center bottom, ellipse farthest-corner, white 0, white 33.33%, rgba(255, 255, 255, 0) 66.67%, rgba(255, 255, 255, 0) 100%), -webkit-linear-gradient(bottom, #EAF1FB 0, rgba(255, 255, 255, 0.3) 100%); /* Webkit */
+    background-image: -o-linear-gradient(bottom, #FFFFFF 0, rgba(255, 255, 255, 0.3) 100%); /* Opera (doesn't support radial gradients yet) */
+    background-image: -ms-radial-gradient(center bottom, ellipse farthest-corner, #FFFFFF 0, #FFFFFF 33.33%, rgba(255, 255, 255, 0) 66.67%, rgba(255, 255, 255, 0) 100%), -ms-linear-gradient(bottom, #EAF1FB 0, rgba(255, 255, 255, 0.3) 100%); /* IE */
+}
+
+#user-menu-tab li {
+	border-color: #d9d7d3;
+	padding: 0 0 .2em 0;
+	background: white;
+	/*font-weight: bold;*/
+	
+    /*background-image: -moz-linear-gradient(bottom, #FBEEBE, rgba(255, 255, 255, 0.3));*/
+    /*background-image: -webkit-linear-gradient(bottom, #FBEEBE 0, rgba(255, 255, 255, 0.3) 100%);*/ /* Webkit */
+    /*background-image: -o-linear-gradient(bottom, #FBEEBE 0, rgba(255, 255, 255, 0.3) 100%);*/ /* Opera */
+    /*background-image: -ms-linear-gradient(bottom, #FBEEBE 0, rgba(255, 255, 255, 0.3) 100%);*/ /* IE */
+
+    background-image: -moz-linear-gradient(bottom, #d9d7d3, rgba(255, 255, 255, 0.3));
+    background-image: -webkit-linear-gradient(bottom, #d9d7d3 0, rgba(255, 255, 255, 0.3) 100%); /* Webkit */
+    background-image: -o-linear-gradient(bottom, #d9d7d3 0, rgba(255, 255, 255, 0.3) 100%); /* Opera */
+    background-image: -ms-linear-gradient(bottom, #d9d7d3 0, rgba(255, 255, 255, 0.3) 100%); /* IE */
+
+    border: 1px solid #d9d7d3!important;
+    padding: 0.5em 0.3em 0.3em 0.3em;
+}
+
+#user-menu-tab li.selected {
+	/*border-color: #a1a1a0;*/
+	/*border-color: black;*/
+	padding: 0 0 .3em 0;
+	background: white;
+	font-weight: bold;
+	
+    background-image: -moz-radial-gradient(center bottom, ellipse farthest-corner, #FFFFFF, #FFFFFF, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)), -moz-linear-gradient(bottom, #EAF1FB, rgba(255, 255, 255, 0.3));
+    background-image: -webkit-radial-gradient(center bottom, ellipse farthest-corner, white 0, white 33.33%, rgba(255, 255, 255, 0) 66.67%, rgba(255, 255, 255, 0) 100%), -webkit-linear-gradient(bottom, #EAF1FB 0, rgba(255, 255, 255, 0.3) 100%); /* Webkit */
+    background-image: -o-linear-gradient(bottom, #FFFFFF 0, rgba(255, 255, 255, 0.3) 100%); /* Opera (doesn't support radial gradients yet) */
+    background-image: -ms-radial-gradient(center bottom, ellipse farthest-corner, #FFFFFF 0, #FFFFFF 33.33%, rgba(255, 255, 255, 0) 66.67%, rgba(255, 255, 255, 0) 100%), -ms-linear-gradient(bottom, #EAF1FB 0, rgba(255, 255, 255, 0.3) 100%); /* IE */
+    border-radius: 5px 5px 0 0;
+    -moz-border-radius: 5px 5px 0 0; /* FF 3.6 */
+    box-shadow: 0 15px 20px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0 15px 20px rgba(0, 0, 0, 0.5); /* FF 3.6 */
+    margin: 0 0.1em 0 0;
+    padding: 0.3em;
+    /*border: none!important;*/
+    border: 1px solid #a1a1a0!important;
+    /*border-width: 1px;*/
+}
+
+#user-menu-tab li.selected a {
+	z-index: 3;
+	padding: 0 1em .2em!important;
+	background-color: white;
+}
+
+#user-menu-tab li a {
+	background-color: transparent!important;
+	/*color: #002bb8;*/
+    color: black;
+	border: none;
+	padding: 0 .8em .3em;
+	position: relative;
+	z-index: 0;
+	margin: 0;
+	text-decoration: none;
+}
+
+#user-menu-tab li a:hover {
+	z-index: 3;
+	text-decoration: none;
+	background-color: white;
+}
+
+#user-menu-tab .pBody {
+	font-size: 1em;
+	background-color: transparent;
+	color: inherit;
+	border-collapse: inherit;
+	border: 0;
+	padding: 0;
+}
+
+.save-customicons {
+	background-image:url(/Images/Icons/FamFamFam/save.png) !important;
+}
+
+.close-cross {
+	background-image:url(/Images/Icons/FamFamFam/cross.png) !important;
+}
+
+.inactive, .inactive a  {
+    color : #ada6a6;
+}

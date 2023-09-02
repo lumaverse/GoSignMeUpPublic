@@ -1,0 +1,224 @@
+﻿@using Gsmu.Api.Data;
+@using Gsmu.Api.Data.School.Course;
+@using Gsmu.Api.Authorization
+@using Gsmu.Api.Language
+@using Gsmu.Api.Data.School.Student
+@using Gsmu.Api.Data.School.Terminology;
+@{
+     ViewBag.Title = "Browse " +  TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course) + "s";
+
+    ViewBag.MenuId = 1;
+
+    string showPublicAnncmnt = "false";
+	if(String.IsNullOrWhiteSpace(Settings.Instance.GetMasterInfo2().PublicAnnouncement2) == false)
+    {
+        showPublicAnncmnt = "true";
+    }
+
+    /*
+    Please make sure if you update the correspoding css to this view, to include the updates in the css and view
+    for the other view types because lots of ids and classes are shared between views because of the components.    
+    The components in javascript use the same classes on the different views because they are reused.
+    Even if you update the components the views should be updated everywhere the component is used.
+    */
+    
+    var internalUrl = Request.Path.ToLower().IndexOf("/browseinternal") > -1;
+    var publicCourseListingFastLoad = Settings.Instance.GetMasterInfo4().PublicCourseListingFastLoadAsBoolean;
+    var defaultPageSize = Gsmu.Api.Data.Settings.Instance.GetMasterInfo3().DefaultPaginationCourses.HasValue ? Gsmu.Api.Data.Settings.Instance.GetMasterInfo3().DefaultPaginationCourses.Value : 10;
+
+    string hideCategoryCss = string.Empty;
+    var hideQuery = Request.QueryString["hide-categories"];
+    HttpCookie hideCookie = null;
+    if (hideQuery == null)
+    {
+        hideCookie = Request.Cookies["hide-categories"];        
+    }
+
+    HttpCookie  HideCategoryCookie= new HttpCookie("hide-categories", hideQuery);
+    HideCategoryCookie.HttpOnly = true;
+    Response.SetCookie(HideCategoryCookie);
+}
+@section Head {
+
+
+    @Styles.Render("~/Areas/Public/Styles/Course/css")    
+    @Scripts.Render("~/bundles/gsmu-public-course")
+
+    <script type="text/javascript">
+        // course search component
+        var cs = null;
+
+        var adminmode_call = @Request.QueryString["adminmode"] +"";
+        // course search left category component
+        var cslc = null;
+
+        // course search keyword component
+        var cskw = null;
+
+        // course view type component
+        var cvt = null;
+
+        // course search date filter
+        var csdf = null;
+        var studentTerm =  ' @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Student)';
+        var AllowSupervisorToAddStudentOnCheckout = '@WebConfiguration.AllowSupervisorToAddStudentOnCheckout'
+        var showAddstudentbutton= true;        
+        Ext.onReady(function() {
+
+            Ext.Ajax.request({
+                url: config.getUrl('public/cart/CheckAuthorization'),
+                success: function (response) {
+                    var result = Ext.decode(response.responseText);
+                    if (result.IsLoggedIn && (result.UserType == 'Student' || result.UserType == 'Supervisor' || result.UserType=='Admin')) {
+                        if(AllowSupervisorToAddStudentOnCheckout =="False" && result.UserType == 'Supervisor')
+                        {
+                            showAddstudentbutton = true;
+                        }
+                        else{
+                            showAddstudentbutton = false;
+                        }
+                    }
+                }
+            }
+            );
+            window.GSMUTOOLTIP = new GsmuTooltip();
+            window.COURSELOCATIONGENERATOR = new CourseLocationGenerator();
+            var loginpopup=@ViewBag.AutoPopUplogin;
+            if(loginpopup ==true){
+                @if (!AuthorizationHelper.CurrentUser.IsLoggedIn){
+                    <text>
+                    membership.showLoginForm(false, true);
+                    </text>
+                }
+            }
+            var defaultPageSize = @(@Gsmu.Api.Data.Settings.Instance.GetMasterInfo3().DefaultPaginationCourses.HasValue ? @Gsmu.Api.Data.Settings.Instance.GetMasterInfo3().DefaultPaginationCourses : 10);
+
+            Ext.onReady(function () {
+                var pattern = /(#.)/;
+                if(pattern.test(window.location.href)){
+                    window.location.href= window.location.href.replace('#','').replace('/(/g','').replace('/)/g','');
+                }
+                else{
+                    var paramsearch = window.location.search;
+
+                    var query_strings = Ext.Object.fromQueryString(paramsearch);
+                
+               
+                    if(query_strings.orderNumberEmpty!=null && query_strings.orderNumberEmpty == "1")
+                    {
+                        Ext.MessageBox.show({
+                            title: 'Status',
+                            msg: 'Error Code: ErrCF101 - Missing Order Number upon paypal redirect. Contact Administrator',
+                            buttons: Ext.MessageBox.OK,
+                            icon: Ext.MessageBox.ERROR
+                        });
+                    }
+        
+                    cs = new CourseSearch({
+                        resultElementId: 'search-result',
+                        defaultPageSize: defaultPageSize,
+                        showPublicAnncmnt: @Html.Raw(showPublicAnncmnt)
+                    });
+                    //courseSearch, currentCategoryElement, delayInit, container
+                    var cslcContainer = Ext.get('course-search-left-category-container');
+                    cslc = new CourseSearchLeftCategory(cs, cslcContainer, false);
+                    cskw = new CourseSearchKeyword(cs, 'course-search-keyword-container');
+                    cvt = new CourseListingType(cs, 'view-type-container', false);
+
+                    csdf = new CourseSearchDateFilter({
+                        courseSearch: cs,
+                        containerId: 'course-search-datefilter-container'
+                    });
+
+                    if (!window.LAYOUT.Options.publicCourseListingFastLoad) {
+                        cs.Invoke();
+                    } else if (cs.CoursePopout > 0) {
+                        cs.ShowCourseDetails(cs.CoursePopout);
+                    }
+                }
+            })
+        });
+    </script>
+
+}
+@section SideBar {
+    <div id="course-search-left-category-container">
+    @if (Settings.Instance.GetMasterInfo4().PublicCourseListingFastLoadAsBoolean)
+    {
+        if ((ConvertHelper.ToBoolean(hideQuery)) || (hideCookie != null && ConvertHelper.ToBoolean(hideCookie.Value)))
+        {
+            //keep for future use
+        }
+        else
+        {
+            Html.RenderAction("LeftCategories", "Category", new { courseInternal = internalUrl, cancelState = CourseCancelState.NotCancelled });
+        }                
+    }
+</div>
+
+    @{Html.RenderAction("LeftLegends", "Category");}
+}
+@section TopMiddle {
+    <div id="course-search-keyword-container">
+    </div>
+}
+
+<div class="grad_stud_search_title">
+
+    <div id="view-type-container" style="border-left: 2px solid #ddd; ">
+    </div>
+
+    <div style="float: right; vertical-align:top; padding: 1px; padding-right: 5px;">
+        <img alt="Refresh Data" src="/Images/icons/glyph2/icons24x24/Arrow-27.png"  style="cursor: pointer; opacity: 0.7;" title="Refresh the data list from the server" onclick="COURSESEARCH.Invoke();" onmouseover="this.style.opacity = 1.0;" onmouseout="this.style.opacity = 0.7;"/>
+    </div>
+    @if(AuthorizationHelper.CurrentAdminUser != null || AuthorizationHelper.CurrentSubAdminUser != null){
+         <div style="float: right; vertical-align:top; padding: 1px; padding-right: 5px;">
+            <img alt="Refresh Data" src="/Images/icons/glyph2/icons24x24/Key.png"  style="cursor: pointer; opacity: 0.7;" title="Includes Internal courses" onclick="COURSESEARCH.SetAdminShowInternal();" onmouseover="this.style.opacity = 1.0;" onmouseout="this.style.opacity = 0.7;" class="internalcoursesshowed"/>
+        </div>
+        <div style="float: right; vertical-align:top; padding: 1px; padding-right: 5px;">
+            <img alt="Refresh Data" src="/Images/icons/glyph2/icons24x24/Calendar 3.png"  style="cursor: pointer; opacity: 0.7;" title="Show past and transcribed courses" onclick="COURSESEARCH.SetAdminShowPastClosed();" onmouseover="this.style.opacity = 1.0;" onmouseout="this.style.opacity = 0.7;" class="pastcoursesshowed"/>
+        </div>
+         <div style="float: right; vertical-align:top; padding: 1px; padding-right: 5px;">
+            <img alt="Refresh Data" src="/Images/icons/glyph2/icons24x24/User-2.png"  style="cursor: pointer; opacity: 0.7;" title="Show Available Membership" onclick="COURSESEARCH.SetAdminShowMembership();" onmouseover="this.style.opacity = 1.0;" onmouseout="this.style.opacity = 0.7;" class="membershipcoursesshowed"/>
+        </div>
+    }
+    <div id="course-search-datefilter-container" style="float: left; width: 360px;">
+    </div>
+
+</div>
+
+
+<div class="grad_stud_search_main" style="display: block;">
+
+@*
+    <div class="grad_stud_search_main_all">
+
+        <div style="padding: 5px;" id="search-elements">
+
+                @if (MembershipHelper.MembershipEnabled) {
+                    <div id="membershiptype-container">
+                        @AuthorizationHelper.CurrentUser.MembershipComment
+                    </div>
+                }
+            
+        </div>
+    </div>
+*@
+</div>
+
+<div class="grad_stud_search_main" id="search-result" style="width:100%">
+    <div>
+     @if (publicCourseListingFastLoad)
+     {
+         Html.RenderAction("List", "Course");
+     }
+     else
+     {
+        <div style="height: 100px;"></div>         
+     }
+</div>
+</div>
+
+
+
+

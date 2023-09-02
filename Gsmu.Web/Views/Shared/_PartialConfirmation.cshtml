@@ -1,0 +1,864 @@
+﻿@using Gsmu.Api.Data
+@using Gsmu.Api.Authorization;
+@using Gsmu.Api.Data.School.Terminology;
+@model Gsmu.Api.Data.School.CourseRoster.OrderModel
+
+@{
+    /*
+     * if you add new fields here, make sure to add the appropriate default fields to the
+     * Gsmu.Api.Data.School.CourseRoster.OrderModel constructor, because there is a test
+     * order model for the situation when the admin is editing the confirmation screen!
+     */
+
+
+    var orderDate = Model.SingleRoster.DATEADDED.Value.Date;
+    var orderTime = Model.SingleRoster.TIMEADDED.Value.TimeOfDay;
+
+    var orderDateTime = orderDate + orderTime;
+    //have to use masterinfo instead of setting variable to get timezone data, since the coursemodel is not available here
+    var timezone = ((Settings.Instance.GetMasterInfo3().system_timezone_hour.HasValue) ? (int)Settings.Instance.GetMasterInfo3().system_timezone_hour : 0);
+    var showCourseNum = ((Settings.Instance.GetMasterInfo2().HideCourseNumber == 0) ? true : false);
+    var orderDateTimeWithZone = new DateTime();
+    var hide_payment_info = Settings.Instance.GetMasterInfo2().HidePaymentInfo;
+    string PubDateFormat = Settings.Instance.GetPubDateFormat();
+
+    if (timezone > 0 && timezone < 4)
+    {
+        orderDateTimeWithZone = orderDateTime.AddHours(timezone);
+    }
+    else
+    {
+        orderDateTimeWithZone = orderDateTime;
+    }
+
+    var singleorderno = "";
+}
+
+<input type="hidden" id="confirmation-iswaiting" value="@Json.Encode(Model.IsWaiting)" />
+
+<div id="confirmation-header-container">
+    @Html.Raw(Model.ConfirmationHeader)
+</div>
+
+<div id="confirmation-content-container">
+
+    <div class="confirmation-area">
+        <div id="confirmation-title-container">
+            Order @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Receipt)
+        </div>
+        <div id="confirmation-enrollment-details-container">
+            <div class="confirmation-area-header">
+                Enrollment Details:
+            </div>
+
+            <div class="confirmation-field">Date:</div>
+            <div class="confirmation-field-value">@orderDateTimeWithZone.ToString(PubDateFormat)</div>
+
+            <div class="confirmation-field">Registration number:</div>
+            <div class="confirmation-field-value">@Model.SingleRoster.OrderNumber</div>
+
+            <div class="confirmation-field">@(Model.UsernameField):</div>
+            <div class="confirmation-field-value">@Model.Username</div>
+        </div>
+    </div>
+
+    @if ((Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser != null) || (Gsmu.Api.Authorization.AuthorizationHelper.CurrentInstructorUser != null) || (Gsmu.Api.Authorization.AuthorizationHelper.CurrentAdminUser != null || Gsmu.Api.Authorization.AuthorizationHelper.CurrentSubAdminUser != null) || (Gsmu.Api.Authorization.AuthorizationHelper.CurrentStudentUser != null))
+    {
+        decimal cardfeestotal = 0;
+        decimal paidtotalmultiple = 0;
+        var query_students = (from an in Model.CourseRosters
+                              group an by
+                                  new
+                                  {
+                                      student = an.Student,
+                                  }
+                                  into newGroup
+                              select newGroup);
+
+        foreach (var student in query_students)
+        {
+            <div class="confirmation-area">
+                <div id="confirmation-customer-container">
+                    <div class="confirmation-area-header">
+                        Participant Information:
+                    </div>
+                    <div>
+                        @Html.Raw(student.Key.student.FIRST) @Html.Raw(student.Key.student.LAST)
+                    </div>
+                    <div>
+                        @Html.Raw(student.Key.student.ADDRESS)
+                    </div>
+                    <div>
+                        @Html.Raw(student.Key.student.CITY)
+                        @(string.IsNullOrWhiteSpace(student.Key.student.STATE) ? string.Empty : ", " + Html.Raw(student.Key.student.STATE))
+                        @(string.IsNullOrWhiteSpace(student.Key.student.ZIP) ? string.Empty : ", " + Html.Raw(student.Key.student.ZIP))
+                    </div>
+                    <div>
+                        <a href="@student.Key.student.EMAIL">@Html.Raw(student.Key.student.EMAIL)</a>
+                    </div>
+                    <div>
+                        @Html.Raw(student.Key.student.HOMEPHONE)
+                    </div>
+                </div>
+            </div>
+            <div class="confirmation-area">
+                <div id="confirmation-items-container">
+                    <div class="confirmation-area-header">
+                        Order Details
+                    </div>
+
+                    <div id="confirmation-items-headers">
+                        <div class="confirmation-items-column-coursename confirmation-items-column">
+                            @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course) name
+                        </div>
+                        @if (showCourseNum)
+                        {
+                            <div class="confirmation-items-column-coursenumber confirmation-items-column">
+                                @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course)#
+                            </div>
+                        }
+                        <div class="confirmation-items-column-coursedates confirmation-items-column">
+                            Dates
+                        </div>
+                        <div class="confirmation-items-column-status confirmation-items-column">
+                            Status
+                        </div>
+                        @if (hide_payment_info == 0)
+                        {
+                            <div class="confirmation-items-column-price confirmation-items-column">
+                                Price
+                            </div>
+                        }
+                    </div>
+
+                    @foreach (var roster in Model.CourseRosters)
+                    {
+
+                        if (student.Key.student.STUDENTID == roster.Student.STUDENTID)
+                        {
+                            <div class="confirmation-items-line">
+                                <div class="confirmation-items-column-coursename confirmation-items-column">
+                                    @{singleorderno = roster.OrderNumber;}
+                                    @Html.Raw(roster.Course.COURSENAME)
+
+                                    @if (roster.PricingOption != null)
+                                    {
+                                        <div style="font-style:italic; font-size:11px;font-weight:normal;">@Html.Raw(roster.PricingOption) </div>
+                                    }
+                                    @{
+                                        var extraParticipants = roster.CourseExtraParticipants.ToList();
+                                        if (extraParticipants.Count > 0)
+                                        {
+                                            Html.RenderPartial("_PartialViewExtraParticipants", extraParticipants);
+                                        }
+                                    }
+                                </div>
+                                @if (showCourseNum)
+                                {
+                                    <div class="confirmation-items-column-coursenumber confirmation-items-column">
+                                        @Html.Raw(roster.Course.COURSENUM)
+                                    </div>
+                                }
+                                <div class="confirmation-items-column-coursedates confirmation-items-column">
+                                    @{
+                                        var courseStartEndTimeDisplay = (roster.Course.StartEndTimeDisplay != null ? roster.Course.StartEndTimeDisplay.Trim() : string.Empty);
+                                    }
+                                    @if (courseStartEndTimeDisplay.Length > 0)
+                                    {
+                                        <div style="float: right;">
+                                            @Html.Raw(courseStartEndTimeDisplay)
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        var timeIndex = 0;
+                                        foreach (var date in roster.Course.CourseTimes)
+                                        {
+                                            timeIndex++;
+                                        <div style="float: right;">
+                                            @if (roster.Course.IsOnlineCourse && roster.Course.coursetype == 0)
+                                            {
+                                                if (timeIndex == 1)
+                                                {
+                                                    <text>Online from </text>
+                                                    @date.COURSEDATE.Value.ToString(PubDateFormat)
+                                                    @Html.Raw("&nbsp;")
+                                                    @date.STARTTIME.Value.ToShortTimeString()
+
+                                                }
+                                                else
+                                                {
+                                                    <text>until </text>
+                                                    @date.COURSEDATE.Value.ToString(PubDateFormat)
+                                                    @Html.Raw("&nbsp;")
+                                                    @date.FINISHTIME.Value.ToShortTimeString()
+
+                                                }
+                                            }
+                                            else
+                                            {
+
+                                                @date.COURSEDATE.Value.ToString(PubDateFormat)
+                                                @date.STARTTIME.Value.ToShortTimeString()
+
+                                            }
+                                            @if (!roster.Course.IsOnlineCourse)
+                                            {
+                                                <text>
+                                                    -
+                                                    @date.FINISHTIME.Value.ToShortTimeString()
+                                                </text>
+                                            }
+                                        </div>
+                                        }
+                                    }
+                                </div>
+                                <div class="confirmation-items-column-status confirmation-items-column">
+                                    @if (!roster.IsWaiting)
+                                    {
+                                        if (roster.Cancel == 1)
+                                        {
+                                            <text>Cancelled</text>
+                                        }
+                                        else
+                                        {
+                                            <text>Enrolled</text>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <text>On Waiting List</text>
+                                    }
+                                </div>
+
+                                @if (hide_payment_info == 0)
+                                {
+                                    <div class="confirmation-items-column-price confirmation-items-column confirmation-items-data" style="">
+                                        @string.Format("{0:c}", roster.CourseCostDecimal)
+                                    </div>
+                                }
+                            </div>
+
+                            var currentMaterial = "";
+                            foreach (var rosterMaterial in roster.Materials)
+                            {
+                                var priceIsHidden = "none";
+                                if (rosterMaterial.Material != null)
+                                {
+                                    priceIsHidden = (hide_payment_info != 0) || (rosterMaterial.Material.hidematerialprice == -1) ? "none" : "block";
+                                }
+                                else
+                                {
+                                    priceIsHidden = (hide_payment_info != 0) || rosterMaterial.hidematerialprice == -1 ? "none" : "block";
+                                }
+                                <div class="confirmation-items-line">
+                                    <div style="float: right;display:@priceIsHidden">
+                                        @string.Format("{0:c}", rosterMaterial.EffectivePrice)
+                                    </div>
+                                    <div class="confirmation-material">
+                                        @if (rosterMaterial.product_name != currentMaterial)
+                                        {
+                                            <text>@Html.Raw(rosterMaterial.product_name) </text>
+
+                                        }
+                                    </div>
+                                </div>
+                                currentMaterial = rosterMaterial.product_name;
+                            }
+                            <div style="clear: both;height: 5px;"></div>
+                        }
+                    }
+                    @if (!Model.HidePaymentInfo)
+                    {
+                        <div class="confirmation-total-field">
+                            <div class="confirmation-orderdetails-value" style="float:left;font-style:italic;">
+                                @Model.OrderDetails
+                            </div>
+                            <div class="confirmation-total-value">
+                                @if (Model.IndividualOrders != null)
+                                {
+                                    bool alreadydisplayed = false;
+                                    foreach (var Order in Model.IndividualOrders)
+                                    {
+                                        if (Order.OrderNumber == singleorderno)
+                                        {
+                                            if (!alreadydisplayed)
+                                            {<text>
+
+                                                    @string.Format("{0:c}", Order.OrderTotal)
+                                            </text>
+                                            alreadydisplayed = true;
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <text>
+                                    @string.Format("{0:c}", Model.OrderTotalNoDiscount)
+                                </text>
+                            }
+                            </div>
+                            <div class="confirmation-total-label">
+                                Total:
+                            </div>
+                            <br />
+                            <div class="confirmation-total-value">
+                                @string.Format("{0:c}", Model.StackDiscountTotal)
+                            </div>
+                            <div class="confirmation-total-label">
+                                Discount:
+                            </div>
+                            @if (Model.SingleRoster.CouponDiscount.HasValue && Model.SingleRoster.CouponDiscount > 0)
+                            {
+                                <br />
+                                <div class="confirmation-total-value">
+                                    @if (Model.IndividualOrders != null)
+                                    {
+                                        bool alreadydisplayed = false;
+                                        foreach (var Order in Model.IndividualOrders)
+                                        {
+                                            if (Order.OrderNumber == singleorderno)
+                                            {
+                                                if (!alreadydisplayed)
+                                                {<text>
+
+                                                        @string.Format("{0:c}", Order.TotalPaid)
+                                                </text>
+                                                alreadydisplayed = true;
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                { <text>
+                                        @string.Format("{0:c}", (Model.OrderTotalNoDiscount - (decimal)Model.StackDiscountTotal))
+                                </text>
+                            }
+                                </div>
+                                <div class="confirmation-total-label">
+                                    Discounted Total:
+                                </div>
+                            }
+                            <br />
+                            <div class="confirmation-total-value">
+                                @if (Model.IndividualOrders != null)
+                                {
+                                    bool alreadydisplayed = false;
+                                    foreach (var Order in Model.IndividualOrders)
+                                    {
+                                        if (Order.OrderNumber == singleorderno)
+                                        {
+                                            if (!alreadydisplayed)
+                                            {
+                                                paidtotalmultiple = paidtotalmultiple + Order.TotalPaid;
+                                                <text>
+
+                                                    @string.Format("{0:c}", Order.TotalPaid)
+                                                </text>
+                                                alreadydisplayed = true;
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    paidtotalmultiple = paidtotalmultiple + Model.SingleRoster.TotalPaid.Value;
+                                    <text>
+                                        @string.Format("{0:c}", Model.SingleRoster.TotalPaid)
+                                    </text>
+                                }
+                            </div>
+                            <div class="confirmation-total-label">
+                                Total Amount Paid:
+                            </div>
+                            @{
+                                decimal? DueAmount = 0;
+                                if (Model.IndividualOrders != null)
+                                {
+                                    bool alreadydisplayed = false;
+                                    foreach (var Order in Model.IndividualOrders)
+                                    {
+                                        if (Order.OrderNumber == singleorderno)
+                                        {
+                                            if (!alreadydisplayed)
+                                            {
+
+                                                DueAmount = (Order.OrderTotal - Order.TotalPaid) - (decimal)Model.StackDiscountTotal;
+
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    DueAmount = Model.OrderTotal - Model.SingleRoster.TotalPaid;
+                                }
+                                if (DueAmount > 0)
+                                {
+                                    <text>
+                                        <br />
+                                        <br />
+                                        <div class="confirmation-total-value" style="color:red;">
+                                            @string.Format("{0:c}", DueAmount)
+                                        </div>
+                                        <div class="confirmation-total-label" style="color:red;">
+                                            Due Amount:
+                                        </div>
+                                    </text>
+                                }
+                            }
+                            <div>@Model.SingleRoster.CheckoutComments</div>
+                        </div>
+                    }
+
+                </div>
+
+
+            </div>
+
+            if (Model.CardFee > 0)
+            {
+                cardfeestotal = cardfeestotal + Model.CardFee;
+            }
+        }
+        <hr />
+
+
+        if (cardfeestotal > 0)
+        {
+            <br />
+            <div class="confirmation-total-value">
+                @string.Format("{0:c}", (cardfeestotal))
+            </div>
+            <div class="confirmation-total-label">
+                Convenience Fee:
+            </div>
+        }
+        if (paidtotalmultiple > 0 && AuthorizationHelper.CurrentAdminUser == null)
+        {
+            <br />
+            <div class="confirmation-total-value">
+                @string.Format("{0:c}", (paidtotalmultiple))
+            </div>
+            <div class="confirmation-total-label">
+                Total Amount Paid:
+            </div>
+        }
+    }
+    else
+    {
+
+
+        <div class="confirmation-area">
+            <div id="confirmation-customer-container">
+                <div class="confirmation-area-header">
+                    Participant Information:
+                </div>
+                <div>
+                    @Html.Raw(Model.Student.FIRST) @Html.Raw(Model.Student.LAST)
+                </div>
+                <div>
+                    @Html.Raw(Model.Student.ADDRESS)
+                </div>
+                <div>
+                    @Html.Raw(Model.Student.CITY)
+                    @(string.IsNullOrWhiteSpace(Model.Student.STATE) ? string.Empty : ", " + Html.Raw(Model.Student.STATE))
+                    @(string.IsNullOrWhiteSpace(Model.Student.ZIP) ? string.Empty : ", " + Html.Raw(Model.Student.ZIP))
+                </div>
+                <div>
+                    <a href="@Model.Student.EMAIL">@Html.Raw(Model.Student.EMAIL)</a>
+                </div>
+                <div>
+                    @Html.Raw(Model.Student.HOMEPHONE)
+                </div>
+            </div>
+            <div id="confirmation-payment-container">
+                <div class="confirmation-area-header">
+                    Payment Details:
+                </div>
+                <div>
+                    <div style="float: left;">
+                        @Model.SingleRoster.CardNumber
+                    </div>
+                    <div style="float: right;">
+                        @Model.SingleRoster.CardExp
+                    </div>
+                </div>
+                <div style="clear: both;">
+                    @Html.Raw(Model.SingleRoster.CardName)
+                </div>
+                <div>
+                    @Html.Raw(Model.SingleRoster.CardAddress)
+                </div>
+                <div>
+                    <div style="float: left;">
+                        @Html.Raw(Model.SingleRoster.PAYMETHOD)
+                    </div>
+                    <div style="float: right;">
+                        @Model.SingleRoster.payNumber
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="confirmation-area">
+            <div id="confirmation-items-container">
+                <div class="confirmation-area-header">
+                    Order Details
+                </div>
+
+                @if (Model.CourseRosters.Where(c => c.Course.COURSENUM == "~ZZZZZZ~").Count() > 0)
+                {
+                    <div id="confirmation-items-headers">
+                        <div class="confirmation-items-column-coursename confirmation-items-column">
+                            Membership
+                        </div>
+                        @if (showCourseNum)
+                        {
+                            <div class="confirmation-items-column-coursenumber confirmation-items-column">
+                                &nbsp;
+                            </div>
+                        }
+                        <div class="confirmation-items-column-coursedates confirmation-items-column">
+                            &nbsp;
+                        </div>
+                        <div class="confirmation-items-column-status confirmation-items-column">
+                            &nbsp;
+                        </div>
+                        @if (hide_payment_info == 0)
+                        {
+                            <div class="confirmation-items-column-price confirmation-items-column">
+                                Price
+                            </div>
+                        }
+                    </div>
+                }
+                @foreach (var roster in Model.CourseRosters.Where(c => c.Course.COURSENUM == "~ZZZZZZ~"))
+                {
+
+                    <br />
+                    <div class="confirmation-items-line">
+                        <div class="confirmation-items-column-coursename confirmation-items-column">
+                            @Html.Raw(roster.Course.COURSENAME)
+                        </div>
+                        @if (showCourseNum)
+                        {
+                            <div class="confirmation-items-column-coursenumber confirmation-items-column">
+                                &nbsp;
+                            </div>
+                        }
+                        <div class="confirmation-items-column-coursedates confirmation-items-column">
+                            &nbsp;
+                        </div>
+                        <div class="confirmation-items-column-status confirmation-items-column">
+                            &nbsp;
+                        </div>
+                        @if (hide_payment_info == 0)
+                        {
+                            <div class="confirmation-items-column-price confirmation-items-column confirmation-items-data">
+                                @string.Format("{0:c}", roster.CourseCostDecimal)
+                            </div>
+                        }
+                    </div>
+
+                }
+                <br />
+                <br />
+
+                <div id="confirmation-items-headers">
+                    <div class="confirmation-items-column-coursename confirmation-items-column">
+                        @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course) name
+                    </div>
+                    @if (showCourseNum)
+                    {
+                        <div class="confirmation-items-column-coursenumber confirmation-items-column">
+                            @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course) #
+                        </div>
+                    }
+                    <div class="confirmation-items-column-coursedates confirmation-items-column">
+                        Dates
+                    </div>
+                    <div class="confirmation-items-column-status confirmation-items-column">
+                        Status
+                    </div>
+                    @if (hide_payment_info == 0)
+                    {
+                        <div class="confirmation-items-column-price confirmation-items-column">
+                            Price
+                        </div>
+                    }
+                </div>
+
+                @foreach (var roster in Model.CourseRosters.Where(c => c.Course.COURSENUM != "~ZZZZZZ~").OrderBy(order => order.EventId).ThenBy(order => order.CourseSession))
+                {
+                    var eventStyle = "";
+                    var eventAddStyle = "";
+                    var indentionForEventStuyle = "";
+                    var coursetype = roster.Course.coursetype;
+
+                    if (coursetype == 1)
+                    {
+                        eventStyle = "font-size: 15px; color: #5fa44a; font-weight: bold;";
+                        eventAddStyle = "display:none;";
+                    }
+                    else
+                    {
+                        indentionForEventStuyle = "&nbsp;&nbsp;&nbsp;&nbsp;";
+                    }
+
+
+
+
+                    <div class="confirmation-items-line">
+                        <div class="confirmation-items-column-coursename confirmation-items-column" style="@eventStyle">
+                            <div style="font-size:13px;">  @Html.Raw(indentionForEventStuyle + roster.CourseSession)</div>
+                            <div> @Html.Raw(indentionForEventStuyle + indentionForEventStuyle + roster.Course.COURSENAME)</div>
+                            @if (hide_payment_info == 0 && roster.PricingOption != null)
+                            {
+                                <div style="font-style:italic; font-size:11px;font-weight:normal;">@Html.Raw(roster.PricingOption) </div>
+                            }
+                            @{
+                                var extraParticipants = roster.CourseExtraParticipants.ToList();
+                                if (extraParticipants.Count > 0)
+                                {
+                                    Html.RenderPartial("_PartialViewExtraParticipants", extraParticipants);
+                                }
+
+
+                                var credits = "";
+                                if (roster.InserviceHours > 0)
+                                {
+                                    credits = credits + "<br />" + Settings.Instance.GetMasterInfo2().InserviceHoursName + " " + roster.InserviceHours.ToString();
+                                }
+                                if (roster.CustomCreditHours > 0)
+                                {
+                                    credits = credits + "<br />" + Settings.Instance.GetMasterInfo2().CustomCreditTypeName + " " + roster.CustomCreditHours.ToString();
+                                }
+                                if (roster.HOURS > 0)
+                                {
+                                    credits = credits + "<br />" + Settings.Instance.GetMasterInfo2().CreditHoursName + " " + roster.HOURS.ToString();
+                                }
+                                if (roster.graduatecredit > 0)
+                                {
+                                    credits = credits + "<br />" + "Graduate";
+                                }
+                                if (roster.Optionalcredithours1 > 0)
+                                {
+                                    credits = credits + "<br />" + Settings.Instance.GetMasterInfo3().OptionalcredithoursLabel1;
+                                }
+                                if (roster.Optionalcredithours2 > 0)
+                                {
+                                    credits = credits + "<br />" + Settings.Instance.GetMasterInfo3().OptionalcredithoursLabel2;
+                                }
+                                if (roster.Optionalcredithours3 > 0)
+                                {
+                                    credits = credits + "<br />" + Settings.Instance.GetMasterInfo3().OptionalcredithoursLabel3;
+                                }
+                                if (roster.Optionalcredithours4 > 0)
+                                {
+                                    credits = credits + "<br />" + Settings.Instance.GetMasterInfo3().OptionalcredithoursLabel4;
+                                }
+                                if (roster.Optionalcredithours5 > 0)
+                                {
+                                    credits = credits + "<br />" + Settings.Instance.GetMasterInfo3().OptionalcredithoursLabel5;
+                                }
+                                if (roster.Optionalcredithours6 > 0)
+                                {
+                                    credits = credits + "<br />" + Settings.Instance.GetMasterInfo3().OptionalcredithoursLabel6;
+                                }
+                                if (roster.Optionalcredithours7 > 0)
+                                {
+                                    credits = credits + "<br />" + Settings.Instance.GetMasterInfo3().OptionalcredithoursLabel7;
+                                }
+                                if (roster.Optionalcredithours8 > 0)
+                                {
+                                    credits = credits + "<br />" + Settings.Instance.GetMasterInfo3().OptionalcredithoursLabel8;
+                                }
+                                if (credits != "")
+                                {
+                                    <div style="font-size:11px; font-style:italic; font-weight:normal; margin-left:5px;">Selected Credit(s) @Html.Raw(credits)</div>
+                                }
+
+                            }
+                        </div>
+                        @if (showCourseNum)
+                        {
+                            <div class="confirmation-items-column-coursenumber confirmation-items-column">
+                                @Html.Raw(roster.Course.COURSENUM)
+                            </div>
+                        }
+                        <div class="confirmation-items-column-coursedates confirmation-items-column" style="@eventAddStyle">
+                            @{
+                                var courseStartEndTimeDisplay = (roster.Course.StartEndTimeDisplay != null ? roster.Course.StartEndTimeDisplay.Trim() : string.Empty);
+                            }
+                            @if (courseStartEndTimeDisplay.Length > 0)
+                            {
+                                <div style="float: right;">
+                                    @Html.Raw(courseStartEndTimeDisplay)
+                                </div>
+                            }
+                            else
+                            {
+                                var timeIndex = 0;
+                                foreach (var date in roster.Course.CourseTimes)
+                                {
+                                    timeIndex++;
+                                <div style="float: right;">
+                                    @if (roster.Course.IsOnlineCourse && roster.Course.coursetype == 0)
+                                    {
+                                        if (timeIndex == 1)
+                                        {
+                                            <text>Online from </text>
+                                            @date.COURSEDATE.Value.ToString(PubDateFormat)
+                                            @Html.Raw("&nbsp;")
+                                            @date.STARTTIME.Value.ToShortTimeString()
+
+                                        }
+                                        else
+                                        {
+                                            <text>until </text>
+                                            @date.COURSEDATE.Value.ToString(PubDateFormat)
+                                            @Html.Raw("&nbsp;")
+                                            @date.FINISHTIME.Value.ToShortTimeString()
+
+                                        }
+                                    }
+                                    else
+                                    {
+
+                                        @date.COURSEDATE.Value.ToString(PubDateFormat)
+                                        @date.STARTTIME.Value.ToShortTimeString()
+
+                                    }
+                                    @if (!roster.Course.IsOnlineCourse)
+                                    {
+                                        <text>
+                                            -
+                                            @date.FINISHTIME.Value.ToShortTimeString()
+                                        </text>
+                                    }
+                                </div>
+                                }
+                            }
+                        </div>
+                        <div class="confirmation-items-column-status confirmation-items-column" style="@eventAddStyle">
+                            @if (!roster.IsWaiting)
+                            {
+                                if (roster.Cancel == 1)
+                                {
+                                    <text>Cancelled</text>
+                                }
+                                else
+                                {
+                                    <text>Enrolled</text>
+                                }
+                            }
+                            else
+                            {
+                                <text>On Waiting List</text>
+                            }
+                        </div>
+                        @if (hide_payment_info == 0)
+                        {
+                            <div class="confirmation-items-column-price confirmation-items-column confirmation-items-data" style="@eventAddStyle">
+                                @string.Format("{0:c}", roster.CourseCostDecimal)
+                            </div>
+                        }
+                    </div>
+                    var currentMaterial = "";
+                    foreach (var rosterMaterial in roster.Materials)
+                    {
+                        var priceIsHidden = (hide_payment_info != 0) || rosterMaterial.hidematerialprice == -1 ? "none" : "block";
+                        <div class="confirmation-items-line">
+                            <div style="float: right;display:@priceIsHidden">
+                                @string.Format("{0:c}", rosterMaterial.EffectivePrice)
+                            </div>
+                            <div class="confirmation-material">
+                                @if (rosterMaterial.product_name != currentMaterial)
+                                {
+                                    <text>@Html.Raw(indentionForEventStuyle + indentionForEventStuyle + rosterMaterial.product_name)</text>
+
+                                }
+                            </div>
+                        </div>
+                        currentMaterial = rosterMaterial.product_name;
+                    }
+                    <div style="clear: both;height: 5px;"></div>
+                }
+
+                @if (!Model.HidePaymentInfo)
+                {
+                    <div class="confirmation-total-field">
+                        <div class="confirmation-orderdetails-value" style="float:left;font-style:italic;">
+                            @Model.OrderDetails
+                        </div>
+                        <div class="confirmation-total-value">
+                            @string.Format("{0:c}", Model.OrderTotalNoDiscount)
+                        </div>
+                        <div class="confirmation-total-label">
+                            Total:
+                        </div>
+                        <br />
+                        <div class="confirmation-total-value">
+                            @string.Format("{0:c}", Model.StackDiscountTotal)
+                        </div>
+                        <div class="confirmation-total-label">
+                            Discount:
+                        </div>
+                        @if (Model.StackDiscountTotal > 0)
+                        {
+                            <br />
+                            <div class="confirmation-total-value">
+                                @string.Format("{0:c}", (Model.OrderTotalNoDiscount - (decimal)Model.StackDiscountTotal))
+                            </div>
+                            <div class="confirmation-total-label">
+                                Discounted Total:
+                            </div>
+                        }
+                        @if (Model.CardFee > 0)
+                        {
+                            <br />
+                            <div class="confirmation-total-value">
+                                @string.Format("{0:c}", (Model.CardFee))
+                            </div>
+                            <div class="confirmation-total-label">
+                                Convenience Fee:
+                            </div>
+                        }
+                        <br />
+                        <div class="confirmation-total-value">
+                            @string.Format("{0:c}", Model.SingleRoster.TotalPaid)
+                        </div>
+                        <div class="confirmation-total-label">
+                            Total Amount Paid:
+                        </div>
+                        @{
+                            var DueAmount = Model.OrderTotal - Model.SingleRoster.TotalPaid - (decimal)Model.StackDiscountTotal;
+                            if (DueAmount > 0)
+                            {
+                                <text>
+                                    <br />
+                                    <br />
+                                    <div class="confirmation-total-value" style="color:red;">
+                                        @string.Format("{0:c}", DueAmount)
+                                    </div>
+                                    <div class="confirmation-total-label" style="color:red;">
+                                        Due Amount:
+                                    </div>
+                                </text>
+                            }
+                        }
+                        <div>@Model.SingleRoster.CheckoutComments</div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    }
+</div>
+
+<div id="confirmation-footer-container">
+    @Html.Raw(Model.ConfirmationFooter)
+</div>
+

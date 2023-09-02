@@ -1,0 +1,115 @@
+﻿@using school = Gsmu.Api.Data.School
+@using Gsmu.Api.Language
+@model school.Entities.SchoolExtraInfo
+
+@{
+    bool modelEmptyData = ReflectionHelper.ObjectStringDataIsEmpty(Model);
+}
+
+@if (modelEmptyData)
+{
+    <text>N/A</text>
+}
+else
+{
+    var hadInput = false;
+    var hadPrevious = false;
+    if (!string.IsNullOrWhiteSpace(Model.schoolshortdesc))
+    {
+        @Model.schoolshortdesc        
+        hadInput = true;
+    }
+
+    if (!string.IsNullOrWhiteSpace(Model.sshipnumber))
+    {
+        if (hadInput)
+        {
+            <br/>
+        }
+        <text>
+            <u>Ship #:</u> @Model.sshipnumber
+        </text>        
+        hadInput = true;
+    }
+
+    if (!string.IsNullOrWhiteSpace(Model.saddress))
+    {
+        if (hadInput)
+        {
+            <br/>
+        }
+        @Model.saddress
+        hadInput = true;
+    }
+    
+    hadPrevious = false;
+    if (!string.IsNullOrWhiteSpace(Model.scity) || !string.IsNullOrWhiteSpace(Model.sstate) || !string.IsNullOrWhiteSpace(Model.szip))
+    {
+        if (hadInput)
+        {
+            <br/>
+        }
+        if (!string.IsNullOrWhiteSpace(Model.scity))
+        {
+            @Model.scity
+            hadPrevious = true;
+        }
+        if (!string.IsNullOrWhiteSpace(Model.sstate))
+        {
+            if (hadPrevious)
+            {
+                <text>, </text>
+            }
+            @Model.sstate
+            hadPrevious = true;
+        }
+        if (!string.IsNullOrWhiteSpace(Model.szip))
+        {
+            if (hadPrevious)
+            {
+                <text>, </text>
+            }
+            @Model.szip
+            hadPrevious = true;
+        }
+        hadInput = true;
+    }
+
+    if (!string.IsNullOrWhiteSpace(Model.scountry))
+    {
+        if (hadInput)
+        {
+            <br/>
+        }
+        @Model.scountry
+        hadInput = true;
+    }
+
+    if (!string.IsNullOrWhiteSpace(Model.sphonenum))
+    {
+        if (hadInput)
+        {
+            <br/>
+        }
+        
+        <text>
+            <u>Phone:</u> @Model.sphonenum
+        </text>        
+        hadInput = true;
+    }
+
+    if (!string.IsNullOrWhiteSpace(Model.sfaxnum))
+    {
+        if (hadInput)
+        {
+            <br/>
+        }
+        <text>
+            <u>Fax:</u> @Model.sfaxnum
+        </text>                
+        hadInput = true;
+    }
+        
+}
+
+

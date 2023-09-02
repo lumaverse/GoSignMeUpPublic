@@ -1,0 +1,630 @@
+﻿@using Gsmu.Api.Data;
+@using Gsmu.Api.Data.ViewModels.Layout;
+@using Gsmu.Api.Web;
+@using Gsmu.Api.Data.School.Terminology
+@using Gsmu.Api.Data.School.Course
+@using Gsmu.Api.Data.School.Entities
+@using Gsmu.Api.Commerce.ShoppingCart
+@using Gsmu.Api.Authorization
+@using Gsmu.Api.Integration.Google
+@using canvas = Gsmu.Api.Integration.Canvas
+@using System.Configuration;
+@using membershiplogin= Gsmu.Web.Areas.Public.Controllers.MembershipController;
+@using BGColorInfolist = Gsmu.Api.Data.ViewModels.Layout.LayoutManager;
+@{
+    // sames as in ButtonLabelsAndColoring.cshtml
+    var menuDivider = "<span style=\"opacity: 0.3;\">|</span>";
+
+    var cartpopupAdjustment = !IsSectionDefined("sidebar");
+    if (ViewBag.LayoutSettings == null)
+    {
+        ViewBag.LayoutSettings = "null";
+    }
+    var currentController = (ViewContext.RouteData.Values["Controller"] as string).ToLower();
+    var currentAction = (ViewContext.RouteData.Values["Action"] as string).ToLower();
+    var embeddedCookieName = WebContextObject.SiteIsEmbedded.ToString();
+    var isEmbedded = EmbedHelper.IsSiteEmbedded;
+    var embeddedCss = isEmbedded ? "embedded" : "";
+
+    var PwLabel = Settings.Instance.GetFieldSpecs("studnum").FieldLabel;
+    PwLabel = string.IsNullOrWhiteSpace(PwLabel) ? "Password" : PwLabel;
+
+    var UsernameLabel = Settings.Instance.GetFieldSpecs("username").FieldLabel;
+    UsernameLabel = string.IsNullOrWhiteSpace(UsernameLabel) ? "Username" : UsernameLabel;
+
+    var EmailLabel = Settings.Instance.GetFieldSpecs("email").FieldLabel;
+    EmailLabel = string.IsNullOrWhiteSpace(EmailLabel) ? "Email" : EmailLabel;
+
+    var layoutConfig = Gsmu.Api.Data.ViewModels.Layout.LayoutManager.PublicLayoutConfiguration;
+
+    var publicCourseListingFastLoad = Settings.Instance.GetMasterInfo4().PublicCourseListingFastLoadAsBoolean;
+    ViewBag.CASConfigLoginGsmu = membershiplogin.GetCASConfig();
+
+    var mi3 = Settings.Instance.GetMasterInfo3();
+    string DisplayShibbolethicon = ConfigurationManager.AppSettings["DisplayShibbolethicon"] + "";
+    string DisplayShibbolethbutton = ConfigurationManager.AppSettings["DisplayShibbolethbutton"] + "";
+    string hideCanvasLoginLink = ConfigurationManager.AppSettings["hideCanvasLoginLink"];
+    var AllowAutoReserveCourseOrder = ConfigurationManager.AppSettings["AllowAutoReserveCourseOrder"];
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="PRAGMA" content="NO-CACHE">
+    <meta http-equiv="Cache-control" content="no-store">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <!--[if IE 11]>
+    <meta http-equiv="X-UA-Compatible" content="IE=10;">
+    <![endif]-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>@ViewBag.Title</title>
+    <base href="@Url.Content("~")" />
+
+    @if(currentAction =="squarepayment"){
+	<script type="text/javascript" src="https://js.squareup.com/v2/paymentform"></script>
+	}
+    @{Html.RenderPartial("_PartialScriptsAndStyles");}
+    @Scripts.Render("~/bundles/gsmu-public")
+    <script src="~/Scripts/plugins/jspdf.1.3.4.min.js"></script>
+    <script src="~/Scripts/plugins/jspdf-autotable.2.3.2.min.js"></script>
+    <script src="https://core.spreedly.com/iframe/iframe-v1.min.js"></script>
+    @Styles.Render("~/Areas/Public/Styles/css")
+
+    @if (cartpopupAdjustment)
+    {
+        <style type="text/css">
+            body.embedded .grad_stud_right {
+                width: 920px !important;
+            }
+
+            .grad_stud_right {
+                width: 962px !important;
+            }
+        </style>
+    }
+	
+    <style type="text/css">
+    	.x-form-item-label-inner{
+    		white-space: break-spaces !important;
+    	}
+    </style>	
+    <link rel="icon" href="/favicon-16x16.png" sizes="16x16">
+    <link rel="icon" href="/favicon-32x32.png" sizes="32x32">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="shortcut icon" sizes="192x192" href="/android-chrome-192x192.png">
+    <link rel="shortcut icon" sizes="512x512" href="/android-chrome-512x512.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+
+    <script type="text/javascript">
+        var shib_stud_for_survey= '@Session["ShibbolethStudent"]';
+        var displayMode = @Html.Raw(Json.Encode(ViewBag.DisplayMode == null ? "normal" : ViewBag.DisplayMode.ToString().ToLower()));
+        var enableComposer = @Html.Raw(Json.Encode(ViewBag.EnableComposer == true ? true : false));
+        var currentAction = @Html.Raw(Json.Encode(currentAction));
+        var currentController = @Html.Raw(Json.Encode(currentController));
+        var googleSsoEnabled =  @Html.Raw(Json.Encode(GoogleHelper.SsoEnabled));
+        var messages = @Html.Raw(Json.Encode(ObjectHelper.GetRequestMessages(ViewContext.Controller)));
+        var showPastOnlineCourses = @Html.Raw(Json.Encode(Settings.Instance.GetMasterInfo().ShowPastOnlineCoursesAsBoolean));
+        var publicCourseListingFastLoad = @Html.Raw(Json.Encode(publicCourseListingFastLoad));
+        var allowviewpastcourse = @Html.Json((Settings.Instance.GetMasterInfo3().allowviewpastcoursesdays ?? 0) == 0 ? false : true);
+        var canvasSsoEnabled = @Html.Raw(Json.Encode(canvas.Configuration.Instance.EnableOAuth2Authentication));
+        var ToolTipSearchCourseText = '@ConfigurationManager.AppSettings["ToolTipSearchCourseText"]';
+
+        var extraParticipantCollectionEnabled = @Html.Json(PricingOptionsHelper.ExtraParticipantCollectionEnabled);
+        var extraParticipantLabel = @Html.Json(PricingOptionsHelper.ExtraParticipantLabel);
+        var extraParticipantCustomFieldLabel = @Html.Json(PricingOptionsHelper.ExtraParticipantCustomFieldLabel);
+        var extraParticipantCollectCustomField = @Html.Json(PricingOptionsHelper.ExtraParticipantCollectCustomField);
+        var extraParticipantCustomFieldLabelRequired =@Html.Json(PricingOptionsHelper.ExtraParticipantCustomFieldLabelRequired);;
+        var AllowAutoReserveCourseOrder ='@System.Configuration.ConfigurationManager.AppSettings["AllowAutoReserveCourseOrder"]';
+        var ReserveOrderExpiry = '@System.Configuration.ConfigurationManager.AppSettings["ReserveOrderExpiry"]';
+        var shibsetting = @Settings.Instance.GetMasterInfo4().shibboleth_sso_enabled;
+        var shib_allow_gsmu_auth = @Settings.Instance.GetMasterInfo4().shibboleth_allow_gsmu_login;
+        var show_shibb_button = false;
+        if((shibsetting == 1 || shibsetting == 2) && (shib_allow_gsmu_auth == 1)) {
+            show_shibb_button = true;
+        }
+        var shibbRedirectPopup = @ConfigurationManager.AppSettings["ShowShibbRedirectPopup"] +"";
+        var useCASAuth = @Html.Raw(Settings.Instance.GetMasterInfo2().useCASAuth == null ? 0 : Settings.Instance.GetMasterInfo2().useCASAuth);
+        var show_cas_button = false;
+        if((useCASAuth == 1) || (useCASAuth == -1)){
+            show_cas_button = true;
+        }
+        var show_canvas_button = false;
+        if(canvasSsoEnabled!=0)
+            show_canvas_button = true;
+        var cart = null;
+        var membership = null;
+        var layout = null;
+
+        Ext.onReady(function() {
+            cart = new Cart({
+                ExtraParticipantCollectionEnabled: extraParticipantCollectionEnabled,
+                ExtraParticipantLabel: extraParticipantLabel,
+                ExtraParticipantCollectCustomField: extraParticipantCollectCustomField,
+                ExtraParticipantCustomFieldLabelRequired : extraParticipantCustomFieldLabelRequired,
+                ExtraParticipantCustomFieldLabel: extraParticipantCustomFieldLabel,
+                CartImageFull: '@Gsmu.Api.Data.WebConfiguration.CartImageFull',
+                CartImageEmpty: '@Gsmu.Api.Data.WebConfiguration.CartImageEmpty'
+            });
+
+            membership = new Membership({
+                loginLabel: @Html.Raw(Json.Encode(layoutConfig.LayoutButtons.Login)),
+                Shibb_LoginLabel: @Html.Raw(Json.Encode(layoutConfig.LayoutButtons.Shibb_Login)),
+                showLoginUi: @Json.Encode(ObjectHelper.GetShowLoginUi(ViewContext.Controller)),
+                googleSsoEnabled: googleSsoEnabled,
+                canvasSsoEnabled: canvasSsoEnabled,
+                Canvas_LoginLabel: @Html.Raw(Json.Encode(layoutConfig.LayoutButtons.Canvas_Login)),
+                show_canvas_button : show_canvas_button,
+                show_shibb_button: show_shibb_button,
+                Cas_LoginLabel: @Html.Raw(Json.Encode(layoutConfig.LayoutButtons.Cas_Login)),
+                show_cas_button:show_cas_button,
+                casurl:'@Settings.Instance.GetMasterInfo2().CASAuthURL',
+                isLoggedIn: @(Json.Encode(AuthorizationHelper.CurrentUser.IsLoggedIn)),
+                loginLinkId: 'link-login',
+                logoutLinkId: 'link-logout',
+                LoginAuthOption: @Settings.Instance.GetMasterInfo4().LoginAuthOption,
+                PwLabel: '@PwLabel',
+                UsernameLabel: '@UsernameLabel',
+                EmailLabel: '@EmailLabel',
+                HideForgotPassword: @Settings.Instance.GetMasterInfo2().HideForgotPassword,
+                PublicSignupAbilityOff: @Settings.Instance.GetMasterInfo().PublicSignupAbilityOff,
+                disallownewuser: @Settings.Instance.GetMasterInfo2().disallownewuser,
+                HideStudentLogin: @layoutConfig.HideStudentLogin,
+                HideSupervisorLogin: @Settings.Instance.GetMasterInfo3().HideSupervisorLogin,
+                HideInstructorLogin: @Settings.Instance.GetMasterInfo3().hideInstructorLogin,
+                AspSiteRootUrl: '@Html.Raw(Settings.Instance.GetMasterInfo4().AspSiteRootUrl)',
+                DocumentsFolder: @Html.Json(WebConfiguration.DocumentsFolder)
+            });
+
+            // Gsmu.Api.Data.ViewModels.DisplayMode value
+
+            layout = new Layout({
+                publicCourseListingFastLoad: publicCourseListingFastLoad,
+                showPastOnlineCourses: showPastOnlineCourses,
+                allowViewPastCourses: allowviewpastcourse,
+                messages: messages,
+                isSiteEmbedded: @Html.Raw(Json.Encode(EmbedHelper.IsSiteEmbedded)),
+                embeddedCookieName: @Html.Raw(Json.Encode(embeddedCookieName)),
+                courseSearchSingleView: @Html.Raw(Json.Encode(Gsmu.Api.Data.WebConfiguration.CourseSearchSingleView)),
+                developmentMode: @Html.Raw(Json.Encode(Gsmu.Api.Data.WebConfiguration.DevelopmentMode)),
+                isGsmuDevelopmentMachine: @Html.Json(Gsmu.Api.Data.WebConfiguration.IsGsmuDevelopmentMachine),
+                currentController: currentController,
+                currentAction: currentAction,
+                selectedLayout: @Html.Raw(ViewBag.LayoutSettings),
+                displayMode: displayMode,
+                enableComposer: enableComposer,
+                browserLinkId: 'link-browse',
+                adminMenuId: 'layout-admin-menu',
+                adminMenuContainerId: 'layout-admin-menu-container',
+                headerContainerId: 'layout-header-container',
+                headerContentId: 'layout-header-content',
+                headerEditorId: 'layout-header-editor',
+                welcomeContainerId: 'layout-welcome-message-container',
+                welcomeContentId: 'layout-welcome-message-content',
+                welcomeEditorId: 'layout-welcome-message-editor',
+                footerContainerId: 'layout-footer-container',
+                footerContentId: 'layout-footer-content',
+                footerEditorId: 'layout-footer-editor',
+                FooterBrowserCompatibility: '@Html.Raw(Json.Encode(Settings.Instance.GetMasterInfo3().FooterBrowserCompatibility))',
+                Settings: {
+                    PublicHeaderVisible:
+                        @(Json.Encode(Settings.GetVbScriptBoolValue(Settings.Instance.GetMasterInfo4().PublicHeaderVisible))),
+                    PublicFooterVisible:
+                        @(Json.Encode(Settings.GetVbScriptBoolValue(Settings.Instance.GetMasterInfo4().PublicFooterVisible))),
+                    PublicWelcomeMessageVisible:
+                        @(Json.Encode(Settings.GetVbScriptBoolValue(Settings.Instance.GetMasterInfo4().PublicWelcomeMessageVisible)))
+                },
+                buttonLabels: @Html.Raw(Json.Encode(layoutConfig.LayoutButtons)),
+                adminMode: @Html.Raw(Json.Encode(Gsmu.Api.Web.RequireAdminModeAttribute.IsAdminMode)),
+                layoutConfiguration: @Html.Json(LayoutManager.PublicLayoutConfiguration),
+                timeoutSeconds: @(Session.Timeout * 60),
+                sessionStart: @Html.Json(Session["session-start"]),
+                fieldNames: {
+                    Field1Name: @Html.Json(Settings.Instance.GetMasterInfo().Field1Name),
+                    Field2Name: @Html.Json(Settings.Instance.GetMasterInfo().Field2Name),
+                    Field3Name: @Html.Json(Settings.Instance.GetMasterInfo().Field3Name),
+                    Field4Name: @Html.Json(Settings.Instance.GetMasterInfo().Field4Name),
+                    Field5Name: @Html.Json(Settings.Instance.GetMasterInfo().Field5Name),
+                }
+            });
+        });
+    </script>
+    @* new implementation of google analytics *@
+    @Html.Raw(ViewBag.GoogleAnalyticsSetUpScript != null || ViewBag.GoogleAnalyticsSetUpScript != "" ? ViewBag.GoogleAnalyticsSetUpScript : "")
+
+    @RenderSection("Head", false)
+<script>
+    Ext.override(Ext.data.Connection, {
+        timeout:60000
+    });
+
+    Ext.Ajax.timeout= 60000; 
+    Ext.override(Ext.form.Basic, { timeout: Ext.Ajax.timeout / 1000 });
+    Ext.override(Ext.data.proxy.Server, { timeout: Ext.Ajax.timeout });
+    Ext.override(Ext.data.Connection, { timeout: Ext.Ajax.timeout });
+</script>
+</head>
+<body class="@embeddedCss">    
+    <div id="fb-root"></div>
+    
+    <script type="text/javascript">
+        var fbAppId = "@Settings.Instance.GetMasterInfo3().facebookAPInum";
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId            : fbAppId,
+                autoLogAppEvents : true,
+                xfbml            : true,
+                version          : 'v3.2'
+            });
+        };
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+    <script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+    <div id="layout-admin-menu-container">
+        <div id="layout-admin-menu"></div>
+    </div>
+    @if (AllowAutoReserveCourseOrder == "true") 
+    {
+    <div id="reservationtimer" style="border-bottom:3px solid red;border-top:3px solid red; text-align:center; font-weight: bold; color:white; background-color: red; Display: none;"> You now have 30 minutes to complete your order..</div>
+    <script>
+        if(@CourseShoppingCart.Instance.Items.Count()>0){
+            Cart.prototype.ReservationTimerHandler('@CourseShoppingCart.Instance.ReservationExpired')
+            $('#reservationtimer').css("visibility", "visible");
+        }
+    </script>
+    } 
+    <div id="layout-container-top">
+        <table cellpadding="0" cellspacing="0" border="0" class="grad_stud_table_1">
+            <tbody>
+
+                <tr>
+                    <td valign="top">
+                        <div class="grad_stud_contener content-sizing">
+                            <div class="grad_stud_top_site BGclogheaderbar" style="background-color: #@mi3.clogheaderbar !important;"></div>
+                            <div class="grad_stud_top_all BGclogheaderbg" style="background-color: #@mi3.clogheaderbg !important;"> 
+                                <div class="grad_stud_top_info BGclogheaderbar" style="
+			                                                    @if (DisplayShibbolethbutton !="hide") 
+			                                                    {
+			                                                        if ((Settings.Instance.GetMasterInfo4().shibboleth_sso_enabled == 1 || Settings.Instance.GetMasterInfo4().shibboleth_sso_enabled == 2) &&  (Settings.Instance.GetMasterInfo4().shibboleth_allow_gsmu_login==2))
+			                                                        {
+			    	                                                    <text>height: 34px;</text>
+			                                                        }
+			    
+			                                                    }
+                                                                background-color: #@mi3.clogheaderbar !important; text-shadow: rgb(230, 230, 230) 2px 2px 3px;">
+                                    
+                                    @{
+                                        if (WebConfiguration.DevelopmentMode)
+                                        {
+                                            <div style="float: left; font-size: 12px; transform:rotate(-90deg); position: relative; left: -130px; top: 115px;">
+                                                <span id="layout-admin-toggle">
+                                                    <a title="Show the admin console" href="javascript:void(0);" onclick="LAYOUT.enterAdminMode();">Public admin console</a>
+                                                    -
+                                                </span>
+                                                <span style="font-weight: bold; color:black;" title="Development mode is enabled so additional functions for testing are available">Development mode</span>
+                                            </div>
+                                        }
+                                    }
+
+                                            <div id="word-top-increase" style="font-size: @(layoutConfig.IncreaseWordTopRow)px; margin-right: 15px; text-shadow:none !important;">
+                                                @if (AuthorizationHelper.CurrentAdminUser != null)
+                                                {
+                                                }
+                                                else
+                                                {
+                                                    <a id="link-browse" class="BGclogheaderbartext" style="color: #@mi3.clogheaderbartext !important;" tabindex="1" href="@Url.Content("~/public/course/browse")">Home</a>
+                                                    if (AuthorizationHelper.CurrentUser.IsLoggedIn)
+                                                    {
+                                                        if (AuthorizationHelper.CurrentSupervisorUser != null)
+                                                        {
+
+                                                            <text>
+                                                                @Html.Raw(menuDivider)
+                                                                <a id="btnmyaccount" class="BGclogheaderbartext" style="color: #@mi3.clogheaderbartext !important;" tabindex="2" href="@Url.Content("~/public/supervisor")">My Account</a>
+                                                            </text>
+                                                        }
+                                                        else if (AuthorizationHelper.CurrentInstructorUser != null)
+                                                        {
+                                                            <text>
+                                                                @Html.Raw(menuDivider)
+                                                                <a id="btnmyaccount" class="BGclogheaderbartext" style="color: #@mi3.clogheaderbartext !important;" tabindex="2" href="@Url.Content("~/public/instructor")">@TerminologyHelper.Instance.GetTermCapital(TermsEnum.Instructor) Dash</a>
+                                                            </text>
+                                                        }
+                                                        else
+                                                        {
+                                                            <text>
+                                                                @Html.Raw(menuDivider)
+                                                                <a id="btnmyaccount" class="BGclogheaderbartext" style="color: #@mi3.clogheaderbartext !important;" tabindex="2" href="@Url.Content("~/public/user/dashboard")">My Account</a>
+                                                            </text>
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+                                                        if (Settings.Instance.GetMasterInfo2().disallownewuser != -1)
+                                                        {
+                                                            if (string.IsNullOrWhiteSpace(Settings.Instance.GetMasterInfo().NewAcctDisclaimer))
+                                                            {
+                                                                <text>
+                                                                    @Html.Raw(menuDivider)
+                                                                    <a id="btncreateaccount" class="BGclogheaderbartext" style="color: #@mi3.clogheaderbartext !important;" tabindex="2" href="@Url.Content("~/Public/User/RegisterUser")">@layoutConfig.LayoutButtons.CreateAccount</a>
+
+                                                                </text>
+                                                            }
+                                                            else
+                                                            {
+                                                                <text>
+                                                                    @Html.Raw(menuDivider)
+                                                                    <a id="btncreateaccount" class="BGclogheaderbartext" style="color: #@mi3.clogheaderbartext !important;" tabindex="2" href="@Settings.Instance.GetMasterInfo().NewAcctDisclaimer">@layoutConfig.LayoutButtons.CreateAccount</a>
+
+                                                                </text>
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            <text></text>
+                                                        }
+                                                    }
+                                                    if (Settings.Instance.GetMasterInfo3().calendarredirectoutsidelink != 99)
+                                                    {
+                                                        if ((AuthorizationHelper.CurrentSupervisorUser != null) && ((CourseShoppingCart.Instance.MultipleOrder_PrincipalStudent == 0) || (CourseShoppingCart.Instance.MultipleOrder_PrincipalStudent == null)))
+                                                        {
+                                                        }
+                                                        else
+                                                        {
+
+                                                            <text>@Html.Raw(menuDivider)
+                                                            <a id="btncalendar" class="BGclogheaderbartext" style="color: #@mi3.clogheaderbartext !important;" tabindex="3" href="@Url.Content("~/public/calendar")">Calendar</a>
+                                                            </text>
+                                                        }
+                                                    }
+
+                                                    if (AuthorizationHelper.CurrentUser.IsLoggedIn)
+                                                    {
+                                                        <text>
+                                                            @if ((Settings.Instance.GetMasterInfo4().shibboleth_sso_enabled == 1 || Settings.Instance.GetMasterInfo4().shibboleth_sso_enabled == 2))
+                                                            {
+                                                                if (Settings.Instance.GetMasterInfo4().shibboleth_logout_link != "hide")
+                                                                {
+                                                                    @Html.Raw(menuDivider)
+                                                                    <a id="link-logout" class="BGclogheaderbartext" style="color: #@mi3.clogheaderbartext !important;" tabindex="4" onclick="" href="javascript:membership.logoutShibboleth('@Settings.Instance.GetMasterInfo4().shibboleth_logout_link');">Log out</a>
+
+                                                                }
+                                                            }
+                                                            else if ((Settings.Instance.GetMasterInfo2().useCASAuth == 1) || (Settings.Instance.GetMasterInfo2().useCASAuth == -1))
+                                                            {
+                                                                @Html.Raw(menuDivider)
+                                                                <a id="link-logout" class="BGclogheaderbartext" style="color: #@mi3.clogheaderbartext !important;" tabindex="4" onclick="" href="javascript:membership.logoutCas('@Settings.Instance.GetMasterInfo2().CASAuthURL');">Log out</a>
+
+                                                            }
+
+                                                            else
+                                                            {
+                                                                @Html.Raw(menuDivider)
+                                                                <a id="link-logout" class="BGclogheaderbartext" style="color: #@mi3.clogheaderbartext !important;" tabindex="4" href="javascript:membership.logout();">Log out</a>
+                                                            }
+                                                        </text>
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>
+
+
+                                                            @if ((Settings.Instance.GetMasterInfo4().shibboleth_sso_enabled == 1 || Settings.Instance.GetMasterInfo4().shibboleth_sso_enabled == 2) && (Settings.Instance.GetMasterInfo4().shibboleth_allow_gsmu_login == 0))
+                                                            {
+																if(!Request.Url.AbsoluteUri.ToLower().Contains("selectshibuser")){
+                                                                @Html.Raw(menuDivider)
+                                                                <a id="link-login" class="BGclogheaderbartext" style="color: #@mi3.clogheaderbartext !important;" tabindex="4" href="/Shibboleth.sso/Login">@layoutConfig.LayoutButtons.Login</a>
+																}
+                                                            }
+
+                                                            else
+                                                            {
+                                                                if (ViewBag.CASConfigLoginGsmu == "0")
+                                                                {
+                                                                    @Html.Raw(menuDivider)
+                                                                    <a id="link-login" class="BGclogheaderbartext" style="color: #@mi3.clogheaderbartext !important;" onclik="event.stopPropagation(); return false;" href="javascript:membership.CasLogin('@Settings.Instance.GetMasterInfo2().CASAuthURL');">@layoutConfig.LayoutButtons.Login</a>
+                                                                }
+                                                                else
+                                                                {
+                                                                    if (!canvas.Configuration.Instance.HideLoginFormIfUserInCanvas)
+                                                                    {
+                                                                        @Html.Raw(menuDivider)
+                                                                        <a id="link-login" class="BGclogheaderbartext" style="color: #@mi3.clogheaderbartext !important;" onclik="event.stopPropagation(); return false;" href="javascript:membership.showLoginForm(false, true);">@layoutConfig.LayoutButtons.Login</a>
+                                                                    }
+                                                                }
+                                                            }
+                                                            @if (GoogleHelper.SsoEnabled)
+                                                            {
+                                                                @Html.Raw(menuDivider)
+                                                                <a id="link-login" class="BGclogheaderbartext" style="color: #@mi3.clogheaderbartext !important;" onclik="event.stopPropagation(); return false;" href="javascript:membership.GoogleLogin();"><img src="Images/Icons/socialmediaicons/google-16x16.png" border="0" /> Google @layoutConfig.LayoutButtons.Login</a>
+
+                                                            }
+                                                            @if (canvas.Configuration.Instance.EnableOAuth2Authentication && canvas.Configuration.Instance.enableGSMUMasterAuthentication == false && hideCanvasLoginLink != "hide")
+                                                            {
+                                                                @Html.Raw(menuDivider)
+                                                                <a id="link-login" class="BGclogheaderbartext" style="color: #@mi3.clogheaderbartext !important;" onclik="event.stopPropagation(); return false;" href="javascript:membership.CanvasLogin(false, 'student');"><img src="Images/IntegrationPartners/lti_canvas.png" border="0" /> @layoutConfig.LayoutButtons.Canvas_Login</a>
+
+
+
+                                                            }
+
+
+                                                            @if (Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlacboardSsoUserIntegrationEnabled == true)
+                                                            {
+                                                                @Html.Raw(menuDivider)
+                                                                <a id="link-login" class="BGclogheaderbartext" style="color: #@mi3.clogheaderbartext !important;" onclik="event.stopPropagation(); return false;" href="authme/BlackBoardAuthentication"><img src="Images/IntegrationPartners/lti_blackboard.png" border="0" /> Blackboard Login</a>
+
+
+                                                            }
+                                                            @if (DisplayShibbolethbutton != "hide")
+                                                            {
+                                                                if ((Settings.Instance.GetMasterInfo4().shibboleth_sso_enabled == 1 || Settings.Instance.GetMasterInfo4().shibboleth_sso_enabled == 2) && (Settings.Instance.GetMasterInfo4().shibboleth_allow_gsmu_login == 2))
+                                                                {
+                                                                    @Html.Raw(menuDivider)
+                                                                    <a id="link-login" class="BGclogheaderbartext" style="color: #@mi3.clogheaderbartext !important;" href="/Shibboleth.sso/Login">
+                                                                        @if (DisplayShibbolethicon != "hide")
+                                                                        {
+                                                                            <img src="Images/IntegrationPartners/shibbolethicon.png" border="0" />
+                                                                        }
+                                                                        @layoutConfig.LayoutButtons.Shibb_Login
+                                                                    </a>
+
+                                                                }
+                                                            }
+                                                        </text>
+                                                    }
+                                                }
+                                            </div>
+                                </div>
+                                <div class="grad_stud_top" id="layout-header-container">
+                                    <div id="layout-header-content" style="display: none;">
+                                    @if(AuthorizationHelper.CurrentAdminUser!=null){
+                                            }
+                                            else{
+                                        @Html.Raw(Settings.Instance.GetMasterInfo4().PublicHeaderContent)
+                                            }
+                                    </div>
+                                    <div id="layout-header-editor">
+                                    </div>
+                                </div>
+
+                                <div id="layout-welcome-message-container">
+                                    <div id="layout-welcome-message-content" style="display: none; color:black;">
+                                        @Html.Raw(Settings.Instance.GetMasterInfo4().PublicWelcomeMessageContent)
+                                    </div>
+                                    <div id="layout-welcome-message-editor"></div>
+                                </div>
+
+                            </div>
+                            <div class="grad_stud_main">
+
+
+                                <div id="cart-info-container" class="cart-info-container" onclick="cart.miniDisplay();">
+                                    <span id="cart-info">
+                                        @CourseShoppingCart.Instance.Status
+                                    </span>
+                                    <div id="cart-popup" style="display: none;">
+                                        <div id="triangle">&#x25B2;</div>
+                                        <div id="cart-popup-items" class="cart-popup-items" onclick="event.stopPropagation();">
+                                            empty cart.
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div id="layout-top-info-middle">
+                                    @RenderSection("TopMiddle", false)
+                                </div>
+
+                                <div id="layout-welcomeuser">
+                                    Welcome
+                                    <span id="layout-welcomeuser-name">
+                                        @AuthorizationHelper.CurrentUser.WelcomeName
+
+
+                                    </span>
+                                </div>
+
+                                <div id="grad_stud_title">
+                                    @if (AuthorizationHelper.CurrentUser.LoggedInUserType == LoggedInUserType.Student && AuthorizationHelper.CurrentStudentUser.CurrentRosters.Count(d => d.MaxDate >= DateTime.Now) > 0)
+                                    {
+                                        <span id="layout-user-enrollment" onclick="document.location= config.getUrl('public/user/dashboard');" style="cursor: pointer;">
+                                            <span>
+                                                You are currently @TerminologyHelper.Instance.GetTermLower(TermsEnum.Enrolled) in <a href="javascript:;">@AuthorizationHelper.CurrentStudentUser.CurrentRosters.Count(d => d.MaxDate >= DateTime.Now || d.MaxDate.ToString() == "")</a>&nbsp;@GrammarHelper.GetConditionallyPluralizedWord(AuthorizationHelper.CurrentStudentUser.CurrentRosters.Count(d => d.MaxDate >= DateTime.Now), @TerminologyHelper.Instance.GetTermLower(TermsEnum.Course))
+                                                .
+                                            </span>
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="page-title">
+                                            @ViewBag.Title
+                                        </span>
+                                        
+                                    }
+                                </div>
+
+
+                                <div id="cart-checkout-container" style="display: none;">
+                                </div>
+
+                                <div id="grad_stud_main2" class="grad_stud_main2">
+                                    @if (IsSectionDefined("sidebar"))
+                                    {
+                                        <div class="grad_stud_left BGclogleftnavbg" style="background-color: #@mi3.clogleftnavbg !important;">
+                                            @RenderSection("sidebar", false)
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                    }
+
+                                    <div class="grad_stud_right content-sizing-ext">
+                                        @RenderBody()
+                                    </div>
+                                </div>
+
+                                <div id="layout-footer-container" style="clear: both;">
+                                    <div id="layout-footer-content" style="display: none;">
+                                        @Html.Raw(Settings.Instance.GetMasterInfo4().PublicFooterContent)
+                                    </div>
+                                    <div id="layout-footer-editor">
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="grad_stud_footer">
+                            </div>
+
+                            <div class="grad_stud_footer2" style="height: 120px;">
+                                <a href="#">Copyright 1999-@System.DateTime.Now.Year.ToString()</a>&nbsp;@Html.Raw(menuDivider)&nbsp;
+                                <a target="_blank" href="http://www.gosignmeup.com">GoSignMeUp Online Event Registration Software</a>
+                                @if (Settings.Instance.GetMasterInfo3().HideFooterBrowserCompatibilityInfo != 1)
+                                {
+                                    <text>&nbsp;@Html.Raw(menuDivider)&nbsp;</text><a id="link-BrowserCompatibility" href="javascript:layout.FooterBrowserCompatibility()">Browser Requirements</a>
+                                }
+                                @{Html.RenderPartial("_PartialCommonFooter");}
+                            </div>
+                        </div>
+                        
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+@if(Gsmu.Api.Web.RequireAdminModeAttribute.IsAdminMode){           
+<text>
+  <div id="BackGroundColorTheme" class="button-box" style="display:none">
+    <button style="height:30px; width:160px;" onclick="Layout.prototype.resetAllBGColors()">Reset All to Default</button>
+    <button style="height:30px; width:160px;" onclick="Layout.prototype.SaveApplyAllBGColors()">Apply Current Theme</button>
+	<select id="BackGroundColorThemeHistory" title="Color Theme History" style="height:30px; width:160px;" onchange="Layout.prototype.ApplyHistoryBGColors(this)">
+	</select>
+
+                @foreach (var bg in BGColorInfolist.BGColorInfos())
+                {
+                    string bgid = "BGColor" + bg.field;
+                <text>
+                    <div style="height:70px; width:160px; float:left; margin-right:3px; margin-top: 13px;">
+                        <span style="width:160px;float:left; height: 30px; font-size:11px; "><label for="@bgid">@bg.Title:</label></span>
+                        <div style="width:160px;float:left; height: 30px;">
+                            <input class="jscolor BGColorVal" onchange="layout.PrevwColor(this,'@bg.field')" value="@bg.color" id="@bgid" style="height:30px; width:160px; text-align:center; float:left;">
+                        </div>
+                    </div>
+                </text>
+                }
+    </div>
+</text>
+    
+}
+<script type="text/javascript" src="https://www.google.com/recaptcha/api.js?render=6LcPeLEUAAAAAMoYQ3qMUz2MMdUswmt-MDUYICjK" async defer></script>
+</body>
+</html>

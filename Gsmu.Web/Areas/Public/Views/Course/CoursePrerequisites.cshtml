@@ -1,0 +1,295 @@
+@using Gsmu.Api.Data;
+
+@{
+    Layout = null;
+    int Prerequisite = WebConfiguration.IsAdvance;
+    var reqpage = HttpContext.Current.Request.Url.PathAndQuery.ToString();
+    //loading again css in course description will cause the layout to change
+    string HideCourseNameOnPreReqList = System.Configuration.ConfigurationManager.AppSettings["HideCourseNameOnPreReqList"];
+}
+
+@if (!reqpage.Contains("CourseDetails"))
+{
+
+ @Scripts.Render("~/bundles/jquery")  
+ @Styles.Render("~/Content/jquery.jgrowl.css")
+ @Scripts.Render("~/Scripts/bootstrap.min.js")
+
+
+@Scripts.Render("~/Content/scripts/ui.js")
+
+    @Scripts.Render("~/Scripts/jquery.jgrowl.min.js")
+    @Scripts.Render("~/Scripts/jquery.placeholder.js")
+
+
+
+@Scripts.Render("~/Areas/Public/Scripts/Course/CourseSearch.js")
+@Scripts.Render("~/bundles/jqueryval")
+@Scripts.Render("~/bundles/jqueryui")
+
+@Scripts.Render("~/Scripts/DataTables/jquery.dataTables.min.js")
+@Scripts.Render("~/Scripts/DataTables/dataTables.bootstrap.min.js")
+@Scripts.Render("~/Scripts/DataTables/dataTables.responsive.min.js")
+@Scripts.Render("~/Scripts/DataTables/responsive.bootstrap.min.js")
+@Scripts.Render("~/Scripts/moment.min.js")
+@Scripts.Render("~/Scripts/bootbox.min.js")
+
+
+@Styles.Render("~/Styles/common")
+@Styles.Render("~/Content/themes/base/css")
+
+@Styles.Render("~/Content/font-awesome.min.css")
+@Styles.Render("~/Content/DataTables/css/dataTables.bootstrap.min.css")
+@Styles.Render("~/Content/DataTables/css/responsive.bootstrap.min.css")
+@Styles.Render("~/Content/DataTables/css/responsive.dataTables.min.css")
+@Styles.Render("~/Content/plugins/bootstnipp-button.css")
+@Styles.Render("~/Content/bootstrap.css")
+
+    <script src="~/Scripts.Gsmu/UrlHelper.js"></script>
+    <script src="~/Scripts.Gsmu/Utility.js"></script>
+}
+
+
+@Scripts.Render("~/Areas/Public/Scripts/Course/Widgets/CoursePrerequisites.js")
+
+
+<style>
+    .ext-js-title {
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .center {
+        text-align: center;
+    }
+
+    .table, .dt-bootstrap {
+        font-size: 12px;
+        width: 100% !important;
+    }
+
+    div.bottom {
+        display: flex;
+    }
+</style>
+<script type="text/javascript">
+
+	var HideCourseNameOnPreReqList = "@HideCourseNameOnPreReqList";
+    var preReqNotMetMsg = "@Gsmu.Api.Data.WebConfiguration.PreReqNotMetMsg";
+        var courses_list = function () {
+            var selectedCourses = [];
+            var PastCourses = false;
+            var courseId = UrlHelper.getUrlVars()["courseid"];
+            var admin = parent && location.href.indexOf('browse') <= -1 && (parent.location.href.indexOf('.asp') > -1 || parent.location.href.indexOf('localhost') > -1) ? 'admin' : '';
+            if (courseId == 0) {
+                $('#course-prereq-btn').hide();
+            }
+            function loadData() {
+                return $.ajax({
+                    type: "GET",
+                    dataType: 'json',
+                    url: '/public/Course/GetCourseList'
+                });
+            }
+
+            function saveData(data) {
+                return $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: '/public/Course/SaveCoursePreReq',
+                    data: data
+                })
+            }
+
+            return {
+                initUI: function (caller) {
+                    return new Promise(function (resolve, reject) {
+                        if (caller === 'admin') {
+                            coursesList.initGrid().then(function (response) {
+                                if (response) {
+
+                                    coursesList.initGetCheckedCourses();
+                                    resolve(true);
+                                }
+                            });
+                        }
+                        else {
+                            $('#current-courselist-container').hide();
+                            $('#course-prerequisitelist-container').removeClass('col-sm-6').addClass('col-sm-12');
+                            resolve(true);
+                        }
+                    });
+                },
+                initGrid: function (data) {
+                    return new Promise(function (resolve, reject) {
+                        $('#current-courselist-table').DataTable({
+                            dom: '<"pull-left"l><"pull-right"f>tip',
+                            ajax: {
+                                url: '/public/Course/GetCourseList',
+                                type: 'POST',
+                                data: {
+                                    courseId: courseId,
+                                    showPast:data
+                                }
+                            },
+                            responsive: true,
+                            autoWitdh: false,
+                            destroy: true,
+                            "order": [],
+                            fixedHeader: true,
+                            scrollY: "300px",
+                            columns: [
+                                {
+                                    title: "Course Id", data: 'CourseId', render: function (data, type, row) {
+                                        var template = '<input type="checkbox" class="prereq-course-id" value=' + data + ' />'
+                                        return template + ' ' + data;
+                                    },
+                                },
+                                {
+                                    title: "Course Num", data: 'CourseNumber', render: function (data, type, row) {
+                                        return data;
+                                    },
+                                },
+                                {
+                                    title: "Course Name", data: 'CourseName', render: function (data, type, row) {
+                                        return data;
+                                    },
+                                }
+                            ],
+                            "initComplete": function (settings, json) {
+                                resolve(true);
+                            }
+                        });
+                    });
+                },
+                initGetCheckedCourses: function () {
+                    $('.prereq-course-id').on('click', function () {
+                        var self = $(this);
+                        if (self.is(':checked')) {
+                            selectedCourses.push(self.val());
+                        }
+                        else {
+                            var coursePrereqIndex = selectedCourses.indexOf(self.val());
+                            if (coursePrereqIndex > -1) {
+                                selectedCourses.splice(coursePrereqIndex, 1);
+                            }
+
+                        }
+                        if (selectedCourses.length > 0) {
+                            if (courseId == 0) {
+                                $('#course-prereq-btn').hide();
+                            }
+                            else {
+                                $('#course-prereq-btn').show();
+                            }
+                        }
+                        else {
+                           // $('#course-prereq-btn').hide();
+                        }
+                    })
+                },
+                getCheckedCourses: function () {
+                    return selectedCourses.join(',');
+                },
+
+                saveCoursePreRequisites: function (cid) {
+                    if (courseId == 0) {
+                        courseId = cid;
+                    }
+                    saveData({
+                        courseId: courseId,
+                        preReqIds: coursesList.getCheckedCourses()
+                    }).done(function (e) {
+                        coursesList.initUI(admin).then(function () {
+                            coursePrerequisites.initUI(admin);
+                        });
+                    });
+                },
+                showPastCourse: function () {
+                    if (PastCourses == false) {
+                        PastCourses = true;
+                        $("#course-past-btn").text('Hide Past Courses');
+                    }
+                    else {
+                        PastCourses = false;
+                        $("#course-past-btn").text('Show Past Courses');
+                    }
+                    coursesList.initGrid(PastCourses).then(function (response) {
+                        if (response) {
+                            coursesList.initGetCheckedCourses();
+                            coursePrerequisites.initUI(admin);
+                        }
+                    });
+                },
+                SearchGrid: function () {
+                    coursesList.initGrid(PastCourses).then(function (response) {
+                        if (response) {
+                            coursesList.initGetCheckedCourses();
+                            coursePrerequisites.initUI(admin);
+                        }
+                    });
+                }
+            }
+        }
+		();
+
+</script>
+
+@if (Prerequisite == 0)
+{<div id="course-prerequisitelist-container" class="col-sm-6" style="padding: 0px 0px 2px 0px;">
+        <div id="course-prerequisitelist">
+            <div class="panel panel-default" style="margin-bottom:0px !important;">
+                <div class="panel-heading gsmu-sub-panel-heading" id="bootstrap-header-prereq">
+                    <div class="panel-title ext-js-title clearfix">
+                        Course Prerequisite List
+                        <div class="pull-right">
+                            <button type="button" class="btn btn-xs btn-success" data-toggle="modal" data-target="#myModal">Add Course</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-widgetbox-smheader" id="none-bootstrap-header-prereq" style="display:none">
+                    Course Prerequisite List
+                </div>
+                <div class="panel-body gsmu-sub-panel-body panel-collapse collapse in">
+                    <table id="course-prerequisite-list" style="width:100%;font-size:11px!important" class="table table-striped table-hover"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn btn-xs btn-success" data-dismiss="modal">Close</button>
+                </div>
+                <div class="modal-body">
+                    <div id="current-courselist-container" class="col-sm-6" style="padding: 10px 2px 0px 0px;">
+                        <div id="current-courselist">
+                            <div class="panel panel-default">
+                                <div class="panel-heading gsmu-sub-panel-heading" id="bootstrap-header-course">
+                                    <div class="panel-title ext-js-title clearfix">
+                                        Current Course List
+                                        &nbsp;&nbsp;<button type="button" onclick="courses_list.showPastCourse();" id="course-past-btn" class="btn btn-xs btn-info">Show Past Courses</button>
+                                        <div class="pull-right" id="save-button-container">
+                                            <button type="button" onclick="courses_list.saveCoursePreRequisites();" id="course-prereq-btn" class="btn btn-xs btn-success">Save</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="course-widgetbox-smheader" id="none-bootstrap-header-course" style="display:none">
+                                    Current Course List
+                                </div>
+                                <div class="panel-body gsmu-sub-panel-body panel-collapse collapse in">
+                                    <div style="float:right; margin-right:3px;">  Search:<input type="text" id="courselist-search" onkeyup="courses_list.SearchGrid();" /></div>
+                                    <table id="current-courselist-table" style="width:100%;font-size:11px!important" class="table table-striped table-hover"></table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}

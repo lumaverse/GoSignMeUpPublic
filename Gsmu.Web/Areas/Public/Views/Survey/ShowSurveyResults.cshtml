@@ -1,0 +1,59 @@
+﻿@using Gsmu.Api.Data.School.Terminology;
+
+@{
+    Layout = null;
+    int qnum = 0;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>ShowSurvey</title>
+</head>
+
+
+<body>
+@if(ViewBag.validrequest ==1){
+    <div>
+        <center>
+        <b>
+            TextArea/TextBox & Comment Report for: @ViewBag.Title <br />
+            Course: @ViewBag.Course
+        </b>
+        </center>
+     </div>
+            foreach(var items in ViewBag.Questions)
+                {
+                   qnum = qnum+1;
+                   var name ="Answer" + items.QuestionID;
+                   var labelname= "label"+items.QuestionID;
+                   var commentName = "Comment" + items.QuestionID;
+                    if (items.Type.ToString().ToLower() == "likertrating"){ <br />
+                            <div><center>@{Html.RenderAction("LikertRatingResult", "Survey", new { intSurveyId = items.SurveyID, questionid = items.QuestionID, questionnum = qnum, label= items.Question1, cid=ViewBag.Cid});}</center></div>
+                    }
+                    if (items.Type.ToString().ToLower() == "likert"){ <br />
+                             <div><center>@{Html.RenderAction("LikertResult", "Survey", new { intSurveyId = items.SurveyID, questionid = items.QuestionID, questionnum = qnum, label= items.Question1, cid=ViewBag.Cid});}</center></div>
+
+                    }
+                    if (items.Type.ToString().ToLower() == "checkbox"){ <br />
+                            <div><center>@{Html.RenderAction("CheckboxResult", "Survey", new { intSurveyId = items.SurveyID, questionid = items.QuestionID, questionnum = qnum, label= items.Question1, cid=ViewBag.Cid});}</center></div>
+
+                    }
+                    if (items.Type.ToString().ToLower() == "radio"){ <br />
+                            <div><center>@{Html.RenderAction("RadioResult", "Survey", new { intSurveyId = items.SurveyID, questionid = items.QuestionID, questionnum = qnum, label= items.Question1, cid=ViewBag.Cid});}</center></div>
+
+                    }
+
+                 }
+
+}
+else{
+<div>Invalid Request</div>
+<script>
+    document.location = "/"
+</script>
+}
+</body>
+</html>

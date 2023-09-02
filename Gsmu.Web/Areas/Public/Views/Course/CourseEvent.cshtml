@@ -1,0 +1,137 @@
+﻿@using Gsmu.Api.Commerce.ShoppingCart;
+@using Gsmu.Service.Models.Events;
+@using Gsmu.Api.Data.School.Course;
+@using Gsmu.Api.Authorization;
+@model CourseModel
+@{
+
+    var modifier = "MainEvent";
+    var wgname = "Event";
+    var wgcontainer = "Course" + wgname + "Container";
+    var wgcontainerDet = "Course" + wgname + "ContainerDet";
+    var courseModel = Model;
+    var course = courseModel.Course;
+    var masterSettings = Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().HideSeatsAvailable;
+
+    var isLoggedIn = Gsmu.Api.Authorization.AuthorizationHelper.CurrentUser.IsLoggedIn;
+    var isShowLoginPricingLabel = Gsmu.Api.Data.Settings.Instance.GetMasterInfo().Membership_Status;
+
+    Gsmu.Service.Interface.IEventDetails EV = new Gsmu.Service.BusinessLogic.Events.EventDetails();
+    Gsmu.Service.Models.Events.EventDetailsModel eventDetails = new Gsmu.Service.Models.Events.EventDetailsModel();
+    if (AuthorizationHelper.CurrentAdminUser != null)
+    {
+        eventDetails = EV.GetEventDetails(course.COURSEID, true);
+    }
+    else
+    {
+        eventDetails = EV.GetEventDetails(course.COURSEID,true);
+    }
+    var count = 0;
+}
+
+<div id="@wgcontainer" class="course-widgetbox" style="min-height:80px;">
+
+    @foreach (var session in eventDetails.Sessions)
+    {
+        count = 0;
+        <text>
+
+            <div style="padding-top: 3px; padding-left: 8px; margin-top: 2px; background-color: #e0e1e0;
+    font-size: 13px; height: 24px; font-weight: bold;">
+                @session.SessionName
+            </div>
+            <div id="@wgcontainerDet" style="padding:5px;margin:5px; ">
+                <table border="0" style="width:100%">
+                    @foreach (var evnt in session.Courses.OrderBy(_course => _course.DateTime.FirstOrDefault().StartTime).ThenBy(_course => _course.CourseName).ToList())
+                    {
+                        Gsmu.Api.Data.School.Course.CourseModel evntmodel = new Gsmu.Api.Data.School.Course.CourseModel(evnt.CourseId);
+                        var courseEnrollmentStat = evntmodel.Course.EnrollmentStatistics;
+                        var disabledRadiobutton = "";
+                        string cked = "";
+                        var existing = CourseShoppingCart.Instance.GetCourseItem(evnt.CourseId);
+                        if (existing != null)
+                        {
+                            cked = "checked";
+                        }
+                        if (courseEnrollmentStat.SpaceAvailable <= 0 && courseEnrollmentStat.WaitSpaceAvailable == 0)
+                        {
+                            disabledRadiobutton = "disabled";
+                        }
+                        if (count == 0)
+                        {
+                            if ((session.MandatoryClass == -1) && (disabledRadiobutton == ""))
+                            {
+                                cked = "checked";
+                            }
+                        }
+
+                        count = count + 1;
+                        <text>
+
+                            <tr style="background-color:rgba(224, 225, 224, 0.5);">
+                                <td style="width: 20px;padding-left: 8px;"><input class="SessionOptn" type="radio" @cked name="@session.SessionId" value="@evnt.CourseId" @disabledRadiobutton></td>
+                                <td style="width: 140px;padding-left: 8px;">@evnt.DateTime.First().StartTime.Value.ToShortTimeString() - @evnt.DateTime.First().EndTime.Value.ToShortTimeString()</td>
+                                <td>@evnt.CourseName</td>
+                                <td style="text-align:right;width: 300px;">
+                                    <font style="font-size:10px; color: darkgrey;">
+                                        @if (masterSettings == 1)
+                                        {
+                                            <text>
+                                                [ @courseEnrollmentStat.SpaceAvailable of @courseEnrollmentStat.MaxEnrolledRosterCount ]
+                                                [ @courseEnrollmentStat.WaitSpaceAvailable of @courseEnrollmentStat.MaxWaitingRosterCount ]
+                                            </text>
+                                        }
+                                        @if (masterSettings == 2)
+                                        {
+                                            <text>
+                                                [ @courseEnrollmentStat.SpaceAvailable Open Seats Left ]
+                                                [ @courseEnrollmentStat.WaitSpaceAvailable Wait Spaces Available ]
+                                            </text>
+                                        }
+                                        @if (masterSettings == 3)
+                                        {
+                                            <text>
+                                                [ @courseEnrollmentStat.MaxEnrolledRosterCount ]
+                                                [ @courseEnrollmentStat.MaxWaitingRosterCount ]
+                                            </text>
+                                        }
+                                    </font>
+                                    &nbsp;&nbsp;
+                                    <a style="font-size: 9px;" href="javascript:window.CourseSearchInstance.ViewCourseDetailsInEvent(@evnt.CourseId);">  See Details</a>
+                                    &nbsp;
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td style="padding-left: 15px;">
+
+                                    @if (isLoggedIn == false && isShowLoginPricingLabel != 0)
+                                    {
+                                        <text><span>* Login to select Member pricing.</span><br /><br />  </text>
+                                    }
+                                    @{Html.RenderPartial("ListingPrices", evntmodel, new ViewDataDictionary { { "Modifier", modifier } });}
+
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td style="padding-left: 20px;">
+                                    @{Html.RenderPartial("ListingEventMaterials", evntmodel, new ViewDataDictionary { { "Modifier", modifier } });}
+                                </td>
+                                <td style="padding-left: 20px;">
+                                    @{Html.RenderPartial("ListingCourseChoices", evntmodel, new ViewDataDictionary { { "Modifier", modifier } });}
+                                </td>
+                            </tr>
+                        </text>
+                    }
+
+                </table>
+
+            </div>
+        </text>
+    }
+
+</div>

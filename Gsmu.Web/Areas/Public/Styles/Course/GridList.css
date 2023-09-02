@@ -1,0 +1,54 @@
+﻿.grid-message {
+    margin: 10px; 
+    font-size: larger; 
+    font-weight: bold;
+}
+
+.grid-column-row {
+    text-shadow: #CCCCCC; 
+    font-weight:bold; 
+    font-size:larger; 
+    background-color:#DDDDDD; 
+    text-align:left; 
+    padding: 0px; 
+    margin: 0;
+}
+
+.grid-column {
+    vertical-align: top;
+    white-space: nowrap;
+    padding-right: 5px;
+}
+
+.grid-order-direction-icon {
+    float: right;
+    position: relative;
+    right: -7px;
+}
+
+.grid-column-sortable {
+    cursor: pointer;
+}
+
+.grid-column-sortable:hover {
+    background-color:#eeeeee  !important; 
+}
+
+.grid-row {
+}
+
+.grid-row:hover {
+	background-color:#F3F3F3 !important;
+}
+
+.grid-detail-row {
+    border-bottom: 1px solid #cccccc;
+}
+
+.grid-row.grid-detail-hover {
+	background-color:#F3F3F3 !important;
+}
+
+.grid-detail-row.grid-detail-hover {
+	background-color:#F3F3F3 !important;
+}

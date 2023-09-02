@@ -1,0 +1,112 @@
+﻿@using Gsmu.Api.Data;
+@using Gsmu.Api.Data.School.User;
+@using Gsmu.Api.Data.School.Terminology;
+@model UserModel
+
+@{
+    string cmd = ViewBag.cmd;
+
+    string formTitle = "Actions";
+    var userModel = Model;
+    var usr = new UserInfo();
+    usr = userModel.CommonUserInfo;
+    var usrID = (usr==null ? 0 : usr.userid);
+    var username = usr.username;
+
+}
+@Scripts.Render("~/Areas/Public/Scripts/ExtFieldValidation.js")
+@Scripts.Render("~/Areas/Public/Scripts/Course/EmailStudent.js")
+<script type="text/javascript">
+    //destroy first main panel if exist for the edit mode
+    var actionCmp = Ext.getCmp('UserDashboardActions');
+    if (actionCmp != null) {actionCmp.destroy();}
+
+    var tempmsg = "Function not yet available"
+
+    var UserActionsEmail = function (param) {
+
+        AdminStudentListWidget.prototype.EmailStudent(param)
+
+    }
+
+    var UserActionsEnroll = function () {
+        Ext.Msg.alert("Reports", tempmsg);
+    }
+
+    var UserActionsEnroll = function () {
+        Ext.Msg.alert("Reports", tempmsg);
+    }
+
+    var UserActionsMakePayment = function () {
+        Ext.Msg.alert("Reports", tempmsg);
+    }
+
+    var UserActionsMerge = function () {
+        Ext.Msg.alert("Reports", tempmsg);
+    }
+
+
+    var styllabl = 'style="font-size:12px; color:#000000; text-decoration:none;"';
+    var btns = '<div class="portlet-content" style="background-color:#FFFFFF"><table style="height:230px;">';
+    //EMAIL
+    btns += '<tr><td><img src="/Areas/Public/Images/Icons/course-center-action-email.png"/></td>';
+    btns += '<td><a ' + styllabl + ' href="javascript: UserActionsEmail('+ @usrID +')">Email</a></td></tr>';
+
+    //ENROLL
+    btns += '<tr><td><img src="/Areas/Public/Images/Icons/action-enroll.png"/></td>';
+    btns += '<td><a ' + styllabl + ' href="javascript: parent.PortalUserGird.prototype.OpenEnrollmentWindow(0,'+ @usrID +')">' + @Html.Raw(Json.Encode(TerminologyHelper.Instance.GetTermCapital(TermsEnum.Enroll))) + '</a></td></tr>';
+
+    //MAKE PAYMENT
+    btns += '<tr><td><img src="/Areas/Public/Images/Icons/action-payment.png"/></td>';
+    btns += '<td><a ' + styllabl + ' href="javascript: UserActionsMakePayment()">Make Payment</a></td></tr>';
+
+    //REFUND
+    btns += '<tr><td><img src="/Areas/Public/Images/Icons/action-refunds.png"/></td>'
+    btns += '<td><a ' + styllabl + ' href="javascript: UserActionsRefund()">Refund</a></td></tr>'
+
+    //MERGE
+    btns += '<tr><td><img src="/Areas/Public/Images/Icons/action-merge.png"/></td>'
+    btns += '<td><a ' + styllabl + ' href="javascript: UserActionsMerge()">Merge</a></td></tr>'
+
+    btns += '</table></div>'
+
+    var UserActionsHtml = btns;
+
+
+
+
+    Ext.onReady(function () {
+
+        Ext.create('Ext.Panel', {
+            id: 'UserDashboardActions',
+            frame: true,
+            renderTo: Ext.get('Actionsrender'),
+            layout: 'anchor',
+            autoScroll: false,
+            title: 'Actions',
+            html: UserActionsHtml
+
+        });
+
+    });
+
+    reloadUserActionsForm = function(cmd,userid,usergroup) {
+
+        Ext.Ajax.request({
+            url: config.getUrl('public/user/UserActions'),
+            params: {
+                cmd: cmd,
+                userid: userid,
+                usergroup: usergroup
+            },
+            success: function (data) {
+                $("#UserActionsContainer").html(data.responseText);
+            }
+        })
+    }
+
+</script>
+
+<div id="Actionsrender" style="position:relative;min-height:100px; padding-bottom:20px"></div>
+
+

@@ -1,0 +1,35 @@
+﻿@model Gsmu.Api.Data.School.Course.CourseModel
+@{
+    var courseModel = Model;
+    var course = courseModel.Course;
+    var csetting = courseModel.CourseSettings;
+    var icons = courseModel.Icons;
+    var wgname = "Media";
+    var wgcontainer = "Course" + wgname + "Container";
+    var wgcontainerDet = "Course" + wgname + "ContainerDet";
+}
+@try
+{
+    if ((course.TileImageUrl.Length > 0))
+    {
+    <div id="@wgcontainer" class="course-widgetbox" style="position:inherit; min-height:250px;">
+        <div class="course-widgetbox-smheader">
+            @wgname
+        </div>
+        <div id="@wgcontainerDet" style="padding:5px;margin:5px; text-align:center; ">
+            @try
+            {
+
+
+                <img src="@course.TileImageUrl" width="70%" height="70%" style="float: center; margin-right: 12px;" alt="Photo Not Available" />
+            }
+            catch (Exception e)
+            {
+            }
+        </div>
+    </div>
+    }
+}
+catch (Exception e)
+{
+}

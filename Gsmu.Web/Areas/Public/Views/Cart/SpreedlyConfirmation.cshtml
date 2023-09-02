@@ -1,0 +1,16 @@
+﻿
+@{
+    ViewBag.Title = "Confirmation";
+}
+<br />
+@if(ViewBag.output=="success"){ 
+<script>
+    document.location = "/public/user/orderconfirmation?order=" + '@ViewBag.OrderNo';
+</script>
+}
+else{
+<div>
+
+            @ViewBag.output
+</div>
+}

@@ -1,0 +1,23 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>EmbedTest</title>
+</head>
+<body>
+    <div style="float: left;">
+        This is here to test embedding with 920 pixels
+    </div>
+    <div style="float: left;">
+
+    <iframe id="gsmu-embedded" scrolling="no" frameborder="none" height="500" width="920" style="border: none; margin: 0;"></iframe>
+    <script type="text/javascript">var ie = (function () { var a, v = 3, div = document.createElement('div'), all = div.getElementsByTagName('i'); while (div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->', all[0]); return v > 4 ? v : a }()); (function () { var c = document.getElementById('gsmu-embedded'); var d = location.protocol + '//' + 'gsmu.softasware.com/landing/embedded'; c.src = d; if (!window.publicnetComponentReceiver) { window.publicnetComponentReceiver = function (a) { var b; if (typeof (ie) != undefined && ie < 9) { b = a.data } else { b = a.data.height } document.getElementById('gsmu-embedded').style.height = b + 'px' } } if (window.removeEventListener) { window.removeEventListener('message', window.publicnetComponentReceiver) } else if (window.detachEvent) { window.detachEvent('onmessage', window.publicnetComponentReceiver) } if (window.addEventListener) { window.addEventListener('message', window.publicnetComponentReceiver) } else if (window.attachEvent) { window.attachEvent('onmessage', window.publicnetComponentReceiver) } })();</script>
+    </div>
+
+</body>
+</html>

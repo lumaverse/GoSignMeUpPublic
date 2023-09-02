@@ -1,0 +1,65 @@
+﻿@using Gsmu.Api.Integration.Blackboard
+@using Gsmu.Api.Integration.Google
+@{
+    ViewBag.Title = "SSO";
+    var blackboardUrl = string.Format("{0}://{1}{2}", Request.Url.Scheme, Request.Url.Authority, Url.Content("~/SSO/Blackboard"));
+    var googleUrl = string.Format("{0}://{1}{2}", Request.Url.Scheme, Request.Url.Authority, Url.Content("~/SSO/Google"));
+    var ltiUrl = string.Format("{0}://{1}{2}", Request.Url.Scheme, Request.Url.Authority, Url.Content("~/SSO/Lti"));
+
+    var canvasUrl = string.Format("{0}://{1}{2}", Request.Url.Scheme, Request.Url.Authority, Url.Content("~/SSO/Canvas"));
+}
+
+<div>
+    <h2>Blackboard SSO</h2>
+    <div>
+        Blackbaord SSO Url:
+        <div>
+            <a href="@blackboardUrl">
+                @blackboardUrl
+            </a>
+        </div>
+    </div>
+</div>
+
+@if (GoogleHelper.SsoEnabled)
+{
+    <hr/>
+    <div>
+        <h2>Google SSO</h2>
+        <div>
+            Google SSO redirect Url: 
+            <div>
+                <a href="@googleUrl">
+                    @googleUrl
+                </a>
+            </div>
+        </div>
+    </div>
+}
+
+<hr />
+<div>
+    <h2>LTI SSO</h2>
+    <div>
+        LTI SSO Url:
+        <div>
+            <a href="@ltiUrl">
+                @ltiUrl
+            </a>
+        </div>
+    </div>
+</div>
+
+<hr />
+<div>
+    <h2>Canvas SSO</h2>
+    <div>
+        Canvas SSO/Redirect Url:
+        <div>
+            <a href="@canvasUrl">
+                @canvasUrl
+            </a>
+        </div>
+    </div>
+</div>
+

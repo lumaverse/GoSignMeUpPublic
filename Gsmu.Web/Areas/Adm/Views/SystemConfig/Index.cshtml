@@ -1,0 +1,127 @@
+﻿@using Gsmu.Api.Data
+@Styles.Render("~/Content/bootstrap.min.css")
+@Scripts.Render("~/Scripts/bootstrap.min.js")
+<div class="navigation-pane panel-group" id="accordion">
+    <div id="public-management" class="navigation-pane-section panel panel-default">
+        <div class="navigation-pane-header panel-heading">
+            <div class="panel-title">PUBLIC MANAGEMENT
+                <span class="pull-right clickable">
+                    <a href="#collapse1" data-toggle="collapse" data-parent="#accordion" title="" class="btn-icon btn-xs glyphicon glyphicon-chevron-up"></a>
+                </span>
+            </div>
+            
+        </div>
+        <div id="collapse1" class="navigation-pane-body panel-collapse collapse in">
+            <div class="list-group">
+                <a href="Catalog/config.asp" class="list-group-item">Catalog Module Config</a>
+                <a href="Catalog/config.asp" class="list-group-item">Calendar Module (Events) Config</a>
+                <a href="Catalog/config.asp" class="list-group-item">Category Viewing</a>
+                <a href="Catalog/config.asp" class="list-group-item">BuyBack/Class Labeling</a>
+                <a href="Catalog/config.asp" class="list-group-item">Course Sort Order Default, Show Course Dates In Cart, Dates Format & Include ICS and ICAL file with E-Mail</a>
+                <a href="Catalog/config.asp" class="list-group-item">Coupons</a>
+                <a href="Catalog/config.asp" class="list-group-item">Display Username/Password in Confirmation</a>
+                <a href="Catalog/config.asp" class="list-group-item">Header/Footer/Logos/Phone Number/Waiting list</a>
+                <a href="Catalog/config.asp" class="list-group-item">Terms & Conditions/Privacy Policy</a>
+                <a href="Catalog/config.asp" class="list-group-item">Public Announcement and other Text</a>
+                <a href="Catalog/config.asp" class="list-group-item">Public Custom Coloring and Font Size/Styles</a>
+                <a href="Catalog/config.asp" class="list-group-item">Common Login, Require Login, <%=ParentLevelTitle%>, Release Form, Multiple Signup, Group Discount, Startup Page</a>
+                <a href="Catalog/config.asp" class="list-group-item">Payor Registration Fields</a>
+                <a href="Catalog/config.asp" class="list-group-item">Site URL and Other Public Settings (e.g. Hide Payment Info/Pagination/Show Base Price/Teacher Name)</a>
+                <a href="Catalog/config.asp" class="list-group-item">Student Registration Fields and Configuration</a>
+                <a href="Catalog/config.asp" class="list-group-item">Teacher Registration Fields</a>
+                <a href="Catalog/config.asp" class="list-group-item">Public Terminology</a>
+            </div>
+        </div>
+    </div>
+    <div id="course-management" class="navigation-pane-section panel panel-default">
+        <div class="navigation-pane-header panel-heading">
+            <div class="panel-title"> COURSE MANAGEMENT
+                <span class="pull-right clickable">
+                    <a href="#collapse2" data-toggle="collapse" data-parent="#accordion" title="" class="btn-icon btn-xs glyphicon glyphicon-chevron-up"></a>
+                </span>
+            </div>
+            
+        </div>
+        <div id="collapse2" class="navigation-pane-body panel-collapse collapse">
+            <div class="list-group">
+                <a href="Catalog/config.asp" class="list-group-item">Categories/Sub-categories</a>
+                <a href="Catalog/config.asp" class="list-group-item">Course/Color Groupings</a>
+                <a href="Catalog/config.asp" class="list-group-item">Closed Course/Course Request/Already Enrolled Message</a>
+                <a href="Catalog/config.asp" class="list-group-item">Contact Information</a>
+                <a href="Catalog/config.asp" class="list-group-item">Course Comments/Pre-Requisites/Requirements/Reminder/Expense Tracking/Conference & Custom Fields/Google</a>
+                <a href="Catalog/config.asp" class="list-group-item">Credit Hours</a>
+                <a href="Catalog/config.asp" class="list-group-item">Edit Department</a>
+                <a href="Catalog/config.asp" class="list-group-item">Edit Room Directions</a>
+                <a href="Catalog/config.asp" class="list-group-item">Edit Room Numbers</a>
+                <a href="Catalog/config.asp" class="list-group-item">Event / Account Number</a>
+                <a href="Catalog/config.asp" class="list-group-item">Icons (also Show / Hide Location and Course #)</a>
+                <a href="Catalog/config.asp" class="list-group-item">Teacher Attendance Taking & Attendance Detail / Status & Parking</a>
+                <a href="Catalog/config.asp" class="list-group-item">Internal Course Access & Attendance Detail / Status & Parking</a>
+                <a href="Catalog/config.asp" class="list-group-item">Country Information</a>
+                <a href="Catalog/config.asp" class="list-group-item">Locations</a>
+                <a href="Catalog/config.asp" class="list-group-item">Number of Instructors</a>
+                <a href="Catalog/config.asp" class="list-group-item">Number of Main Categories</a>
+                <a href="Catalog/config.asp" class="list-group-item">Start / Finish Times</a>
+                <a href="Catalog/config.asp" class="list-group-item">Substitute and Checkout Options</a>
+                <a href="Catalog/config.asp" class="list-group-item">Target Audience</a>
+                <a href="Catalog/config.asp" class="list-group-item">Unique Course Number, Flex Days, Course Costing, Course Fast Track & Other Info</a>
+                <a href="Catalog/config.asp" class="list-group-item">Certificate Default</a>
+                <a href="Catalog/config.asp" class="list-group-item">Custom Certificate Settings</a>
+                <a href="Catalog/config.asp" class="list-group-item">Custom Transcript Settings</a>
+                <a href="Catalog/config.asp" class="list-group-item">Course Outlines</a>
+                <a href="Catalog/config.asp" class="list-group-item">Course Details Messages (Course Full / Wait List)</a>
+                <a href="Catalog/config.asp" class="list-group-item">Automatic Course Duplicate Config.</a>
+                <a href="Catalog/config.asp" class="list-group-item">Manage Electronic Signatures</a>
+                <a href="Catalog/config.asp" class="list-group-item">Manage RSS Feeds</a>
+            </div>
+        </div>
+    </div>
+    <div id="administration-management" class="navigation-pane-section panel panel-default">
+        <div class="navigation-pane-header panel-heading">
+            <div class="panel-title">ADMINISTRATION MANAGEMENT
+                <span class="pull-right clickable">
+                    <a href="#collapse3" data-toggle="collapse" data-parent="#accordion" title="" class="btn-icon btn-xs glyphicon glyphicon-chevron-up"></a>
+                </span>
+            </div>
+            
+        </div>
+        <div id="collapse3" class="navigation-pane-body panel-collapse collapse">
+            <div class="list-group">
+                <a href="Catalog/config.asp" class="list-group-item">Chargeback / Rebill System</a>
+                <a href="Catalog/config.asp" class="list-group-item">Check for Updates</a>
+                <a href="Catalog/config.asp" class="list-group-item">Email Configurations</a>
+                <a href="Catalog/config.asp" class="list-group-item">Shipping Configurations</a>
+                <a href="Catalog/config.asp" class="list-group-item">Grading System</a>
+                <a href="Catalog/config.asp" class="list-group-item">Custom Import Template</a>
+                <a href="Catalog/config.asp" class="list-group-item">Certifications</a>
+                <a href="Catalog/config.asp" class="list-group-item">Membership</a>
+                <a href="Catalog/config.asp" class="list-group-item">Order Area - Footer & Other Setting</a>
+                <a href="Catalog/config.asp" class="list-group-item">Parent E-mail Settings and other Options</a>
+                <a href="Catalog/config.asp" class="list-group-item">System Profile & FTP Updates Setup (renamed from System Parameters)</a>
+                <a href="Catalog/config.asp" class="list-group-item">For Programmer / Trainer Only</a>
+            </div>
+        </div>
+    </div>
+    <div id="payment-management" class="navigation-pane-section panel panel-default">
+        <div class="navigation-pane-header panel-heading">
+            <div class="panel-title">PAYMENT MANAGEMENT
+                <span class="pull-right clickable">
+                    <a href="#collapse4" data-toggle="collapse" data-parent="#accordion" title="" class="btn-icon btn-xs glyphicon glyphicon-chevron-up"></a>
+                </span>
+            </div>
+            
+        </div>
+        <div id="collapse4" class="navigation-pane-body panel-collapse collapse">
+            <div class="list-group">
+                <a href="Catalog/config.asp" class="list-group-item">Accepted Credit Cards</a>
+                <a href="Catalog/config.asp" class="list-group-item">Checkout Comoments / Questions</a>
+                <a href="Catalog/config.asp" class="list-group-item">Credit Card Processing & Possible Refund Link</a>
+                <a href="Catalog/config.asp" class="list-group-item">Edit Pricing Options and HouseHold Information</a>
+                <a href="Catalog/config.asp" class="list-group-item">Other Payment Methods</a>
+                <a href="Catalog/config.asp" class="list-group-item">Sales Tax</a>
+                <a href="Catalog/config.asp" class="list-group-item">SSL Security</a>
+                <a href="Catalog/config.asp" class="list-group-item">Order Management</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,48 @@
+﻿@using Gsmu.Api.Data
+@using Gsmu.Api.Data.School.Student
+@using json = Newtonsoft.Json
+
+@{
+
+    var mi = Settings.Instance.GetMasterInfo();
+    var mi2 = Settings.Instance.GetMasterInfo2();
+    var mi3 = Settings.Instance.GetMasterInfo3();
+
+    var enableAdditionalInformation = Settings.GetVbScriptBoolValue(mi3.RegDDExtraInfo);
+    ViewBag.Title = "Settings &raquo; User Settings &raquo; Student Settings &raquo; User fields";
+}
+
+@section Head {    
+    @Scripts.Render("~/Areas/Adm/Scripts/UserFields/UserFieldsComponent.js")
+
+
+    <script type="text/javascript">
+        Ext.onReady(function() {
+            var cmp = new UserFieldsComponent({
+                containerId: 'user-fields-component-container',
+                EnableAdditionalInformation: @Html.Json(enableAdditionalInformation),
+                Titles: {
+                    District: @Html.Json(mi.Field3Name),
+                    School: @Html.Json(mi.Field2Name),
+                    Grade: @Html.Json(mi.Field1Name),
+                    Membership: @Html.Json(mi.Field4Name),
+                },
+                MembershipConfig: {
+                    MembershipEnabled: @Html.Json(MembershipHelper.MembershipEnabled),
+                    MemberLabel: @Html.Json(MembershipHelper.MemberLabel),
+                    NonMemberLabel: @Html.Json(MembershipHelper.NonMemberLabel),
+                    Special1Label: @Html.Json(MembershipHelper.Special1Label)
+                },
+                SetConfig: {
+                    DisallowDistrictEdit: @Html.Json(mi2.DisallowDistrictEdit),
+                    DisallowSchoolEdit: @Html.Json(mi2.DisallowSchoolEdit),
+                    DisallowGradeEdit: @Html.Json(mi2.DisallowGradeEdit)
+                }
+            });
+        });
+    </script>
+}
+
+<div id="user-fields-component-container">
+
+</div>

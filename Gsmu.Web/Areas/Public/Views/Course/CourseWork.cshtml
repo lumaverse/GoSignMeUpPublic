@@ -1,0 +1,63 @@
+﻿@using Gsmu.Api.Data.School.Terminology;
+<div style="font-weight:bold;"> @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course) Work <a href="javascript:CourseSearch.prototype.ShowCourseDetails('@ViewBag.courseid')">@Html.Raw(ViewBag.coursename)</a> @Html.Raw(ViewBag.datetimevalues)</div>
+@{
+    int counter = 0;
+    string baseheight="120px;";
+    if (ViewBag.files.Length > 0)
+    {
+    }
+    else
+    {
+        baseheight = "100px;";
+    <div>
+        @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course) Pre-Work Not Available.
+    </div>
+    }
+}
+<div style="background-color: white; min-height:@baseheight" id="tblCourseWorks">
+
+    <table class="x-grid-table x-grid-with-row-lines">
+        <tr>
+            <td >Attachment Title
+
+
+            </td>
+            <td >Description</td>
+            <!--<td style="width: 100px;">Action(s)</td>-->
+        </tr>
+
+        @foreach (string file in ViewBag.files)
+        {
+            counter = counter + 1;
+            string divid = "divCourseWorkLinkEmail" + counter.ToString();
+            string textid = "txtCourseWorkLinkEmail" + counter.ToString();
+            var fi = new System.IO.FileInfo(file);
+            
+            <tr>
+                <td style="border-bottom:solid 1px grey;">
+                    <a href ="@(Gsmu.Api.Data.WebConfiguration.DocumentsFolder)@fi.Name" target="_blank">@fi.Name</a>
+                </td>
+                <td  style="border-bottom:solid 1px grey;"></td>
+                <!--<td  style="border-bottom:solid 1px grey;">
+                    <div>
+                        <select style="width: 110px;" onchange="membership.CourseWorkAction(this.value,'@fi.Name',@counter)">
+                            <option value="0">Select...</option>
+                            <option value="print">Print</option>
+                            <option value="email">Email</option>
+                            <option value="download">Download</option>
+                        </select>
+                    </div>
+                </td>-->
+            </tr>
+        }
+    </table>
+</div>
+<!--
+<div style="background-color: white; display:none; padding: 0px 100px 30px 30px;" id="tblEmailFunction">
+   <b> Attachment:</b><div id="divattached"></div><hr />
+   <b> Email Address:</b><input type="text" id="userEmail" style="width:260px; border:1px solid grey; font-family:Arial;" />
+    <div  class="hudbtn primary button-component button-checkout" onclick="javascript:membership.CourseWorkAction('back')"  >Cancel</div>
+     <div  class="hudbtn primary button-component button-checkout" onclick="javascript:membership.CourseWorkAction('back')"  >Send</div>
+    
+</div>
+-->

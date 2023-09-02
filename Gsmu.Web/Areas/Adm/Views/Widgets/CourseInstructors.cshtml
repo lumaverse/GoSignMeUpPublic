@@ -1,0 +1,38 @@
+﻿@{ 
+    Layout = "~/Areas/Adm/Views/Shared/_WidgetLayout.cshtml";
+}
+<div id="widget-course-instructors">
+    <div class="panel panel-default">
+        <div class="panel-heading gsmu-sub-panel-heading">
+            <div class="panel-title pull-left">
+                Instructors
+            </div>
+            <div class="pull-right">
+            <div id="course-instructors-editor-btns">
+                <div>
+                    <div class="toggle-middle"><span>Copy Confirmation Email &nbsp;</span><input type="checkbox" class="bootstrap-toggle" id="course-copy-confirmation-to-instructor" data-size="mini"></div>
+                    <div class="btn-group">
+                        <select id="course-instructors-dropdown" data-live-search="true" data-style="btn-xs btn-primary">
+                            <option>Select Instructor</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-info btn-xs add" onclick="courseInstructors.setInstructor()"><span class="glyphicon glyphicon-plus"></span></button>
+                    <button type="button" class="btn btn-warning btn-xs edit" onclick="courseInstructorsEditor.initEditor()"><span class="glyphicon glyphicon-pencil"></span></button>
+                    <button type="button" class="btn btn-success btn-xs save" onclick="courseInstructorsEditor.save()"><span class="glyphicon glyphicon-ok"></span></button>
+                    <button type="button" class="btn btn-danger btn-xs cancel" onclick="courseInstructorsEditor.initView()"><span class="glyphicon glyphicon-remove"></span></button>
+                </div>
+            </div>
+        </div>
+        <div style="clear: both;"></div>
+        </div>
+        <div class="panel-body gsmu-sub-panel-body medium-panel panel-collapse collapse in scroll-y">
+            <ul id="course-intstructors-tabs-header" class="nav nav-tabs">
+
+            </ul>
+            <div id="course-intstructors-tabs-content" class="tab-content">
+         
+            </div>
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/Areas/Adm/Scripts/Widgets/CourseInstructors.js")

@@ -1,0 +1,46 @@
+﻿@{
+    ViewBag.Title = "Confirmation";
+}
+<br />
+
+@if(ViewBag.x_response_code == "1" || ViewBag.x_response_code == "4"){
+
+<FORM METHOD=POST name="ANETfrmSubmit" id="ANETfrmSubmit" ACTION="@ViewBag.PostUrl">
+
+<INPUT TYPE=HIDDEN NAME="x_trans_id" VALUE="@ViewBag.x_trans_id">
+<INPUT TYPE=HIDDEN NAME="x_auth_code" VALUE="@ViewBag.x_auth_code">
+<INPUT TYPE=HIDDEN NAME="x_description" VALUE="@ViewBag.x_description">
+<INPUT TYPE=HIDDEN NAME="x_invoice_num" VALUE="@ViewBag.x_invoice_num">
+<INPUT TYPE=HIDDEN NAME="x_amount" VALUE="@ViewBag.x_amount">
+<INPUT TYPE=HIDDEN NAME="x_response_code" VALUE="@ViewBag.x_response_code">
+<INPUT TYPE=HIDDEN NAME="x_response_reason_code" VALUE="@ViewBag.x_response_reason_code">
+<INPUT TYPE=HIDDEN NAME="x_response_reason_text" VALUE="@Html.Raw(ViewBag.x_response_reason_text)">
+
+</FORM>
+    <center>    
+    Redirecting... Please Wait.
+    </center>
+    <br />  
+    <br />  
+    <center>    
+    @ViewBag.x_response_reason_text
+    </center>   
+    <script language=javascript>
+          document.ANETfrmSubmit.submit();
+    </script>
+
+
+}else{
+
+    <center> 
+    Error!
+    <br />  
+    <br />  
+    @ViewBag.x_response_reason_text
+    <br />  
+    <br />  
+    <input action="action" type="button" value="Go Back" onclick="history.go(-1);" />
+    </center>    
+}
+
+<br />

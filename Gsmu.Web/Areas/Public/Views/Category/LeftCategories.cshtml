@@ -1,0 +1,129 @@
+﻿@using Gsmu.Api.Data;
+@model Dictionary<string, Dictionary<string, List<string>>>
+@{
+    var mi3 = Settings.Instance.GetMasterInfo3();
+
+}
+@if (Model.Count == 0)
+{
+    <text>No categories available</text>
+}
+else
+{
+    var index = -1;
+    var subIndex = 0;
+    var subSubIndex = 0;
+
+<style>
+    .BGclogmaincatbg:active {
+        background-color: #@mi3.clogmaincatactive !important;
+    }
+    .BGclogmaincatbg {
+        text-decoration:none;
+    }
+
+    .BGclogsubcatactive {
+        background-color: #@mi3.clogsubcatactive;
+        color: #@mi3.clogsubcattext;
+    }
+
+    .grad_stud_left_ul_ul li.sub.BGclogsubcatactive {
+        background-color: #@mi3.clogsubcatactive;
+        color: #@mi3.clogsubcattext;
+    }
+    .grad_stud_left_ul_ul li.sub {
+	    background-color: #@mi3.clogsubcatbg;
+        color: #@mi3.clogsubcattext;
+    }
+    .BGclogsubcatbg {
+        text-decoration:none;
+		color: #@mi3.clogsubcattext;
+    }
+
+    .BGclogsub2catactive {
+        background-color: #@mi3.clogsub2catactive !important;
+    }
+
+    .grad_stud_left_ul_ul li.subsub.BGclogsub2catactive {
+        background-color: #@mi3.clogsub2catactive !important;
+    }
+
+    .BGclogsub2catbg {
+        text-decoration:none !important;
+        width: 199px !important;
+    }
+
+    .BGclogsub2catbg {
+        text-decoration:none !important;
+        width: 199px !important;
+        background-color: #@mi3.clogsub2catbg !important;
+        color: #@mi3.clogsub2cattext !important;
+    }
+
+</style>
+
+    <ul>
+        <li class="course-search-leftcategory-showall course-search-leftcategory-showall-active BGclogshowallbg BGclogshowalltext"
+            style="background-color: #@mi3.clogshowallbg !important; color: #@mi3.clogshowalltext !important;" onclick="window.cslc.Reset();">
+            Show All
+        </li>
+    </ul>
+
+    foreach (var category in Model)
+    {
+        index++;
+        <ul>
+            @{
+                var mainDisplay = string.IsNullOrWhiteSpace(category.Key) ? "[Nameless category]" : category.Key;
+            }
+            <li id="grad_stud_left_@index" class="main_cat_li BGclogmaincatbg BGclogmaincattext" style="padding-left: 9px; width: 220px; background-color: #@mi3.clogmaincatbg !important; color: #@mi3.clogmaincattext !important;" 
+                onclick="cslc.ShowCategory(@index);" data-mainmenu-name="@Html.Encode(category.Key)" title="@mainDisplay">
+              <font id="main_sub_plusminus_@index" style="font-size:18px; font-weight:400;" >+</font>&nbsp;&nbsp; @mainDisplay
+            </li>
+        </ul>        
+    
+        if (category.Value.Count > 0)
+        {
+            <ul class="grad_stud_left_ul_ul" id="grad_stud_left_menu_@index" style="display: none; ">
+            @foreach (var subCategory in category.Value)
+            {
+                var hasSubSub = subCategory.Value.Count > 0;
+                string cssExtension = string.Empty;
+                if (hasSubSub)  {
+                    cssExtension = "left-category-subcategory-parent";
+                }
+                subIndex++;
+                <li id="SubCatID@(subIndex)" class="sub_cat_li BGclogsubcatbg BGclogsubcattext sub @cssExtension" style="cursor:pointer; text-decoration:none;" data-subcategory-index="@subIndex" data-subcategory-name="@Html.Encode(subCategory.Key)" data-subcategory-hasSubSub="@hasSubSub"  onclick="cslc.FilterByCategory('@HttpUtility.JavaScriptStringEncode(category.Key)','@HttpUtility.JavaScriptStringEncode(subCategory.Key)',@subIndex)">
+                    &nbsp;
+                    @if (hasSubSub)
+                    {
+                        <span style="position:relative;">
+                            <span id="SubCatID@(subIndex)-plus" class="sub-plus" style="position: absolute; left: -10px;">+</span>
+                            <span id="SubCatID@(subIndex)-minus" class="sub-minus" style="position: absolute; left: -10px;">-</span>
+                            @(string.IsNullOrWhiteSpace(subCategory.Key) ? "[Nameless sub-category]" : subCategory.Key)
+                        </span>
+                    }
+                    else
+                    {
+                        @(string.IsNullOrWhiteSpace(subCategory.Key) ? "[Nameless sub-category]" : subCategory.Key )
+                    }
+
+                </li>        
+        
+                if (hasSubSub)
+                {
+                    foreach (var subSubCategory in subCategory.Value)
+                    {
+                        <li class="sub_sub_li BGclogsub2catbg BGclogsub2cattext subsub" id="grad_stud_left_menu_subsub_@(subIndex)_@(subSubIndex)" style="" data-subsubcategory-index="@subSubIndex" data-subsubcategory-name="@Html.Encode(subSubCategory)"  onclick="cslc.FilterByCategory('@HttpUtility.JavaScriptStringEncode(category.Key)','@Html.Encode(subCategory.Key)',@subIndex, @subSubIndex, false,false,'@HttpUtility.JavaScriptStringEncode(subSubCategory)')">
+                           @(string.IsNullOrWhiteSpace(subSubCategory) ? "[Nameless sub-sub-category]" : subSubCategory)
+                        </li>        
+                        subSubIndex++;
+                    }
+                }            
+            }
+            </ul>    
+        }    
+    }
+            
+}
+

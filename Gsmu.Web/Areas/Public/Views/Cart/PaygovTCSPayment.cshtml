@@ -1,0 +1,31 @@
+﻿
+@{
+    ViewBag.Title = "Payment";
+}
+
+@if (ViewBag.Cmd == "error")
+{
+    <text>
+
+        <div class="center" style="color:red;"><h3>Error in connecting to payment server.</h3></div>
+        <br />
+        <div class="center"><h4>Error Code: @ViewBag.ErrCode </h4></div>
+        <br />
+        <div class="center"><h4>@ViewBag.ErrDetail </h4></div>
+        <br /><br /><br />
+
+        <div class="center">
+            <a href="Javascript:cart.checkout()"><h5>Try again. Go to Checkout.</h5></a>
+
+        </div>
+        <br /><br /><br />
+
+    </text>
+}
+else
+{
+    <text>
+        <div class="center">Loading...</div>
+    </text>
+}
+

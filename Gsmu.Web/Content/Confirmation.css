@@ -1,0 +1,140 @@
+#confirmation-header-container {
+    
+}
+
+#confirmation-content-container {
+}
+
+#confirmation-footer-container {
+}
+
+.confirmation-area {
+    clear: both;
+    margin-bottom: 5px;
+    overflow: hidden;
+}
+
+#confirmation-title-container {
+    padding-top: 5px;
+    float: left;
+    width: 50%;
+    font-size: xx-large;
+    font-weight: bold;
+}
+
+#confirmation-enrollment-details-container {
+    float: left;
+    width: 50%;
+}
+
+#confirmation-customer-container {
+    float: left;
+    width: 50%;
+}
+
+#confirmation-payment-container {
+    float: left;
+    width: 50%;
+}
+
+#confirmation-items-container {
+    clear: both;
+    width: 100%;
+}
+
+.confirmation-area-header {
+    background-color: #dddddd;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#dddddd), to(#eeeeee)); /* Chrome, Safari 4+ */
+    background-image: -webkit-linear-gradient(top, #dddddd, #eeeeee); /* Chrome 10-25, iOS 5+, Safari 5.1+ */
+    background-image:    -moz-linear-gradient(top, #dddddd, #eeeeee); /* Firefox 3.6-15 */
+    background-image:      -o-linear-gradient(top, #dddddd, #eeeeee); /* Opera 11.10-12.00 */
+    background-image:         linear-gradient(to bottom, #dddddd, #eeeeee); /* Chrome 26, Firefox 16+, IE 10+, Opera 12.50+ */ 
+    font-weight: bold;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-size: larger;
+    margin-bottom: 2px;
+}
+
+.confirmation-field {
+    clear: both;
+    font-weight: bold;
+    float: left;
+    width: 50%;
+}
+
+.confirmation-field-value {
+    float: left;
+    width: 50%;
+    text-align: right !important;
+}
+
+#confirmation-items-headers {
+    color: gray;
+    border-bottom: 1px solid gray;
+    overflow: hidden;
+}
+
+.confirmation-items-column {
+    float: left;
+}
+
+.confirmation-items-column-coursename {
+    width: 40%;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.confirmation-items-column-coursenumber {
+    width: 15%;
+    font-size: 11px;
+}
+
+.confirmation-items-column-coursedates {
+    width: 20%;
+    text-align: right;
+    font-size: 11px;
+}
+
+.confirmation-items-column-status {
+    width: 15%;
+    text-align: right;
+    font-size: 11px;
+}
+
+
+.confirmation-items-column-price {
+    width: 10%;
+    text-align: right;
+    font-size: 11px;
+}
+
+.confirmation-items-data.confirmation-items-column-price  {
+    font-weight: bold;
+}
+
+.confirmation-total-field {
+    clear: both;
+}
+
+.confirmation-total-label {
+    float: right;
+    /* width: 15%; */
+    text-align: right;
+    font-weight: bold;
+}
+
+.confirmation-total-value {
+    font-weight: bold;
+    float: right;
+    width: 10%;
+    text-align: right;
+}
+
+.confirmation-material {
+    color: darkgray;
+}
+
+.confirmation-items-line {
+    clear: both;
+}

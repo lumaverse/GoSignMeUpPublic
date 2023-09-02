@@ -1,0 +1,101 @@
+﻿@using school = Gsmu.Api.Data.School
+@using Gsmu.Api.Language
+@model school.Entities.DistrictExtraInfo
+
+@{
+    bool modelEmptyData = ReflectionHelper.ObjectStringDataIsEmpty(Model);
+}
+
+@if (modelEmptyData)
+{
+    <text>N/A</text>
+}
+else
+{
+    var hadInput = false;
+    var hadPrevious = false;
+    if (!string.IsNullOrWhiteSpace(Model.shortdesc))
+    {
+        @Model.shortdesc        
+        hadInput = true;
+    }
+
+    if (!string.IsNullOrWhiteSpace(Model.daddress))
+    {
+        if (hadInput)
+        {
+            <br/>
+        }
+        @Model.daddress
+        hadInput = true;
+    }
+    
+    hadPrevious = false;
+    if (!string.IsNullOrWhiteSpace(Model.dcity) || !string.IsNullOrWhiteSpace(Model.dstate) || !string.IsNullOrWhiteSpace(Model.dzip))
+    {
+        if (hadInput)
+        {
+            <br/>
+        }
+        if (!string.IsNullOrWhiteSpace(Model.dcity))
+        {
+            @Model.dcity
+            hadPrevious = true;
+        }
+        if (!string.IsNullOrWhiteSpace(Model.dstate))
+        {
+            if (hadPrevious)
+            {
+                <text>, </text>
+            }
+            @Model.dstate
+            hadPrevious = true;
+        }
+        if (!string.IsNullOrWhiteSpace(Model.dzip))
+        {
+            if (hadPrevious)
+            {
+                <text>, </text>
+            }
+            @Model.dzip
+            hadPrevious = true;
+        }
+        hadInput = true;
+    }
+
+    if (!string.IsNullOrWhiteSpace(Model.dcountry))
+    {
+        if (hadInput)
+        {
+            <br/>
+        }
+        @Model.dcountry
+        hadInput = true;
+    }
+
+    if (!string.IsNullOrWhiteSpace(Model.dphone))
+    {
+        if (hadInput)
+        {
+            <br/>
+        }
+        <text>
+            <u>Phone:</u> @Model.dphone
+        </text>        
+        hadInput = true;
+    }
+
+    if (!string.IsNullOrWhiteSpace(Model.dfax))
+    {
+        if (hadInput)
+        {
+            <br/>
+        }
+        <text>
+            <u>Fax:</u> @Model.dfax
+        </text>        
+        hadInput = true;
+    }
+            
+}
+

@@ -1,0 +1,430 @@
+﻿@using Gsmu.Api.Data;
+@using Gsmu.Api.Data.School.User;
+@using Gsmu.Api.Data.School.Terminology;
+@model UserModel
+
+@{
+    string cmd = ViewBag.cmd;
+
+    string formTitle = "Reports";
+    var userModel = Model;
+    var usr = new UserInfo();
+    usr = userModel.CommonUserInfo;
+    if(usr == null){
+        usr = new UserInfo();
+        usr.userid = 0;
+    }
+     var stylehidden="visible";
+
+
+}
+@Scripts.Render("~/Areas/Public/Scripts/ExtFieldValidation.js")
+<script type="text/javascript">
+    //destroy first main panel if exist for the edit mode
+    var reportCmp = Ext.getCmp('UserDashCourseHoursTransactions');
+    var creditpurchaseFilterDateTo = ""
+    if (reportCmp != null) { reportCmp.destroy(); }
+
+    var prvCmp = Ext.getCmp('pdftranscriptpanel');
+    if (prvCmp != null) { prvCmp.destroy(); }
+
+    var tempmsg = "Function not yet available"
+
+    var UserReportsLoginHistory = function (titl, txt) {
+        Ext.Msg.alert("Reports", tempmsg);
+    }
+
+    var UserReportsTranscript = function (titl, txt) {
+        Ext.Msg.alert("Reports", tempmsg);
+    }
+    CourseHoursshtml = "";
+
+    Ext.onReady(function () {
+        var emailIcon = config.getUrl('images/icons/famfamfam/coins_add.png');
+        var printIcon = config.getUrl('images/icons/famfamfam/printer.png');
+        var store = Ext.create('Ext.data.Store', {
+            autoLoad: true,
+            autoSync: true,
+            fields: [
+                { name: 'OrderNumber', type: 'string' },
+                { name: 'coursename', type: 'string' },
+                { name: 'Amount', type: 'string' },
+                {
+                    name: 'dateadded', type: 'string'
+                },
+                { name: 'CustomCreditHours', type: 'string' }
+            ],
+            //model: 'PaymentHours',
+            proxy: {
+                type: 'ajax',
+                url: config.getUrl('public/Course/GetCourseHours?studentid=@usr.userid'),
+                reader: {
+                    type: 'json',
+                    rootProperty: 'Result',
+                    totalProperty: 'TotalCount',
+                    listeners: {
+                        exception: function (reader, response, error, opts) {
+                            log(error);
+                        }
+                    }
+                }
+            }
+        });
+        var store_purchased = Ext.create('Ext.data.Store', {
+            autoLoad: true,
+            autoSync: true,
+            fields: [
+                { name: 'OrderNumber', type: 'string' },
+                { name: 'coursename', type: 'string' },
+                { name: 'Amount', type: 'string' },
+                {
+                    name: 'dateadded', type: 'string'
+                },
+                { name: 'CustomCreditHours', type: 'string' }
+            ],
+            proxy: {
+                type: 'ajax',
+                url: config.getUrl('public/Course/GetPurchasedCourseHours?studentid=@usr.userid'),
+                reader: {
+                    type: 'json',
+                    rootProperty: 'Result',
+                    totalProperty: 'TotalCount',
+                    listeners: {
+                        exception: function (reader, response, error, opts) {
+                            log(error);
+                        }
+                    }
+                }
+            }
+        });
+        var grid = Ext.create('Ext.grid.Panel', {
+            region: 'center',
+            title: 'Available to Purchase',
+            id: 'credithoursgrid',
+            dockedItems: [
+                {
+                    xtype: 'pagingtoolbar',
+                    store: store,
+                    dock: 'top',
+                    displayInfo: true
+                }
+            ],
+            store: store,
+            emptyText: 'No Students found',
+            columns: [
+                {
+                    text: 'Courses',
+                    dataIndex: 'coursename',
+                    width: 120,
+                },
+                {
+                    text: '@ViewBag.Label',
+                    dataIndex: 'CustomCreditHours',
+                    flex: 1
+                },
+                {
+                    text: 'Register Date',
+                    dataIndex: 'dateaddedstring',
+                    flex: 1
+                },
+                {
+                    text: 'Due Amount',
+                    dataIndex: 'Amount',
+                    renderer: Ext.util.Format.usMoney,
+                    flex: 1
+                },
+                {
+                    xtype: 'actioncolumn',
+                    width: 22,
+                    items: [
+                        {
+                            icon: emailIcon,
+                            tooltip: 'Pay',
+                            handler: function (view, rowIndex, colIndex, item, e, record) {
+                                var data = record.data;
+                                ActionControl(data.OrderNumber, data.Amount, data.TranscriptID);
+                            }
+                        }]
+
+                }
+            ]
+        });
+        var rowBodyFeature = Ext.create('Ext.grid.feature.RowBody', {
+            getAdditionalData: function (data, rowIndex, record, orig) {
+                var headerCt = this.view.headerCt,
+                colspan = headerCt.getColumnCount();
+                return {
+                    rowBody: "Payment Info: " + data.IsHoursPaidInfo, // display payment records.
+                    rowBodyCls: this.rowBodyCls,
+                    rowBodyColspan: colspan
+                };
+            }
+        });
+        function renderTip(val, meta, rec, rowIndex, colIndex, store) {
+            meta.tdAttr = 'data-qtip="' + "Payment Information: <br />" + rec.get('IsHoursPaidInfo') + '"';
+            return "<div style='color:blue; text-decoration: underline;'>" + Ext.util.Format.currency(val, '$', Ext.util.Format.currencyPrecision); + "</div>";
+        };
+
+        var buttonBar = Ext.create('Ext.toolbar.Toolbar', {
+            border: false,
+            height: 30,
+            items: [
+
+                {
+                    xtype: 'label',
+                    text: 'From: ',
+                    margin: '0 3 0 0'
+                }, {
+                    id: 'creditpurchaseFilterDateFrom',
+                    format: 'm/d/Y',
+                    xtype: 'datefield',
+                    width: 90
+                },
+                {
+                    xtype: 'tbfill',
+                    width: 8
+                },
+                {
+                    xtype: 'label',
+                    text: 'To: ',
+                    margin: '0 3 0 0'
+                },
+                {
+                    id: 'creditpurchaseFilterDateTo',
+                    format: 'm/d/Y',
+                    xtype: 'datefield',
+                    width: 90
+                }, {
+                    xtype: 'button',
+                    text: '<div style="margin-bottom:2px;"><img style="float:left;" src="/Images/Icons/FamFamFam/zoom.png" />&nbsp;Filter</div>',
+                    tooltip: 'Filter',
+                    id: 'creditpurchasefilterbutton',
+                    width: 70,
+                    height: 25,
+                    handler: function (e, toolEl, panel, tc) {
+
+                        creditpurchaseFilterDateFrom = Ext.getCmp('creditpurchaseFilterDateFrom').getValue();
+                        creditpurchaseFilterDateTo = Ext.getCmp('creditpurchaseFilterDateTo').getValue();
+                        var startdate = new Date(creditpurchaseFilterDateFrom);
+                        var enddate = new Date(creditpurchaseFilterDateTo);
+                        var store = Ext.getCmp('credithoursgridpurchased').getStore();
+
+                        if (Ext.isEmpty(creditpurchaseFilterDateFrom) && Ext.isEmpty(creditpurchaseFilterDateTo)) {
+                            alert("Invalid start and end date")
+                            return;
+                        }
+
+                        if (Ext.isEmpty(creditpurchaseFilterDateFrom)) {
+                            alert("Invalid start date")
+                            return;
+                        }
+
+                        if (Ext.isEmpty(creditpurchaseFilterDateTo)) {
+                            alert("Invalid end date")
+                            return;
+                        }
+
+                        store.load({
+                            params: { startdate: startdate, enddate: enddate }
+                        })
+                    }
+                },
+                            {
+                                xtype: 'button',
+                                text: '<div style="margin-bottom:2px;"><img style="float:left;" src="/Images/Icons/FamFamFam/printer.png" />&nbsp;&nbsp;Print</div>',
+                                tooltip: 'Print Transcript',
+                                width: 80,
+                                height: 28,
+                                listeners: {
+                                    click: function () {
+                                        creditpurchaseFilterDateFrom = Ext.getCmp('creditpurchaseFilterDateFrom').getValue();
+                                        creditpurchaseFilterDateTo = Ext.getCmp('creditpurchaseFilterDateTo').getValue();
+                                        var startdate = new Date(creditpurchaseFilterDateFrom);
+                                        var enddate = new Date(creditpurchaseFilterDateTo);
+                                        Ext.Ajax.request({
+                                            url: config.getUrl('public/course/GetPDFTranscript?'),
+                                            params: { startdate: startdate, enddate: enddate, studentid: '@usr.userid' },
+                                            success: function (response) {
+                                                window.open(response.responseText, '_blank');
+                                            }
+                                        });
+
+                                    }
+                                }
+                            }, {
+                                xtype: 'tbfill'
+                            }]
+        });
+
+        var grid_purchased = Ext.create('Ext.grid.Panel', {
+            region: 'center',
+            flex: 1,
+            title: 'Purchased',
+
+            id: 'credithoursgridpurchased',
+            dockedItems: [buttonBar,
+
+                {
+                    xtype: 'pagingtoolbar',
+                    store: store_purchased,
+                    dock: 'top',
+                    displayInfo: true
+                }
+            ],
+            store: store_purchased,
+            emptyText: 'No Students found',
+            columns: [
+                {
+                    text: 'Courses',
+                    dataIndex: 'coursename',
+                    width: 120,
+                },
+                {
+                    text: 'Course Start Date',
+                    dataIndex: 'CourseStartDateString',
+                    flex: 1
+                },
+                {
+                    text: '@ViewBag.Label',
+                    dataIndex: 'CustomCreditHours',
+                    flex: 1
+                },
+                {
+                    text: 'Register Date',
+                    dataIndex: 'dateaddedstring',
+                    flex: 1
+                },
+                {
+                    text: 'Amount',
+                    dataIndex: 'Amount',
+                    renderer: renderTip,
+                    flex: 1
+                },
+                {
+                    xtype: 'actioncolumn',
+                    width: 22,
+                    items: [
+                        {
+                            icon: printIcon,
+                            tooltip: 'Print Receipt',
+                            handler: function (view, rowIndex, colIndex, item, e, record) {
+                                var data = record.data;
+                                var win = window.open(location.href.replace('dashboard', 'UserClockhoursPurchaseReceipt' + '?transcriptid=' + data.TranscriptID).replace('/Supervisor/EditStudentInfo', '/user/UserClockhoursPurchaseReceipt' + '?transcriptid=' + data.TranscriptID).replace('/DashboardViewAdmin', '/UserClockhoursPurchaseReceipt' + '?transcriptid=' + data.TranscriptID + '&'));
+                            }
+                        }]
+
+                }
+
+            ],
+            stateful: true,
+            stateId: 'portal-rosters-grid',
+
+        });
+
+
+
+        var pdftranscriptpanel = Ext.create('Ext.panel.Panel', {
+            html: 'No Data.',
+            id: 'pdftranscriptpanel',
+            title: 'Print Transcript'
+        });
+        var clockhourstab = Ext.create('Ext.tab.Panel', {
+            activeTab: 0,
+            items: [
+                grid, grid_purchased
+            ],
+        });
+
+        Ext.create('Ext.Panel', {
+            id: 'UserDashCourseHoursTransactions',
+            frame: true,
+            renderTo: Ext.get('coursehoursrender'),
+            layout: 'anchor',
+            autoScroll: false,
+            title: '@ViewBag.Label',
+            items: [clockhourstab],
+            tools: [
+                {
+                    hidden: (dasboardadminmode ? false : true),
+                    type: 'cross',
+                    tooltip: 'Delete this widget ',
+                    handler: function (e, toolEl, panel, tc) {
+                        DeleteUserWidget(GetwidgetColIDbyPlID('UserDashCourseHoursTransactions'), GetwidgetIDbyPlID('UserDashCourseHoursTransactions'));
+                    }
+                }
+            ],
+            html: CourseHoursshtml
+
+        });
+
+    });
+
+    reloadUserReportsForm = function (cmd, userid, usergroup) {
+
+        Ext.Ajax.request({
+            url: config.getUrl('public/user/UserReportsCourseTransactions'),
+            params: {
+                cmd: cmd,
+                userid: userid,
+                usergroup: usergroup
+            },
+            success: function (data) {
+                $("#UserReportsContainer").html(data.responseText);
+            }
+        })
+    }
+
+    ActionControl = function (OrderNumber, OrderTotal, TranscriptID) {
+
+        cart.ShowPaymentPage(OrderTotal, OrderNumber, TranscriptID, 'payclockhours');
+
+    }
+
+
+    ActionControlX = function (OrderNumber, OrderTotal, TranscriptID) {
+
+
+        Ext.Ajax.request({
+            url: config.getUrl('public/cart/Payment'),
+            params: {
+                OrderNumber: OrderNumber,
+                OrderTotal: OrderTotal,
+                TranscriptID: TranscriptID,
+                credithourspayment: true,
+            },
+            success: function (data) {
+
+                popWindow_paymenthours = Ext.create('Ext.form.Panel', {
+                    floating: true,
+                    centered: true,
+                    modal: true,
+                    width: 970,
+                    height: 640,
+                    closable: true,
+                    defaultType: 'textfield',
+                    bodyPadding: 10,
+                    html: data.responseText,
+
+                    renderTo: Ext.getBody(),
+                });
+                popWindow_paymenthours.show();
+            }
+        })
+
+    }
+
+    CourseTransactPayHoursSuccess = function () {
+        alert($("#CardNumber").val());
+        popWindow_paymenthours.hide();
+    }
+
+    PrintStudentTranscript = function (TranscriptID) {
+        alert(TranscriptID);
+    }
+</script>
+
+@if (Settings.Instance.GetMasterInfo3().UsePurchaseCredit == 0)
+{
+    stylehidden = "hidden";
+}
+<div id="coursehoursrender" style="position:relative;min-height:100px; padding-bottom:20px; visibility:@stylehidden;"></div>

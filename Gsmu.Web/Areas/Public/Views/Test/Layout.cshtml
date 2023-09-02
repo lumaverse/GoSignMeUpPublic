@@ -1,0 +1,15 @@
+﻿@{
+    ViewBag.Title = "Layout";
+}
+
+
+<a href="javascript:testmask()">Test mask</a>
+
+<script type="text/javascript">
+    function testmask() {
+        window.LAYOUT.MaskLayout('Mask layout test...');
+        setTimeout(function () {
+            window.LAYOUT.UnmaskLayout();
+        }, 2000);
+    }
+</script>

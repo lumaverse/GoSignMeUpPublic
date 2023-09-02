@@ -1,0 +1,982 @@
+@using Gsmu.Api.Authorization
+@using Gsmu.Api.Language
+@using Gsmu.Api.Data
+@using Gsmu.Api.Data.School
+@using Gsmu.Api.Data.School.Entities
+@using Gsmu.Api.Data.School.Student
+@using Gsmu.Api.Data.ViewModels.Grid
+@using Gsmu.Api.Data.ViewModels.Layout
+@using Gsmu.Api.Data.School.Course
+@using Gsmu.Api.Commerce.ShoppingCart;
+@using System.Web.Script.Serialization;
+@using Gsmu.Api.Data.School.Terminology;
+@model GridModel<CourseModel>
+
+@{
+    var mi2 = Settings.Instance.GetMasterInfo2();
+    var mi3 = Settings.Instance.GetMasterInfo3();
+    var showCourseChoice = mi2.ShowCourseType != null && mi2.ShowCourseType != 0;
+    var showFastTrackCourses = mi3.FastTrackCoursesOn != null && mi3.FastTrackCoursesOn != 0;
+    var hidepaymentinfo = mi2.HidePaymentInfo;
+    string PubDateFormat = Settings.Instance.GetPubDateFormat();
+    string jsPubDateFormat = Settings.Instance.GetJsPubDateFormat();
+    var showCourseNum = ((Settings.Instance.GetMasterInfo2().HideCourseNumber == 0) ? true : false);
+}
+
+@if (Model.TotalCount < 1)
+{
+    <div class="grid-message">
+        Sorry, there are no new courses with the selected options. Please check back at a later time.
+    </div>
+}
+else
+{
+    var ascending = Url.Content("~/" + Gsmu.Api.Data.WebConfiguration.PublicCourseBrowseAscendingImage);
+    var descending = Url.Content("~/" + Gsmu.Api.Data.WebConfiguration.PublicCourseBrowseDescendingImage);
+    var orderByField = (CourseOrderByField)Model.OrderByField;
+    var counter = 0;
+    var layoutConfig = LayoutManager.PublicLayoutConfiguration;
+    var config = layoutConfig.SearchColumns.TileJuly;
+    string comma;
+    
+    <span style="font-weight: bold;">Sort by: 
+    </span>
+    foreach (var sortField in Enum.GetValues(typeof(CourseOrderByField)))
+    {
+        switch ((CourseOrderByField)sortField)
+        {
+            case CourseOrderByField.CourseId:
+                if (!config.CourseId)
+                {
+                    continue;
+                }
+                break;
+
+            case CourseOrderByField.CourseNum:
+                if (!config.CourseNumber)
+                {
+                    continue;
+                }
+                break;
+
+            case CourseOrderByField.CourseStart:
+                if (!config.CourseStart)
+                {
+                    continue;
+                }
+                break;
+
+        }
+
+        var sortableAction = string.Format(Model.SorterCallbackTemplate, sortField);
+        var fieldName = Gsmu.Api.Language.EnumHelper.GetEnumDescription((CourseOrderByField)sortField);
+        var sortActionExtraCss = orderByField == (CourseOrderByField)sortField ? " tile-july-sort-action-sorted" : "";
+        if (counter > 0)
+        {
+            <span>|</span>
+        }
+        <span class="tile-july-sort-action" onclick="@sortableAction">
+            <span class="@(sortActionExtraCss)">@fieldName.Replace("Course", TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course))</span>
+            
+            @if (orderByField == (CourseOrderByField)sortField)
+            {
+                if (Model.OrderByDirection == OrderByDirection.Ascending)
+                {
+                    <img alt="Ascending" src="@ascending" />
+                }
+                else
+                {
+                    <img alt="Descending" src="@descending" />
+                }                    
+            }
+        </span>
+            counter++;
+    }
+
+    
+    <div class="tile-july-break">
+    </div>
+        
+    var FieldIcons = new
+    {
+        Starts = Url.Content("~/Areas/Public/Images/TileJuly/starts.png"),
+        Sessions = Url.Content("~/Areas/Public/Images/TileJuly/sessions.png"),
+        Duration = Url.Content("~/Areas/Public/Images/TileJuly/duration.png"),
+        Credits = Url.Content("~/Areas/Public/Images/TileJuly/credits.png"),
+        Pricing = Url.Content("~/Areas/Public/Images/TileJuly/pricing.png"),
+        Location = Url.Content("~/Areas/Public/Images/TileJuly/location.png"),
+        Status = Url.Content("~/Areas/Public/Images/TileJuly/status.png"),
+        ClassSize = Url.Content("~/Areas/Public/Images/TileJuly/classsize.png"),
+        Materials = Url.Content("~/Areas/Public/Images/TileJuly/materials.png"),
+        AccessCode = Url.Content("~/Areas/Public/Images/TileJuly/accesscode.png"),
+        PreRequisites = Url.Content("~/Areas/Public/Images/TileJuly/accesscode.png"),
+        Certificate = Url.Content("~/Areas/Public/Images/TileJuly/certificate.png")
+    };
+            
+    <script type="text/javascript">
+        var TileListJuly = null;
+        var showCourseChoice = @Html.Json(showCourseChoice);
+        var showFastTrackCourses = @Html.Json(showFastTrackCourses);
+        var hidePaymentInfo = @Html.Json(hidepaymentinfo);
+        Ext.onReady(function() {
+            TileListJuly = {
+                TileCount: @Model.Result.Count,
+                TileReady: 0,
+                Config: @Html.Raw(Json.Encode(config)),
+                IncreaseTileReady: function(courseid) {
+                
+                    if (this.Config.CourseDescription) {
+                        this.Renderers[courseid].description();
+                    }
+
+                    if (this.Config.Sessions) {
+                        this.Renderers[courseid].sessions();
+                    }
+
+                    if (this.Config.Price) {
+                        this.Renderers[courseid].price();
+                    }
+
+                    if (this.Config.Location) {
+                        this.Renderers[courseid].location();
+                    }
+
+                    if (showCourseChoice)
+                    {
+                        this.Renderers[courseid].coursechoice();
+                    }
+
+                    if (showFastTrackCourses)
+                    {
+                        this.Renderers[courseid].bundled();
+                    }
+
+                    this.TileReady++;
+                    if (this.TileCount == this.TileReady) {
+                        this.DoLayout();
+                    }
+                },
+                DoLayout: function() {
+                    var parent = Ext.get(Ext.dom.Query.selectNode('.tile-july-container').parentNode);
+                    parent.setStyle('display', 'table');
+                    console.log($("#MainResultBody").width());
+                    var MainResultBodyWD = $("#search-result").width();
+                    var CrsBoxWidth =  (MainResultBodyWD/3)-18;
+                    if(MainResultBodyWD < 650){
+                        CrsBoxWidth =  (MainResultBodyWD/2)-10;
+                    }
+                    if(MainResultBodyWD < 450){
+                        CrsBoxWidth =  (MainResultBodyWD)-10;
+                    }
+                    console.log(CrsBoxWidth);
+
+                    $(".tile-july-container").width(CrsBoxWidth);
+                    $(".tile-july-button").width(CrsBoxWidth-7);
+                    //Ext.getCmp("SearchCourseText").setWidth(MainResultBodyWD/2 +"px")
+                    Ext.Array.forEach(Ext.query('.tile-july'), function(value) {
+                        Ext.get(value).setStyle({
+                            height: 'auto'
+                        });
+                    });
+
+                    Ext.Array.forEach(Ext.query('.tile-july-container'), function(value) {
+                        Ext.get(value).setStyle({
+                            paddingBottom: '40px'
+                        });
+                    });
+                    Ext.Array.forEach(Ext.query('.tile-july-button-container'), function(value) {
+                        Ext.get(value).setStyle({
+                            bottom: '0px',
+                            position: 'absolute',
+                            width: TileListJuly.Config.TileWidth + 'px'
+                        });
+                    });
+
+                    setTimeout(function () {
+                        window.LAYOUT.setSameHeight('.tile-july-main-data', parent, '.tile-july-container');
+                        window.LAYOUT.setSameHeight('.tile-july-data', parent, '.tile-july-container');
+                        window.LAYOUT.setSameHeight('.tile-july', parent, '.tile-july-container');
+                        $('.tile-july-container').each(function (i, obj) {
+                            if ($(this).find('.tile-july-button-container').length > 0) {
+                                $(this).css('padding-bottom', '40px')
+                            } else {
+                                if ($(this).find('.tile-july-coursetype-text').length > 0) {
+                                    $(this).find('.tile-july-coursetype-text').css('padding-top', '10px')
+                                    $(this).css('padding-bottom', '40px')
+                                } else {
+                                    $(this).css('padding-bottom', '40px')
+                                }
+                            }
+
+                        });
+
+                    }, 200);
+
+                },
+                Renderers: {
+                }
+            };
+        });
+    </script>
+
+    
+    counter = 0;
+    foreach (var courseModel in Model.Result)
+    {
+        counter++;
+        var course = courseModel.Course;
+        var courseId = courseModel.CourseId;
+        var backgroundStyle = string.Empty;
+        var courseStart = courseModel.CourseStartAsDate;
+        var courseEnd = courseModel.CourseEndAsDate;
+        var courseStartEndTimeDisplay = (courseModel.Course.StartEndTimeDisplay != null ? courseModel.Course.StartEndTimeDisplay.Trim() : string.Empty);
+        //var hasCourseTypeText = ((course.CourseTypeAltVerbiage != null && course.CourseTypeAltVerbiage.Trim().Length > 0) ? true : false);
+        var duration = courseModel.Duration;
+        var courseCCSetting = (courseModel.Course.StudentChoiceCourse != null ? courseModel.Course.StudentChoiceCourse : 0);
+        var statistics = courseModel.Course.EnrollmentStatistics;
+        var enrollment = Gsmu.Api.Data.School.Entities.Student.GetAllStudentEnrollmentInCourse(courseId);
+        var inShoppingCart = CourseShoppingCart.Instance.ContainsCourse(courseId);
+        if (ViewBag.EnabledColor)
+        {
+            foreach (var colorcode in ViewBag.ColorCode)
+            {
+                if (colorcode.CourseCategoryID == course.CourseColorGrouping)
+                {
+                    backgroundStyle = string.Format("background-color:#" + colorcode.CourseCategoryColor + ";");
+                }
+            }
+        }
+
+        <script type="text/javascript">
+            Ext.onReady(function () {
+
+                var dh = Ext.DomHelper;
+
+                var courseid = @course.COURSEID;
+
+                var isOnlineCourse = @Html.Raw(Json.Encode(course.IsOnlineCourse));
+                var courseTimes = @Html.JsonEntity(courseModel.CourseTimes);
+
+                var credits = @(Html.Raw(Json.Encode(courseModel.Credits)));
+
+                var materials = @(Html.Raw(Json.Encode(courseModel.Materials)));
+                var materialsRequired = @(Json.Encode(course.MaterialsRequiredAsBoolean && courseModel.Materials.Count > 0));
+
+                var courseCourseChoiceSetting = @Html.Raw(Json.Encode(courseCCSetting));
+                var courseChoices = @Html.JsonEntity(courseModel.CourseChoices);
+
+                var bundledCourseCount = @Html.Raw(Json.Encode(courseModel.BundledCourses.Count));
+                var bundledCourses = @Html.Raw(Json.Encode(courseModel.BundledCourses));
+
+                var accessCodeRequired = @Html.Raw(Json.Encode(course.AccessCodeRequired));
+
+                var prerequisitesRequired = @Html.Raw(Json.Encode(course.PrereqiusiteRequired));
+                var prerequisiteInfo = @Html.Raw(Json.Encode(course.PrerequisiteInfo));
+
+                var prices = @Html.JsonEntity(courseModel.EffectivePrices);
+
+                var isInCart = @(Json.Encode(CourseShoppingCart.Instance.ContainsCourse(course.COURSEID)));
+                var cartItem = @Html.JsonEntity(CourseShoppingCart.Instance.GetCourseItem(courseId));
+
+                var container = Ext.get('tile-july-container-' + courseid);
+
+                cart.setCourseMaterialData(courseid, materialsRequired, materials);
+
+                TileListJuly.Renderers[courseid] = {
+                    description: function() {
+
+                        var removeTags = function(container, removeTags) {
+                            var list = container.getElementsByTagName(removeTags);
+                            var i = list.length;
+                            while (i--) {
+                                list[i].parentNode.removeChild(list[i]);
+                            }
+                        }
+
+                        var maxLenth = 125;
+                        var container = document.getElementById('tile-july-coursedescription-' + courseid);
+                        if (container == null) {
+                            return;
+                        }
+
+                        var more = Ext.get('tile-july-coursedescription-more-' + courseid);
+
+                        removeTags(container, 'html');
+                        removeTags(container, 'head');
+                        removeTags(container, 'meta');
+                        removeTags(container, 'title');
+                        removeTags(container, 'script');
+                        removeTags(container, 'style');
+                        removeTags(container, 'body');
+
+                        var text = Ext.String.trim(container.textContent || container.innerText);
+                        if (text.length > maxLenth) {
+                            text = Ext.String.ellipsis(text, 125, true);  
+                        } else {
+                            more.hide();
+                        }
+                        container.innerHTML = text;
+                    },
+                    location: function() {
+
+                        var field = Ext.get('tile-july-field-location-' + courseid);
+                        var value = Ext.get('tile-july-field-location-value-' + courseid);
+
+                        var data= {
+                            location: @Html.Raw(Json.Encode(course.LOCATION)),
+                            country: @Html.Raw(Json.Encode(course.Country)),
+                            street: @Html.Raw(Json.Encode(course.STREET)),
+                            city: @Html.Raw(Json.Encode(course.CITY)),
+                            state: @Html.Raw(Json.Encode(course.STATE)),
+                            zip: @Html.Raw(Json.Encode(course.ZIP)),
+                            locationurl: @Html.Raw(Json.Encode(course.LOCATIONURL)),
+                            locationadditionalinfo: @Html.Raw(Json.Encode(course.LocationAdditionalInfo)),
+                            room: @Html.Raw(Json.Encode(course.ROOM)),
+                            roomdirection: @Html.Raw(Json.Encode(course.RoomDirection))
+                        };
+
+                        window.COURSELOCATIONGENERATOR.generate(data, value, field, {
+                            extraCssClass: 'gsmu-tooltip-removable'
+                        });
+
+
+                    },
+                    coursechoice: function() {
+
+                        if (courseCourseChoiceSetting == 0 || courseChoices.length == 0) {
+                            return;
+                        }
+
+                        var parent = Ext.get('tile-july-field-course-choices-' + courseid);
+                        var container = Ext.get('tile-july-field-course-choices-container-' + courseid);
+
+                        var html = '<span class="tile-july-tooltip-course-choices">';
+                        
+                        for (var index = 0; index < courseChoices.length; index++) {
+                            var courseChoice = courseChoices[index];
+                            html += courseChoice.CourseChoice1;
+                            html += '<br/>';
+                        }
+
+                        html += '</span>';
+
+                        GSMUTOOLTIP.CreateTooltip({
+                            target: parent,
+                            html: html,
+                            trigger: container,
+                            extraCssClass: 'gsmu-tooltip-removable'
+                        });
+
+                    },
+                    bundled: function() {
+
+                        if (bundledCourseCount == 0) {
+                            return;
+                        }
+
+                        var parent = Ext.get('tile-july-field-bundled-course-' + courseid);
+                        var container = Ext.get('tile-july-field-bundled-course-container-' + courseid);
+
+                        var html = '<span class="tile-july-tooltip-bundled-course">';
+                        
+                        for (var index = 0; index < bundledCourseCount; index++) {
+                            var bundledCourse = bundledCourses[index];
+                            html += '<a href="javascript:window.CourseSearchInstance.ShowCourseDetails(' + bundledCourse.COURSEID + ');">' + bundledCourse.COURSENUM + ' ' + bundledCourse.COURSENAME + '</a>';
+                            html += '<br/>';
+                        }
+                        html += '</span>';
+
+                        GSMUTOOLTIP.CreateTooltip({
+                            target: parent,
+                            html: html,
+                            trigger: container,
+                            extraCssClass: 'gsmu-tooltip-removable'
+                        });
+
+                    },
+                    price: function() {
+
+                        var field = Ext.get('tile-july-field-price-' + courseid);
+                        var title = Ext.get('tile-july-field-price-title-' + courseid);
+                        var value = Ext.get('tile-july-field-price-value-' + courseid);
+
+                        var freeText = function() {
+                            if(value!=null){
+                                value.setHtml('$0.00');
+                            }
+                        };
+                        
+                        var displaySinglePrice = function(label, price) {
+                            var display = Ext.util.Format.currency(price);
+                            if (label != null && label != '') {
+                                display += ' (' + label + ')';
+                            }
+                            if(value!=null){
+                                value.setHtml(display);
+                            }
+                        }
+                        
+                        if (cartItem != null) {
+
+                            if (cartItem.PricingModel == null) {
+                                freeText();
+                                return;
+                            }
+                            displaySinglePrice(cartItem.PricingModel.Label, cartItem.PricingModel.EffectivePrice);
+                            return;
+                        }
+                        if (prices.length > 0) {
+                            if (prices.length == 1) {
+                                var price = prices[0];
+                                displaySinglePrice(price.Label, price.EffectivePrice);
+                                if (price.IsOption) {
+                                    dh.append(container, '<input type="hidden" id="course-price-' + courseid + '" value="' + price.CoursePricingOption.CoursePricingOptionId + '"/>');
+                                }
+
+                                return;
+                            }
+
+                            var display = '';
+                            var comma = '';
+                            for(var index = 0; index < prices.length; index++) {
+                                var price = prices[index];
+                                display += comma + Ext.util.Format.currency(price.EffectivePrice);
+                                if (price.Label != null && price.Label != '') {
+                                    display += ' ' + price.Label;
+                                }
+                                comma = ', ';
+                            }
+                            if(value!=null)
+                                value.setHtml(display);
+
+                        } else {
+                            freeText();
+                        }
+                    },
+                    sessions: function() {
+
+                        if (courseTimes.length == 0) {
+                            return;
+                        }
+
+                        var parent = Ext.get('tile-july-field-sessions-' + courseid);
+                        var container = Ext.get('tile-july-field-sessions-container-' + courseid);
+
+                        var html = '<span class="tile-july-tooltip-sessions">';
+
+                        var dateFormat = '@jsPubDateFormat';
+                        var timeFormat = 'h:ia';
+
+                        if (isOnlineCourse && courseTimes.length == 2) {
+                            var start = courseTimes[0];
+                            var end = courseTimes[1];
+                           
+                            html += 'Online from<br/>';
+                            html += Ext.util.Format.date(Ext.Date.parse(start.COURSEDATE,'c'), dateFormat);
+                            html += ' ';
+                            html += Ext.util.Format.date(Ext.Date.parse(start.STARTTIME,'c'), timeFormat);
+                            html += ' until<br/>';
+                            html += Ext.util.Format.date(Ext.Date.parse(end.COURSEDATE,'c'), dateFormat);
+                            html += ' ';
+                            html += Ext.util.Format.date(Ext.Date.parse(end.FINISHTIME,'c'), timeFormat);
+                        } else {
+                            for(var index = 0; index < courseTimes.length; index++) {
+                                var courseTime = courseTimes[index];
+                                html += Ext.util.Format.date(Ext.Date.parse(courseTime.COURSEDATE,'c'), dateFormat);
+                                html += ' ';
+                                html += Ext.util.Format.date(Ext.Date.parse(courseTime.STARTTIME,'c'), timeFormat);
+                                html += ' - ';
+                                html += Ext.util.Format.date(Ext.Date.parse(courseTime.FINISHTIME,'c'), timeFormat);
+                                html += '<br/>';
+                            }
+                        }
+
+                        html += '</span>';
+
+                        GSMUTOOLTIP.CreateTooltip({
+                            target: parent,
+                            html: html,
+                            trigger: container,
+                            extraCssClass: 'gsmu-tooltip-removable'
+                        });
+                    }
+                };
+                TileListJuly.IncreaseTileReady(courseid);
+            });
+        </script>
+        
+                
+        <div class="tile-july-container" id="tile-july-container-@course.COURSEID" style="width: @(config.TileWidth - 2)px; @(backgroundStyle)">
+            <div class="tile-july" data-course-id="@course.COURSEID" data-course-name="@HttpUtility.HtmlEncode(course.COURSENAME)">
+
+                @if (config.CourseId)
+                {
+                    <div class="tile-july-courseid">    
+                        @course.COURSEID
+                    </div>
+                }
+
+                @if (config.Image)
+                {
+                    <div class="tile-july-image-container" id="tile-july-image-container-@course.COURSEID" style="text-align: center;">
+                        @if (!string.IsNullOrWhiteSpace(course.TileImageUrl) && course.TileImageUrl != "CourseTiles/")
+                        {
+                            <img alt="@Html.Raw(course.COURSENAME)" src="@course.TileImageUrl"  style="border: none; width: @(config.TileImageWidth)px; height: @(config.TileImageHeight)px;" />
+                            <script type="text/javascript">
+                                
+                                $('.tile-july-image-container').find('img').each(function(){
+                                        $('.tile-july-image-container').find('img').each(function(){
+                                            if(window.location.protocol=='http:'){
+                                                var new_src = $(this).attr('src').replace('https:','http:')
+                                                $(this).attr('src',new_src);
+                                            }
+                                            if(window.location.protocol=='https:'){
+                                                var new_src = $(this).attr('src').replace('http:','https:')
+                                                $(this).attr('src',new_src);
+                                            }
+                                        });
+                                });
+                            </script>
+                        }
+                    </div>
+                }
+
+                <div class="tile-july-main-data">
+                    <div class="tile-july-coursename">
+                        <a href="javascript:window.CourseSearchInstance.ShowCourseDetails(@course.COURSEID);">@Html.Raw(course.COURSENAME)</a>
+                    @if (config.Icons)
+                    {
+                        <div>
+                            @{Html.RenderPartial("ListingIcons", courseModel);}
+                        </div>
+                    }
+                    </div>
+                    @if(showCourseNum){
+                     <div class="tile-july-coursenumber">
+                        @if (config.CourseNumber && !string.IsNullOrWhiteSpace(course.COURSENUM))
+                        {
+                            @Html.Raw(course.COURSENUM)
+                        }
+                      </div>
+                    }
+                    else{                     <div class="tile-july-coursenumber">&nbsp;</div>
+                    }
+                    <div class="tile-july-coursedescription">
+                    @if (config.CourseDescription && !string.IsNullOrWhiteSpace(course.DESCRIPTION))
+                    {
+                        <span id="tile-july-coursedescription-@course.COURSEID">
+                            @Html.Raw(course.DESCRIPTION)
+                        </span>
+                        <a id="tile-july-coursedescription-more-@course.COURSEID" href="javascript:window.CourseSearchInstance.ShowCourseDetails(@course.COURSEID);">More</a>
+                    }
+                    </div>
+                </div>
+
+                <div class="tile-july-data">
+                     @if(courseModel.CertificateProgram!=""){
+                        <div style="text-decoration:none; font-weight:lighter; font-size:12px;">
+                                 <img alt="Certification Program" class="tile-july-field-image" src="@FieldIcons.Certificate" />
+                                 <span style="font-weight: bold;">Certification Program:</span>
+                                @Html.Raw(courseModel.CertificateProgram)</div>
+
+                    }
+                    <div class="tile-july-field tile-july-field-coursestart">
+                    @if (config.CourseStart)
+                    {
+                        if (courseStart != null && string.IsNullOrWhiteSpace(courseStartEndTimeDisplay))
+                        {
+                            <span class="tile-july-field-title">
+                                <img alt="Starts" class="tile-july-field-image" src="@FieldIcons.Starts" />
+                                Starts: 
+                            </span>
+                            <span class="tile-july-field-value">
+                                @courseStart.Value.ToString(PubDateFormat)
+                                @courseStart.Value.ToShortTimeString()
+                            </span>
+                        }
+                        else if (!string.IsNullOrWhiteSpace(courseStartEndTimeDisplay))
+                        {
+                            <span class="tile-july-field-title">
+                                <img alt="Dates" class="tile-july-field-image" src="@FieldIcons.Starts" />
+                                Dates: 
+                            </span>
+                            <span class="tile-july-field-value">
+                                @courseStartEndTimeDisplay
+                            </span>                            
+                        }                            
+                    } 
+                    </div>
+
+                    <div class="tile-july-field tile-july-field-courseend">
+                    @if (config.CourseEnd)
+                    {
+                        if (courseEnd != null && string.IsNullOrWhiteSpace(courseStartEndTimeDisplay))
+                        {
+                            <span class="tile-july-field-title">
+                                <img alt="Ends" class="tile-july-field-image" src="@FieldIcons.Starts" />
+                                Ends: 
+                            </span>
+                            <span class="tile-july-field-value">
+                                @courseEnd.Value.ToString(PubDateFormat)
+                                @courseEnd.Value.ToShortTimeString()
+                            </span>
+                        }
+                    } 
+                    </div>
+
+                    <div class="tile-july-field tile-july-field-sessions" id="tile-july-field-sessions-container-@course.COURSEID">
+                    @if (config.Sessions && courseModel.CourseTimes.Count() > 0 && courseStartEndTimeDisplay.Length == 0 && courseModel.Course.coursetype !=1 && courseModel.Course.eventid ==0 )
+                    {
+
+                        <span class="tile-july-field-title">
+                            <img alt="Sessions" class="tile-july-field-image" src="@FieldIcons.Sessions" />
+                            @if (course.IsOnlineCourse)
+                            {
+                                <text>Session:</text>
+                            }
+                            else
+                            {
+                                <text>
+                                    @(GrammarHelper.GetConditionallyPluralizedWord(courseModel.CourseTimes.Count(), "Session")): 
+                                </text>
+                            }
+                        </span>
+                        <span class="tile-july-field-value">
+                            <a href="javascript:;" id="tile-july-field-sessions-@course.COURSEID">
+                            @if (course.IsOnlineCourse)
+                            {
+                                <text>Online</text>
+                            }
+                            else
+                            {
+                                @courseModel.CourseTimes.Count()
+                            }
+                            </a>
+                        </span>
+                    }
+                    </div>
+
+                    <div class="tile-july-field tile-july-field-duration">
+                    @if (config.Duration && duration.HasValue && !course.IsOnlineCourse && courseStartEndTimeDisplay.Length == 0)
+                    {
+                        <span class="tile-july-field-title">
+                           <img alt="Duration" class="tile-july-field-image" src="@FieldIcons.Duration" />
+                            Duration:
+                        </span>
+                        <span class="tile-july-field-value">
+                            @if (duration.Value.Days > 0)
+                            {
+                                <text>
+                                @duration.Value.Days @(GrammarHelper.GetConditionallyPluralizedWord(duration.Value.Days, "day"))
+                                </text>
+                            }
+                            @if (duration.Value.Hours > 0)
+                            {
+                                <text>
+                                @duration.Value.Hours @(GrammarHelper.GetConditionallyPluralizedWord(duration.Value.Hours, "hour"))
+                                </text>
+                            }
+                            
+                            @if (duration.Value.Minutes > 0)
+                            {
+                                <text>
+                                @duration.Value.Minutes @(GrammarHelper.GetConditionallyPluralizedWord(duration.Value.Minutes, "minute"))
+                                </text>
+                            }
+                        </span>
+                    }
+                    </div>
+
+                    <div class="tile-july-field tile-july-field-credit">
+                    @if (config.Credit && courseModel.Credits.Count > 0)
+                    {
+                        <span class="tile-july-field-title">
+                           <img alt="Credits" class="tile-july-field-image" src="@FieldIcons.Credits" />
+                            Credits:
+                        </span>
+                        <span class="tile-july-field-value">
+
+                            @{
+                                comma = string.Empty;
+                            }
+
+                            @for (var index = 0; index < courseModel.Credits.Count; index++)
+                            {
+                                var credit = courseModel.Credits[index];
+                                @comma
+                                @(credit.Credit + " " + credit.Label)
+                                //print credits with format: 1 credit e.g. 5 Credit Hours; 2 credits e.g. 5 Credit Hours and 2 Inservice Hours; 3+ credits e.g. 5 Credit Hours, 2 Inservice Hours, and 2 CEUs
+                                comma = (index < courseModel.Credits.Count-2 ? ", " : (courseModel.Credits.Count > 2 ? ", and " : " and "));
+                            }
+                        </span>
+                    }
+                    </div>
+
+                    <div class="tile-july-field tile-july-field-course-choices" id="tile-july-field-course-choices-container-@course.COURSEID">
+                        @if (Settings.Instance.GetMasterInfo2().ShowCourseType != 0 && courseModel.Course.StudentChoiceCourse != 0)
+                        {
+                            <span class="tile-july-field-title" id="tile-july-field-course-choices-title-@courseId">
+                                <img alt="Course Choices" class="tile-july-field-image" src="@FieldIcons.Status" />
+                                Course Choices:
+                            </span>
+                            <span class="tile-july-field-value">
+                                @if (courseModel.CourseChoices.Count() > 0)
+                                {
+                                    <a href="javascript:;" id="tile-july-field-course-choices-@courseId">
+                                        @courseModel.CourseChoices.Count()
+                                    </a>
+                                }
+                                else
+                                {
+                                    <text>None</text>
+                                }
+                            </span>
+                        }
+                    </div>
+
+                    <div class="tile-july-field tile-july-field-price" id="tile-july-field-price-@courseId">
+                    @if (hidepaymentinfo == 0 && config.Price && courseModel.Course.coursetype == 0)
+                    {
+                        <span class="tile-july-field-title" id="tile-july-field-price-title-@courseId">
+                           <img alt="Pricing" class="tile-july-field-image" src="@FieldIcons.Pricing" />
+                            Pricing:
+                        </span>
+                        <span class="tile-july-field-value" id="tile-july-field-price-value-@courseId">
+                        </span>
+                    }
+                    </div>
+
+                    <div class="tile-july-field tile-july-field-location" id="tile-july-field-location-@courseId">
+                    @if (config.Location)
+                    {
+                        <span class="tile-july-field-title">
+                        <img alt="Location" class="tile-july-field-image" src="@FieldIcons.Location" />
+                            Location:
+                        </span>
+                        <span class="tile-july-field-value" id="tile-july-field-location-value-@courseId">
+                        </span>
+                    }
+                    </div>
+
+                    <div class="tile-july-field tile-july-field-status">
+                    @if (config.Status)
+                    {
+                        if(courseModel.BundleCourseStatus != CourseEnrollmentStatus.Full){
+                            if(statistics.SpaceAvailable!=10000){
+                        <span class="tile-july-field-title">
+                           <img alt="Status" class="tile-july-field-image" src="@FieldIcons.Status" />
+                            Status:
+                        </span>
+                            }
+                        <span class="tile-july-field-value">
+                            @switch (statistics.EnrollmentStatus)
+                            {
+                                case CourseEnrollmentStatus.Full:
+                                    <text>Full</text>
+                                    break;
+
+                                case CourseEnrollmentStatus.Expired:
+                                    <text>Closed</text>
+                                    break;
+
+                                case CourseEnrollmentStatus.SpaceAvailable:
+                                    if (statistics.SpaceAvailable != 10000)
+                                    {
+                                        if (courseModel.Course.coursetype == 0)
+                                        {
+                                            <text>@statistics.SpaceAvailable open @GrammarHelper.GetConditionallyPluralizedWord(statistics.SpaceAvailable, "seat") left</text>
+                                        }
+                                        else
+                                        {
+                                            <text>@(statistics.SpaceAvailable - statistics.TotalRosterCount) open @GrammarHelper.GetConditionallyPluralizedWord(statistics.SpaceAvailable, "seat") left</text>
+                                        }
+                                    }
+                                    break;
+
+                                case CourseEnrollmentStatus.WaitSpaceAvailable:
+                                    <text>@statistics.WaitSpaceAvailable wait @GrammarHelper.GetConditionallyPluralizedWord(statistics.WaitSpaceAvailable, "space") available</text>
+                                    break;
+                            }
+                        </span>
+                        }
+                    }
+                    </div>
+
+                    <div class="tile-july-field tile-july-field-classsize">
+                    @if (config.ClassSize)
+                    {
+                        if(statistics.SpaceAvailable!=10000){
+                        <span class="tile-july-field-title">
+                           <img alt="Class Size" class="tile-july-field-image" src="@FieldIcons.ClassSize" />
+                            Class size:
+                        </span>
+                        <span class="tile-july-field-value">
+                            @statistics.MaxEnrolledRosterCount @GrammarHelper.GetConditionallyPluralizedWord(statistics.MaxEnrolledRosterCount, "seat")
+                        </span>
+                        }
+                    }
+                    </div>
+
+                    <div class="tile-july-field tile-july-field-bundled-course" id="tile-july-field-bundled-course-container-@courseId">
+                        @if (Settings.Instance.GetMasterInfo3().FastTrackCoursesOn > 0 && courseModel.BundledCourses.Count > 0)
+                        {
+                            <span class="tile-july-field-title" id="tile-july-field-bundled-course-title-@courseId">
+                                <img alt="@Settings.Instance.GetMasterInfo3().FastTrackLabel Courses" class="tile-july-field-image" src="@FieldIcons.Sessions" />
+                                @Settings.Instance.GetMasterInfo3().FastTrackLabel Courses:
+                            </span>
+                            <span class="tile-july-field-value">
+                                <a href="javascript:;" id="tile-july-field-bundled-course-@courseId">
+                                    @courseModel.BundledCourses.Count
+                                </a>
+                            </span>
+                        }
+                    </div>
+                </div>
+
+
+
+                @{
+                    var addClick = string.Empty;
+                    if ((courseModel.EffectivePrices.Count > 1 || courseModel.Materials.Count > 0 || courseModel.Course.PrereqiusiteRequired || !courseModel.Course.CheckStudentPreRequsiteMet || courseModel.CourseChoices.Count > 1 || (courseModel.CreditOption==2) || (courseModel.CreditOption==1)) )
+                    {
+
+                        addClick = "window.CourseSearchInstance.ShowCourseDetails(" + courseId.ToString() + ", '', false);";
+                    }
+                    else
+                    {
+                            if ((Gsmu.Api.Authorization.AuthorizationHelper.CurrentUser.IsLoggedIn) && (Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser != null ||(Gsmu.Api.Authorization.AuthorizationHelper.CurrentStudentUser != null && Settings.Instance.GetMasterInfo2().AllowStudentMultiEnroll == 1)))
+                            {
+                                addClick = "window.CourseSearchInstance.ShowCourseDetails(" + courseId.ToString() + ", '', false);";
+                            }
+                         else
+                         { 
+                        addClick = "cart.AddCourse(" + courseId.ToString() + ");";
+                         }
+                    }
+                }
+                
+                @if(courseModel.Course.coursetype == 1 && !inShoppingCart && statistics.EnrollmentStatus != CourseEnrollmentStatus.Expired)
+                {
+                <div class="tile-july-button-container" style="position: relative;">
+                    <button class="tile-july-button tile-july-button-add button-addtocart button-component" onclick="window.CourseSearchInstance.ShowCourseDetails(@courseId)" data-cart-button="@courseId" data-button-type="@LayoutButton.AddToCart.ToString()" data-access-code-required="@Json.Encode(course.AccessCodeRequired)">
+                        See Details
+                    </button>
+                </div>
+                }
+                else if(courseModel.Course.sessionid >0 )
+                {
+                <div class="tile-july-button-container" style="position: relative;">
+                    <button class="tile-july-button tile-july-button-add button-addtocart button-component" onclick="window.CourseSearchInstance.ShowCourseDetails(@courseId)" data-cart-button="@courseId" data-button-type="@LayoutButton.AddToCart.ToString()" data-access-code-required="@Json.Encode(course.AccessCodeRequired)">
+                        See Details
+                    </button>
+                </div>
+                }
+                else if (courseModel.Course.CoursesType == 0)
+                {
+                    <div class="tile-july-button-container" style="position: relative;">
+
+                    @if (courseModel.Course.AccessCodeRequired)
+                    {
+                        <button style="position: absolute; top: 7px; left: 5px;">
+                            <img alt="Access Code Required" src="@Url.Content("~/" + Gsmu.Api.Data.WebConfiguration.PublicCourseAccessCodeImage)" title="Access Code Required."/>
+                        </button>
+                    }
+
+                    @if (enrollment != null)
+                    {
+                        var onclick = string.Empty;
+                        if (enrollment.Roster.DATEADDED.HasValue)
+                        {
+                            onclick = "onclick=\"membership.enrollmentInfo('" + enrollment.Roster.DATEADDED.Value.ToShortDateString() + "')\";";
+                        }
+                        if (enrollment.Roster.WAITING != 0)
+                        {
+                            <button class="tile-july-button tile-july-button-enrolled button-enrolled button-component"  data-button-type="@LayoutButton.OnWaitList.ToString()" data-checkout-button="@courseId" @Html.Raw(onclick)>@layoutConfig.LayoutButtons.OnWaitList</button>
+                        }
+                        else {
+                            <button class="tile-july-button tile-july-button-enrolled button-enrolled button-component"  data-button-type="@LayoutButton.Enrolled.ToString()" data-checkout-button="@courseId" @Html.Raw(onclick)>@Settings.Instance.GetMasterInfo4().PublicButtonLabelEnrolled</button>
+                        }
+
+                    }
+                    else if (!inShoppingCart)
+                    {
+                        if ((statistics.EnrollmentStatus == CourseEnrollmentStatus.Full) || (courseModel.BundleCourseStatus == CourseEnrollmentStatus.Full))
+                        {
+                            <div class="tile-july-button-full button-class-full-tilejuly button-component" data-button-type="@LayoutButton.ClassFull.ToString()">
+                                @layoutConfig.LayoutButtons.ClassFull
+                            </div>                                
+                        }
+                        else if (statistics.EnrollmentStatus == CourseEnrollmentStatus.WaitSpaceAvailable)
+                        {
+                            if (Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 0 || (Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 2 && Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser != null)) {
+                                <button class="tile-july-button tile-july-button-add button-waitspace button-component" onclick="@addClick" data-cart-button="@courseId" data-button-type="@LayoutButton.WaitSpaceAvailable.ToString()" data-access-code-required="@Json.Encode(course.AccessCodeRequired)">
+                                    @layoutConfig.LayoutButtons.WaitSpaceAvailable
+                                </button>
+                            }
+                        }
+                        else if (statistics.EnrollmentStatus == CourseEnrollmentStatus.Expired)
+                        {
+
+                            <div style="display: inline-block; width:100%" class="button-class-full-tilejuly button-component" data-button-type="@LayoutButton.ClosedEnrollment.ToString()">
+                                @layoutConfig.LayoutButtons.ClosedEnrollment
+                            </div>
+
+                        }
+                        else
+                        {
+                            if (Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 0 || (Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 2 && (Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser != null || Gsmu.Api.Authorization.AuthorizationHelper.CurrentAdminUser != null))){
+                            <button class="tile-july-button tile-july-button-add button-addtocart button-component" onclick="@addClick" data-cart-button="@courseId" data-button-type="@LayoutButton.AddToCart.ToString()" data-access-code-required="@Json.Encode(course.AccessCodeRequired)">
+                                @Settings.Instance.GetMasterInfo4().PublicButtonLabelAddToCart 
+
+
+                            </button>
+                            }
+                            else
+                            {
+                                <div><!--turn off all  butons @Settings.Instance.GetMasterInfo().PublicSignupAbilityOff --></div>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var count = "";
+                        if ((Gsmu.Api.Authorization.AuthorizationHelper.CurrentUser.IsLoggedIn) && (Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser != null))
+                        {
+                            var student_count = (from an in CourseShoppingCart.Instance.MultipleStudentCourses where an.CourseId == courseId select an.StudentId).Count();
+                            count = "(" + student_count + ")";
+                        }
+
+                        <div class="tile-july-button tile-july-button-checkout button-component button-checkout" onclick="cart.checkout();" data-checkout-button="@courseId" data-button-type="@LayoutButton.Checkout.ToString()">@Settings.Instance.GetMasterInfo4().PublicButtonLabelCheckout @count</div>
+                   
+                     }
+
+                    </div>
+                }
+                else if(courseModel.Course.CoursesType == 1 && (!string.IsNullOrWhiteSpace(courseModel.Course.ContactName) || !string.IsNullOrWhiteSpace(courseModel.Course.ContactPhone)))
+                {
+                    <div class="tile-july-coursetype-text" style="position: relative; padding-top: 10px;">
+                        <span style="font-weight: bold;">Register by contacting:</span><br />
+                        @courseModel.Course.ContactName<br />
+                        @courseModel.Course.ContactPhone
+                    </div>
+                }
+                else if(courseModel.Course.CoursesType == 2 && !string.IsNullOrWhiteSpace(courseModel.Course.CourseTypeAltVerbiage))
+                {
+                    <div class="tile-july-coursetype-text" style="position: relative; padding-top: 10px;">
+                        @Html.Raw(course.CourseTypeAltVerbiage)
+                    </div>
+                }
+            </div>
+        </div>   
+
+
+    }
+
+    <div class="tile-july-break">
+    </div>
+    
+    
+    Html.RenderPartial("_Pager", Model as GridPagerModel);
+
+}
+

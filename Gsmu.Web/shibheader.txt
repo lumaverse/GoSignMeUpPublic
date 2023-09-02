@@ -1,0 +1,73 @@
+Update customcetificate Set certtitle='HCT Certificate',certheight=612,certwidth=792,marginTop=18,marginBottom=18,marginLeft=18,marginRight=18,boundX=756,boundY=576,locheader1='0,75,756,54 ',useHeader1=0,fontsizeHeader1=28,locheader2='0,105,756,54 ',useHeader2=0,fontsizeHeader2=22,locinfo1='DEPRECATED FIELD',useinfo1=0,fontsizeInfo1=0,textInfo1='DEPRECATED FIELD',locinfo2='DEPRECATED FIELD',useinfo2=0,fontsizeInfo2=0,textInfo2='DEPRECATED FIELD',locname1='DEPRECATED FIELD',fontsizestudname=0,alignsname=0,locname2='0,260,756,54 ',useExtraName=0,locstudfield1='-145,230,576,54 ',usestudfield1=0,fontsizestudfield1=14,selectedstudfield1='Grade',locstudfield2='0,230,576,54 ',usestudfield2=0,fontsizestudfield2=12,selectedstudfield2='StudRegField2',locstudfield3='120,230,576,54 ',usestudfield3=0,fontsizestudfield3=12,selectedstudfield3='StudRegField4',loccourseinfo2='DEPRECATED FIELD',useCInfo2=0,fontsizeCInfo2=0,useCourseNum='0',useLocation='0',loccoursenumber='150,363,576,54',usecoursenumber=0,fontsizecoursenumber=12,loccourseloc='66.00,511.00,183.00,17.00,1',usecourseloc=0,fontsizecourseloc=10,loccoursedesc='0,150,576,54',usecoursedesc=0,fontsizecoursedesc=12,loccredits='DEPRECATED FIELD', usecredits=0,fontsizecredits=0,loccourseicon='0,405,576,54',usecourseicon=0,fontsizecourseicon=12,loccourseinfo1='DEPRECATED FIELD',useCInfo1=0,fontsizeCInfo1=0,textCourseInfo1='DEPRECATED FIELD',loccoursedate1='DEPRECATED FIELD',usecoursedate='0',fontsizecoursedate='0',locInstructor='461.00,496.00,266.00,14.00 ',useInstructor=1,fontsizeInstructor=12,locsig1='0,290,756,0 ',usesig1=0,locsig2='280,490,756,54 ',useSig2=0,locfooter='0,570,756,0 ',useFooter=0,loccourselicense='0,0,576,54 ',useLicense=0,fontsizelicense=12,loclicnumber ='0,0,576,54 ',uselicnumber=0,fontsizelicnumber=12,useDatePrint='1',locDatePrint='63.00,496.00,183.00,17.00',fontsizeDateprint='12',useStudentAddress='0',locStudentAddress='0,280,576,54',fontsizeStudentAddress='12',useCourseDuration='1',showcourseenddate='0',showcoursetime='0',surveyusecompdate=0,defaultcert=0,signatureDisplay=0,usecustomcredit='0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ',loccustomcredit1='0,0,200,26,0,0,200,26,0,0,200,26,0,0,200,26,0,0,200,26,0,0,200,26,0,0,200,26,0,0,200,26,0,0,200,26,0,0,200,26',usestudentid='0 ',locstudentid='0,0,200,26 ',fontsizestudid='0',startdatesettings='{ "usefield": "0", "text": "", "fontsize": "12", "alignment": "", "labelstyle": "", "x": "80.00", "y": "509.00", "w": "148.00", "h": "25.00", "useDataOption": "Course" }',enddatesettings='{ "usefield": "0", "text": "", "fontsize": "10", "alignment": "", "labelstyle": "", "x": "322.00", "y": "421.00", "w": "183.00", "h": "16.00", "useDataOption": "Course" }',daterangesettings='{ "usefield": "0", "text": "", "fontsize": "12", "alignment": "", "labelstyle": "", "x": "0", "y": "300", "w": "576", "h": "54", "useDataOption": "Course" }',datelistsettings='{ "usefield": "0", "text": "", "fontsize": "12", "alignment": "", "labelstyle": "", "x": "0", "y": "400", "w": "576", "h": "54", "useDataOption": "Course" }',rosterdateaddedsettings='{ "usefield": "0", "text": "", "fontsize": "12", "alignment": "", "labelstyle": "", "x": "0", "y": "500", "w": "576", "h": "54", "useDataOption": "Course" }',credithourssettings='{ "usefield": "0", "text": "", "fontsize": "12", "alignment": "", "labelstyle": "0", "x": "320.00", "y": "402.00", "w": "26.00", "h": "26.00", "useDataOption": "Course" }',inservicehourssettings='{ "usefield": "0", "text": "", "fontsize": "12", "alignment": "", "labelstyle": "0", "x": "0", "y": "250", "w": "576", "h": "54", "useDataOption": "Course" }',customcredittypesettings='{ "usefield": "0", "text": "", "fontsize": "12", "alignment": "", "labelstyle": "0", "x": "0", "y": "350", "w": "576", "h": "54", "useDataOption": "Course" }',ceucreditsettings='{ "usefield": "0", "text": "", "fontsize": "12", "alignment": "", "labelstyle": "0", "x": "0", "y": "450", "w": "576", "h": "54", "useDataOption": "Course" }',graduatecreditsettings='{ "usefield": "0", "text": "", "fontsize": "12", "alignment": "", "labelstyle": "0", "x": "0", "y": "500", "w": "576", "h": "54", "useDataOption": "Course" }',customtextsettings='{ "usefield": "0", "text": "", "fontsize": "12", "alignment": "", "labelstyle": "", "x": "0", "y": "100", "w": "576", "h": "54", "useDataOption": "Course" }',studentnameSettings='{ "usefield": "1", "text": "", "fontsize": "20", "alignment": "0", "labelstyle": "", "x": "20.00", "y": "276.00", "w": "712.00", "h": "28.00", "useDataOption": "Course" }',coursenameSettings='{ "usefield": "1", "text": "", "fontsize": "16", "alignment": "0", "labelstyle": "", "x": "23.00", "y": "354.00", "w": "711.00", "h": "22.00", "useDataOption": "Course" }',courseaddtextSettings='{ "usefield": "0", "text": "Course Additional Text", "fontsize": "12", "alignment": "0", "labelstyle": "", "x": "0", "y": "400", "w": "576", "h": "54", "useDataOption": "Course" }',optionaltext1Settings='{ "usefield": "0", "text": "Optional Text 1", "fontsize": "12", "alignment": "0", "labelstyle": "", "x": "0", "y": "100", "w": "576", "h": "54", "useDataOption": "Course" }',optionaltext2Settings='{ "usefield": "0", "text": "Optional Text 2", "fontsize": "12", "alignment": "0", "labelstyle": "", "x": "0", "y": "100", "w": "576", "h": "54", "useDataOption": "Course" }',customcredtisettings='{ "usefield": "0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ", "text": "", "fontsize": "12,12,12,12,12,12,12,12,12,12", "alignment": "", "labelstyle": "0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ", "xywh": "0,0,200,26 ,0,0,200,26 ,0,0,200,26 ,0,0,200,26 ,0,0,200,26 ,0,0,200,26 ,0,0,200,26 ,0,0,200,26 ,0,0,200,26 ,0,0,200,26 ", "useDataOption": "Course" }',CustomCourseField1Settings='{ "usefield": "0", "text": "66,511,183,16", "fontsize": "10", "alignment": "", "labelstyle": "", "x": "66.00", "y": "528.99", "w": "183.00", "h": "16.00", "useDataOption": "Course" }',CustomCourseField2Settings='{ "usefield": "0", "text": "66,372,220,98", "fontsize": "16", "alignment": "", "labelstyle": "", "x": "66.00", "y": "371.00", "w": "220.00", "h": "98.00", "useDataOption": "Course" }',CustomCourseField3Settings='{ "usefield": "0", "text": "66,372,220,98", "fontsize": "16", "alignment": "", "labelstyle": "", "x": "66.00", "y": "371.00", "w": "220.00", "h": "98.00", "useDataOption": "Course" }',CustomCourseField4Settings='{ "usefield": "0", "text": "66,372,220,98", "fontsize": "16", "alignment": "", "labelstyle": "", "x": "66.00", "y": "371.00", "w": "220.00", "h": "98.00", "useDataOption": "Course" }',CustomCourseField5Settings='{ "usefield": "0", "text": "66,372,220,98", "fontsize": "16", "alignment": "", "labelstyle": "", "x": "66.00", "y": "371.00", "w": "220.00", "h": "98.00", "useDataOption": "Course" }',miscglobalsettings='{ "hidezerocredits": "0" }',StudCustomField1Settings='{ "usefield": "1", "text": "", "fontsize": "12.00", "alignment": "0", "labelstyle": "0", "x": "0.00", "y": "0.00", "w": "10.00", "h": "20.00", "useDataOption": "Course" }',StudCustomField2Settings='{ "usefield": "1", "text": "", "fontsize": "12.00", "alignment": "0", "labelstyle": "0", "x": "0.00", "y": "0.00", "w": "10.00", "h": "20.00", "useDataOption": "Course" }',StudCustomField3Settings='{ "usefield": "1", "text": "", "fontsize": "12.00", "alignment": "0", "labelstyle": "0", "x": "0.00", "y": "0.00", "w": "10.00", "h": "20.00", "useDataOption": "Course" }' where customcertid=4Session Validation values : 
+Start log
+WEUFHSAJDFJQW=azfwr4cq21ucbdloij2o51cuParam<br/>
+ASP.NET_SessionId=Param<br/>
+ALL_HTTP=HTTP_CONNECTION:keep-alive
+HTTP_ACCEPT:text/html,application/xhtml+xml,application/signed-exchange;v=b3,application/xml;q=0.9,*/*;q=0.8
+HTTP_ACCEPT_ENCODING:gzip,deflate,br
+HTTP_COOKIE:WEUFHSAJDFJQW=azfwr4cq21ucbdloij2o51cu; ASP.NET_SessionId=
+HTTP_FROM:googlebot(at)googlebot.com
+HTTP_HOST:dev252.gosignmeup.com
+HTTP_USER_AGENT:Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.96 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)
+HTTP_AMP_CACHE_TRANSFORM:google;v="1..2"
+Param<br/>
+ALL_RAW=Connection: keep-alive
+Accept: text/html,application/xhtml+xml,application/signed-exchange;v=b3,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding: gzip,deflate,br
+Cookie: WEUFHSAJDFJQW=azfwr4cq21ucbdloij2o51cu; ASP.NET_SessionId=
+From: googlebot(at)googlebot.com
+Host: dev252.gosignmeup.com
+User-Agent: Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.96 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)
+AMP-Cache-Transform: google;v="1..2"
+Param<br/>
+APPL_MD_PATH=/LM/W3SVC/13/ROOTParam<br/>
+APPL_PHYSICAL_PATH=C:\websites\lang2\Gsmu.Web\Param<br/>
+AUTH_TYPE=Param<br/>
+AUTH_USER=Param<br/>
+AUTH_PASSWORD=Param<br/>
+LOGON_USER=Param<br/>
+REMOTE_USER=Param<br/>
+CERT_COOKIE=Param<br/>
+CERT_FLAGS=Param<br/>
+CERT_ISSUER=Param<br/>
+CERT_KEYSIZE=256Param<br/>
+CERT_SECRETKEYSIZE=2048Param<br/>
+CERT_SERIALNUMBER=Param<br/>
+CERT_SERVER_ISSUER=C=US, S=Arizona, L=Scottsdale, O="GoDaddy.com, Inc.", OU=http://certs.godaddy.com/repository/, CN=Go Daddy Secure Certificate Authority - G2Param<br/>
+CERT_SERVER_SUBJECT=OU=Domain Control Validated, CN=*.gosignmeup.comParam<br/>
+CERT_SUBJECT=Param<br/>
+CONTENT_LENGTH=0Param<br/>
+CONTENT_TYPE=Param<br/>
+GATEWAY_INTERFACE=CGI/1.1Param<br/>
+HTTPS=onParam<br/>
+HTTPS_KEYSIZE=256Param<br/>
+HTTPS_SECRETKEYSIZE=2048Param<br/>
+HTTPS_SERVER_ISSUER=C=US, S=Arizona, L=Scottsdale, O="GoDaddy.com, Inc.", OU=http://certs.godaddy.com/repository/, CN=Go Daddy Secure Certificate Authority - G2Param<br/>
+HTTPS_SERVER_SUBJECT=OU=Domain Control Validated, CN=*.gosignmeup.comParam<br/>
+INSTANCE_ID=13Param<br/>
+INSTANCE_META_PATH=/LM/W3SVC/13Param<br/>
+LOCAL_ADDR=172.16.1.250Param<br/>
+PATH_INFO=/AuthMe/ShibbolethAuthenticationParam<br/>
+PATH_TRANSLATED=C:\websites\lang2\Gsmu.Web\AuthMe\ShibbolethAuthenticationParam<br/>
+QUERY_STRING=Param<br/>
+REMOTE_ADDR=66.249.73.67Param<br/>
+REMOTE_HOST=66.249.73.67Param<br/>
+REMOTE_PORT=50897Param<br/>
+REQUEST_METHOD=GETParam<br/>
+SCRIPT_NAME=/AuthMe/ShibbolethAuthenticationParam<br/>
+SERVER_NAME=dev252.gosignmeup.comParam<br/>
+SERVER_PORT=443Param<br/>
+SERVER_PORT_SECURE=1Param<br/>
+SERVER_PROTOCOL=HTTP/1.1Param<br/>
+SERVER_SOFTWARE=Microsoft-IIS/7.5Param<br/>
+URL=/AuthMe/ShibbolethAuthenticationParam<br/>
+HTTP_CONNECTION=keep-aliveParam<br/>
+HTTP_ACCEPT=text/html,application/xhtml+xml,application/signed-exchange;v=b3,application/xml;q=0.9,*/*;q=0.8Param<br/>
+HTTP_ACCEPT_ENCODING=gzip,deflate,brParam<br/>
+HTTP_COOKIE=WEUFHSAJDFJQW=azfwr4cq21ucbdloij2o51cu; ASP.NET_SessionId=Param<br/>
+HTTP_FROM=googlebot(at)googlebot.comParam<br/>
+HTTP_HOST=dev252.gosignmeup.comParam<br/>
+HTTP_USER_AGENT=Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.96 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)Param<br/>
+HTTP_AMP_CACHE_TRANSFORM=google;v="1..2"Param<br/>
+end log
+1/14/2020 12:00:00 AMNot Valid Session ID

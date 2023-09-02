@@ -1,0 +1,54 @@
+﻿<div id="widget-course-options">
+    <div class="panel panel-default">
+        <div class="panel-heading gsmu-sub-panel-heading">
+            <div class="panel-title pull-left">
+                Course Options
+            </div>
+            <div class="pull-right">
+                <div id="course-social-btns">
+                    <div>
+                        <button type="button" class="btn btn-success btn-xs edit" onclick="CourseOptionsEditor.save()">Save Changes &nbsp; <span class="glyphicon glyphicon-ok"></span></button>
+                        <button type="button" class="btn btn-warning btn-xs attach" onclick="CourseOptions.navigateToEditCredits()"><span class="fa fa-cog"></span></button>
+                        <button type="button" class="btn btn-warning btn-xs attach" onclick="CourseOptions.navigateToManageSystemCredits()"><span class="fa fa-cogs"></span></button>
+                    </div>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <div class="panel-body gsmu-sub-panel-body medium-panel panel-collapse collapse in scroll-y">
+            <ul class="nav nav-tabs">
+                <li role="presentation" class="active"><a href="#course-option-credits" data-toggle="tab">Credits</a></li>
+                <li role="presentation"><a href="#course-option-material" data-toggle="tab">Material</a></li>
+                <li role="presentation"><a href="#course-option-prereq" data-toggle="tab">Pre-reqs</a></li>
+                <li role="presentation"><a href="#course-option-choices" data-toggle="tab">Course Choices</a></li>
+                <li role="presentation"><a href="#course-option-identifiers" data-toggle="tab">Identifiers</a></li>
+                <li role="presentation"><a href="#course-option-access-code" data-toggle="tab">Access Code</a></li>
+                <li role="presentation"><a href="#course-option-completion-certificate" data-toggle="tab">Completion Certificate</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="course-option-credits" class="tab-pane fade in active">
+                    @RenderPage("../Widgets/CourseCredits.cshtml")
+                </div>
+                <div id="course-option-material" class="tab-pane fade">
+                    @RenderPage("../Widgets/CourseMaterials.cshtml")
+                </div>
+                <div id="course-option-prereq" class="tab-pane fade">
+                    @RenderPage("../Widgets/CoursePreRequisite.cshtml")
+                </div>
+                <div id="course-option-choices" class="tab-pane fade">
+                    @RenderPage("../Widgets/CourseChoices.cshtml")
+                </div>
+                <div id="course-option-identifiers" class="tab-pane fade">
+                    @RenderPage("../Widgets/CourseIdentifiers.cshtml")
+                </div>
+                <div id="course-option-access-code" class="tab-pane fade">
+                    @RenderPage("../Widgets/CourseAccessCode.cshtml")
+                </div>
+                <div id="course-option-completion-certificate" class="tab-pane fade">
+                    @RenderPage("../Widgets/CourseCompletionCertificate.cshtml")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/Areas/Adm/Scripts/Widgets/CourseOptions.js"></script>

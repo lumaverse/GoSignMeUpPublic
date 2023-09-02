@@ -1,0 +1,355 @@
+﻿@model Gsmu.Api.Data.School.Course.CourseModel
+@using Gsmu.Api.Commerce.ShoppingCart
+@using Gsmu.Api.Data.ViewModels.Layout
+@using Gsmu.Api.Data.School.Terminology;
+
+@using Gsmu.Api.Authorization
+@using Gsmu.Api.Language
+@using Gsmu.Api.Data
+@using Gsmu.Api.Data.School
+@using Gsmu.Api.Data.School.Entities
+
+@{
+    var materials = Model.Materials;
+    var materialWord = @Gsmu.Api.Data.GrammarHelper.GetConditionallyPluralizedWord(materials.Count, TerminologyHelper.Instance.GetTermCapital(TermsEnum.Material));
+    var guid = Guid.NewGuid().ToString("N");
+    var modifier = ViewData["Modifier"] != null ? ViewData["Modifier"].ToString() : string.Empty;
+    var readOnly = ViewData["ReadOnly"] != null ? (bool)ViewData["ReadOnly"] : false;
+    var fade = ViewData["Fade"] != null && (bool)ViewData["Fade"] == true ? true : false;
+    var render = ViewData["FieldConfig"] == null ? false : (ViewData["FieldConfig"] as GridSearchColumns).Material;
+    var containerId = "course-materials-container-" + Model.Course.COURSEID + modifier;
+    render = !string.IsNullOrEmpty(modifier) || render;
+    var autoselectmaterial = Settings.Instance.GetMasterInfo3().materialdefault;
+    var allow_quantity_purchase = Settings.Instance.GetMasterInfo4().allow_quantity_purchase;
+    var hide_payment_info = Settings.Instance.GetMasterInfo2().HidePaymentInfo;
+}
+
+<script type="text/javascript">  
+    var totalIsHidden = "block";
+    Ext.onReady(function () {
+        var materials = @(Html.Raw(Json.Encode(materials)));
+        var containerId = @(Html.Raw(Json.Encode(containerId)));
+        var materialsRequired = @(Json.Encode(Model.Course.MaterialsRequiredAsBoolean && materials.Count>0));
+        var materialRequiredVal = @(Json.Encode(Model.Course.MaterialsRequired));
+        var render = @Json.Encode(render);
+        var readOnly = @Html.Raw(Json.Encode(readOnly));
+        var courseId = @(Json.Encode(Model.Course.COURSEID));
+        var inCart = @(Json.Encode(CourseShoppingCart.Instance.ContainsCourse(Model.Course.COURSEID)));
+        var modifier = @(Html.Raw(Json.Encode(modifier)));
+        var courseIdWithModifier =  courseId + modifier;
+        cart.setCourseMaterialData(courseIdWithModifier, materialsRequired, materials);
+        var autoselectmaterial =@(Html.Raw(Json.Encode(autoselectmaterial)));
+        var allow_quantity_purchase = @(Html.Raw(Json.Encode(allow_quantity_purchase)));
+        var materialWord = @(Html.Raw(Json.Encode(materialWord)));
+        var hidepaymentinfo = @(Html.Raw(Json.Encode(hide_payment_info)));
+
+        if (!render) {
+            return;
+            
+        }
+        
+        if (materials.length == 0) {
+            return;
+        }
+        var selectedMaterials = {};
+
+        @if (CourseShoppingCart.Instance.ContainsCourse(Model.CourseId))
+        {
+            <text>
+            var selectedMaterials2 = @(Html.Raw(Json.Encode(CourseShoppingCart.Instance.GetCourseItem(Model.Course.COURSEID).Materials)));
+            if (selectedMaterials2 != null && Ext.isArray(selectedMaterials2)) {
+                for(var index = 0; index < selectedMaterials2.length; index++) {
+                    var item = Ext.create('Models.Material', selectedMaterials2[index]);
+                    selectedMaterials[item.get('productID')] = item;
+                }
+            }
+            </text>
+        }
+            
+        var buttonText;
+        var menuType;
+        if (readOnly) {
+            buttonText = materialWord;
+            menuType = 'menuitem';
+        } else if (materialsRequired) {
+            buttonText = materialWord + ' selection is required';
+            //menuType = 'menucheckitem';
+            menuType = 'checkboxfield';
+        } else {
+            if(materialRequiredVal == 2)
+            {
+                menuType = 'radiofield';
+                buttonText = materialWord + ' selection is required';
+            }else
+            {
+                menuType = 'checkboxfield';
+                buttonText = materialWord + ' selection is optional';
+            }
+            
+            //menuType = 'menucheckitem';
+            
+        }
+
+        var setTotal = function() {
+            //debugger;
+            var total = 0;
+            var count = 0;
+            for(var id in selectedMaterials) {
+                var item = selectedMaterials[id];
+                total += item.get('ActualPriceTotal'); 
+                count++;
+            }
+
+            var newButtonText;
+            if (count == 0) {
+                newButtonText = buttonText;
+                if (materialsRequired) {
+                    $("#CourseMaterialsContainer").removeClass("course-widgetbox").addClass('course-widgetbox_error');
+                }
+
+            } else {
+                $('#total_material_cart_span').text(Ext.util.Format.currency(total));
+                //newButtonText = 'Material total: <span id="lblMaterialTotal">' + Ext.util.Format.currency(total) + '</span>';
+                if (materialsRequired) {
+                    $("#CourseMaterialsContainer").removeClass("course-widgetbox_error").addClass('course-widgetbox');
+                }
+            }
+            var width = metrics.getWidth(newButtonText);
+            button.setWidth(width + 32);
+            button.setText(newButtonText);
+        }
+        
+        if(modifier=="CourseDetails")
+        {
+            var priceWD = '10%';
+            var matdescWD = '90%';
+        }else{
+            var priceWD = '60px';
+            var matdescWD = '100px';
+        }
+
+        var materialItems = [];
+        var menuMaterialItems = [];
+        for(var index = 0; index < materials.length; index++) {
+            var materialItem = Ext.create('Models.Material', materials[index]);
+            if(modifier=="CourseDetails"){
+                if(autoselectmaterial =="checked"){
+                    if(menuType =='radiofield' && index>0){
+                    }
+                    else{
+                        selectedMaterials[materialItem.get('productID')] = materialItem;
+                        cart.setCourseSelectedMaterials(courseIdWithModifier, selectedMaterials);
+                    }
+                }
+            }
+            var material_total = 0;
+            var ckbxid = 'ckbxid'+ materialItem.get('productID')
+            var prvCmp = Ext.getCmp(ckbxid);
+            if (prvCmp != null) {prvCmp.destroy();}
+            var priceId = 'priceLblField'+ materialItem.get('productID');
+            var actual_price = Ext.util.Format.currency(materialItem.get('ActualPriceTotal'));
+            var actualPriceId = 'priceHiddenField'+ materialItem.get('productID');
+            var priceIsHidden = (hidepaymentinfo != 0) || (materialItem.get('hidematerialprice') == -1 && materialItem.get('hidematerialprice') !=null && materialItem.get('hidematerialprice') !=undefined) ? 'none' : 'block';
+            if ((hidepaymentinfo != 0) || materialItem.get('hidematerialprice') == -1 && materialItem.get('hidematerialprice') !=null && materialItem.get('hidematerialprice') !=undefined && totalIsHidden == 'block')  {
+                totalIsHidden  =  'none' ;
+            }
+            var displayPrice = '<div style="text-align: right;display:'+priceIsHidden+'" id="'+priceId+'" name="priceName">' + Ext.util.Format.currency(materialItem.get('ActualPriceTotal')) + '</div>';
+            var displayText = '<label for="ckbxid'+ materialItem.get('productID') +'-inputEl"><div style="font-weight: bold; white-space: normal !important;">' + materialItem.get('product_name') + '</div></label>';
+            var qtyId = 'qtyNoField'+ materialItem.get('productID');
+            var qty = materialItem.get('quantity');
+            var materialMenuItem = {
+                //id: ckbxid,
+                materialItem: materialItem,
+                //disabled: inCart || autoselectmaterial=="checked",
+                plain: true,
+                style: window.LAYOUT.Options.plainMenuItemStyle,
+                checked: selectedMaterials[materialItem.get('productID')] != null,
+                xtype: menuType,
+                name: 'selectMaterial',
+                handler: function(menu, e) {
+                    var item = menu.initialConfig.materialItem;               
+                    var product_id = item.get('productID');
+                    var parent_container = $('input[name="qtyNoField'+ product_id +'"]').parent().parent().parent().parent();
+                    var qty_comp = Ext.ComponentQuery.query('[name=qtyNoField'+product_id+']');
+                    if (menu.checked) {
+                        qty_comp[qty_comp.length - 1].enable().setValue(1); //EXT JS Having issues,it creates mutliple instances of the dynamic objects so there's a need to count the created objects and select the latest one
+                        selectedMaterials[item.get('productID')] = item;
+                        $('#priceLblField'+product_id).attr('data-selected',true);
+                    } else {
+                        qty_comp[qty_comp.length - 1].disable().setValue(0);
+                        delete selectedMaterials[item.get('productID')];
+                        $('#priceLblField'+product_id).attr('data-selected',false);
+                    }
+                    cart.setCourseSelectedMaterials(courseIdWithModifier, selectedMaterials);
+                    setTotal();
+                }
+            };
+
+
+            var materialColItem =  {
+                xtype: 'panel',
+                layout: {
+                    type: 'hbox',
+                    align: 'stretch'
+                },
+                style:
+                    {
+                        backgroundImage: 'none',
+                        border: 'none',
+                        cursor: 'default',
+                        backgroundColor: 'transparent'
+                    },
+                items: [{
+                    width: 20,
+                    items: materialMenuItem
+                    //html: 'Foo',
+                    //style: 'border: 1px solid red;'
+                },{
+                    flex: 3,
+                    html: displayText,
+                    //style: 'border: 1px solid blue; padding-top: 5px; '
+                    style: 'padding-top: 5px; padding-left: 2px;',
+                },
+                {
+                    html : '<input type="hidden" value='+actual_price+' id='+ actualPriceId +' />'
+                },
+                {
+                    xtype: 'numberfield',
+                    name:  qtyId,
+                    cls : 'qtyNoField',
+                    maxValue: 99,
+                    disabled : materialItem.get('quantity') == 0? true : false,
+                    value : 1,
+                    minValue: 1,
+                    height:10,
+                    maxHeight : 10,
+                    style : {
+                        width: '50px',
+                    },
+                    listeners : 
+                    {
+                        afterRender : function(object)
+                        {
+                            var id = object.name.replace('qtyNoField', '');
+                            if((allow_quantity_purchase==0 || allow_quantity_purchase=="0"))
+                            {
+                                object.hide();
+                            }
+                            if(qty == 0)
+                            {
+                                object.disable();
+                            }
+                            $($('input[name="qtyNoField'+id+'"]').parent().parent().parent()).hover(function(){
+                                $('.x-form-trigger-spinner-default').show()
+                            },function(){
+                                $('.x-form-trigger-spinner-default').hide()
+                            });
+                        },
+                        change : function(object, new_val, old_val)
+                        {
+                            //delay(function () {
+                                total = 0;
+                                var id = object.name.replace('qtyNoField', '');
+                                var price_lbl = $('#priceLblField' + id);
+                                var price_hidden_lbl = $('#priceHiddenField' + id);
+                                var price = $(price_hidden_lbl).val().replace('$', '');
+                                var total = price * new_val;
+                                $(price_lbl).text('$'+total.toFixed(2));
+                                var prices = $('div[name="priceName"]');
+                                var final_total = 0;
+                                for(var x = 0; x<prices.length; x++)
+                                {
+                                    var item_selected = $($('div[name="priceName"]')[x]).attr('data-selected');
+                                    var price_data = $($('div[name="priceName"]')[x]).text().replace('$', '');
+                                    if(item_selected == 'true')
+                                    {
+                                        final_total += parseFloat(price_data);
+                                    }
+                                }
+                                $('#lblMaterialTotal').text('$'+final_total.toFixed(2));
+                                $('#total_material_cart_span').text('$'+final_total.toFixed(2));
+                            //}, 100);
+                        }
+                    }
+                },
+                {
+                    flex: 1,
+                    html: displayPrice,
+                    style: 'padding-top: 5px;'
+                },{
+                    width: 10,
+                    html: '',
+                }]
+            };
+            var menuMatItems = {
+                text: '<div style="width:200px!important"><div style="float: left; text-align: right;">' + displayText + '</div><div style="font-weight: bold; white-space: normal !important;">' + displayPrice + '</div></div>',
+                xtype: 'menuitem',
+                plain: true,
+                style: window.LAYOUT.Options.plainMenuItemStyle
+            };
+
+            materialItems.push(materialColItem);
+            menuMaterialItems.push(menuMatItems);
+        }   
+
+        var delay = (function () {
+            var timer = 0;
+            return function (callback, ms) {
+                clearTimeout(timer);
+                timer = setTimeout(callback, ms);
+            };
+        })();
+        var buttonMenu = null;
+        if (modifier == '') {
+            buttonMenu = new Ext.menu.Menu({
+                items: menuMaterialItems,
+                showSeparator: false,
+                plain: true
+            });
+        }
+
+        var style = {};
+        if (modifier != '') {
+            style = {
+                backgroundImage: 'none;',
+                border: 'none;',
+                cursor: 'default',
+                backgroundColor: 'transparent;'
+            };
+        }
+        var button = Ext.create('Ext.Button', {
+            renderTo: containerId,
+            style: style,
+            text: buttonText,
+            textAlign: 'left',
+            menuAlign: 'tr-br?',
+            handler: function() {
+                $('.qtyNoField').hide();
+            },
+           // icon: config.getUrl('Images/Icons/glyph2/Icons16x16/Book-6.png'),
+            menu: buttonMenu
+        });
+
+        if (modifier != '') 
+        {
+            var total_material_cart =  
+                            {   flex: 3,
+                            html: '<div style="padding-top:2px!important; display:'+ totalIsHidden +'">' + materialWord + ' Total : <span id="total_material_cart_span">$ 0.00</span></div>',
+                                style: 'margin-top: 3px;margin-right : 2px;padding-right : 2px;border-top : 1px solid black; text-align : right'  
+                            }; 
+            materialItems.push(total_material_cart);
+            Ext.create('Ext.form.Panel', {
+                renderTo: containerId, 
+                items: materialItems
+            });
+        }
+
+        var metrics = new Ext.util.TextMetrics(button.getEl());
+        if ((inCart) || (autoselectmaterial=="checked")) {
+            setTotal();
+        }
+    });
+    $('.x-form-trigger-spinner-default').hide();
+</script>
+
+<div id="@containerId" class="extjs-hide-menu-theme @(fade ? "item-fade" : "" )"></div>

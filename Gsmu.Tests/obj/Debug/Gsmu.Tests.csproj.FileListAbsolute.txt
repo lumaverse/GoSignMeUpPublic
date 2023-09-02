@@ -1,0 +1,3 @@
+C:\websites\lang2\Gsmu.Tests\obj\Debug\Gsmu.Tests.csproj.App.config
+C:\websites\lang2\Gsmu.Tests\obj\Debug\Gsmu.Tests.csprojAssemblyReference.cache
+C:\websites\lang2\Gsmu.Tests\obj\Debug\Gsmu.Tests.csproj.CoreCompileInputs.cache

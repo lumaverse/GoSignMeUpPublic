@@ -1,0 +1,9 @@
+﻿Guys,
+
+The components directory is for stuff that is being re-used multiple times.
+If you use a component that you are overwriting to be specific for a purpose,
+please place under the /areas/adm/scripts/purpose or /areas/public/scripts/purpose
+directory even if it was a component you overwrote.
+
+If you have question please contact me patrik@gosignmeup.com or lang@gosignmeup.com
+but in technical stuff it would be cool if you allowed me to help you about this kind of stuff.

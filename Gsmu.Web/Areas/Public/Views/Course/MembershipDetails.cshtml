@@ -1,0 +1,96 @@
+﻿@using Gsmu.Api.Authorization
+@using Gsmu.Api.Language
+@using Gsmu.Api.Data
+@using Gsmu.Api.Data.School
+@using Gsmu.Api.Data.School.Entities
+@using Gsmu.Api.Data.School.Student
+@using Gsmu.Api.Data.ViewModels.Grid
+@using Gsmu.Api.Data.School.Course
+@using Gsmu.Api.Data.School.Terminology
+@using Gsmu.Api.Commerce.ShoppingCart;
+
+@{
+    var modifier = "CourseDetails";
+    var MembershipHeader = ViewBag.memheader;
+    var MembershipFooter = ViewBag.memfooter;
+    var Memberships = ViewBag.memberships;
+    var membershiplabel = Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().membertypememberlabel;
+    var nonmemberlabel = "";
+
+    int DISTEMPLOYEE = 0;
+    if (AuthorizationHelper.CurrentStudentUser!=null)
+    {
+        var student = new Student();
+        student = AuthorizationHelper.CurrentUser as Student;
+        DISTEMPLOYEE = student.DISTEMPLOYEE;
+    }
+    //MembershipHeader
+}
+
+
+<div style="float: left; width: 940px; height: 100%; padding: 10px; margin: 0px;">
+
+    <div style="float:right">
+        <img style="cursor: pointer" onclick="CourseSearch.prototype.CloseMembershipDetailsWindow();location.reload();"
+            src="~/Areas/Public/Images/Layout/btn_close_off.jpg" width="20" height="20" />
+    </div>
+
+    <div style="float: left; min-height: 20px; padding: 0px; width:100%; /*margin-top:20px;*/ margin-bottom:20px;">
+         @Html.Raw(MembershipHeader)
+    </div>
+
+    <div style="width: 940px; float: left; padding: 0px 10px 0px 0px;">
+ 
+        @{foreach (var Membership in Memberships)
+            {
+            var inShoppingCart = CourseShoppingCart.Instance.ContainsCourse(Membership.COURSEID);
+            var enrollment = Gsmu.Api.Data.School.Entities.Student.GetCurrentStudentEnrollmentInCourseForMembership(Membership.COURSEID);
+
+        <div id="CourseNameDescContainer" class="course-widgetbox" style="width: 920px; float: left; min-height: 50px; padding: 10px;">
+            <div style="float:left; width:700px; /*border: 1px solid red;*/">
+                <div style="float: left; min-height: 30px; width:100%; font-weight: bold; padding: 0px; font-size: 20px; border-bottom: 1px solid #ddd; border-bottom-color: gray;">@Html.Raw(Membership.COURSENAME)</div>
+                <div style="float: left; min-height: 30px; width:100%;">@Html.Raw(Membership.DESCRIPTION)</div>
+            </div>
+            <div style="float:left; width:200px;">
+
+                @if (enrollment != null){
+                    <div style="display: inline-block; width: 170px; text-align:center;font-size: 15px;line-height: 50px; height:50px;
+                    float:left; margin-left:20px; cursor:default;" 
+			        class="hudbtn info button-enrolled button-component">
+                        @Settings.Instance.GetMasterInfo4().PublicButtonLabelEnrolled
+                    </div>
+                }else{
+                     if(!inShoppingCart){
+                        <div style="display: inline-block; width: 170px; text-align:center;font-size: 15px;line-height: 53px; height:50px;
+                        float:left; margin-left:20px;" 
+			            class="hudbtn primary button-addtocart button-component" 
+			            onclick="cart.AddMembership(@Membership.COURSEID)" >
+                            <img style="position: relative; top: -3px; height:30px;" src="@Url.Content("~/" + Gsmu.Api.Data.WebConfiguration.CartButtonExpandedIcon)">
+                            @Settings.Instance.GetMasterInfo4().PublicButtonLabelAddToCart
+                        </div>
+                    }else{
+
+                        <div style="display: inline-block; width: 170px; text-align:center;font-size: 15px;line-height: 50px; height:50px;
+                        float:left; margin-left:20px;" 
+			            class="hudbtn primary button-component button-checkout" 
+			            onclick="cart.checkout();" >
+                            @Settings.Instance.GetMasterInfo4().PublicButtonLabelCheckout
+                        </div>
+                    }
+                }
+               <div style="width: 100%; height:30px; float: left; text-align:center; margin-left:20px;
+                    line-height: 40px;font-size: 13px;">Price: @string.Format("{0:c}", Membership.DISTPRICE)</div>
+            </div>
+        </div>        
+         
+        }
+}
+    <div style="float: left; min-height: 50px; padding: 0px; width:100%; margin-top:20px; margin-bottom:20px;">
+       @Html.Raw(MembershipFooter)
+    </div>
+
+
+</div>
+
+
+

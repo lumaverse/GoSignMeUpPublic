@@ -1,0 +1,25 @@
+﻿@{
+var name="Answer"+ ViewBag.QuestionId;
+var namecomment="Comment"+ ViewBag.QuestionId;
+int answervalue = 0;
+}
+                    <table>	
+                         @foreach(var item in  ViewBag.Choices){
+                                  answervalue= answervalue+1;
+						     <tr class="bodystyle">
+								<td>
+
+								          <input type="radio" name="@name" value="@answervalue"> @Html.Raw(item.AnswerText)                                          
+								</td>
+                            </tr>
+                         }
+
+                  </table>
+@if((ViewBag.withComment==1) || (ViewBag.withComment==-1)){
+<div>
+Comments:
+  <textarea style="width:100%" cols="65" rows="5" name="@namecomment" id="@namecomment" type="text"></textarea>
+</div>
+}
+
+       

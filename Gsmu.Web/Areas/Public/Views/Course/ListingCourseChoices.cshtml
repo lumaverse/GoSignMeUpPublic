@@ -1,0 +1,76 @@
+﻿@model CourseModel
+@using Gsmu.Api.Data.School.Course
+@using Gsmu.Api.Commerce.ShoppingCart
+
+@{
+                /**/
+
+                var coursechoices = Model.CourseChoices;
+                int courseId = Model.Course.COURSEID;
+                var cartItem = CourseShoppingCart.Instance.GetCourseItem(courseId);
+                var modifier = ViewData["Modifier"] != null ? ViewData["Modifier"].ToString() : string.Empty;
+                var readOnly = ViewData["ReadOnly"] != null ? (bool)ViewData["ReadOnly"] : false;
+                var fade = ViewData["Fade"] != null && (bool)ViewData["Fade"] == true ? true : false;
+
+                string sufxname = "";
+                if (modifier == "MainEvent") { sufxname = courseId.ToString(); }
+}
+
+@{
+    <div class="course-widgetbox-smheader">
+        Course Choices
+    </div>
+    <span id="course-choice-container-@(courseId+modifier)"></span>
+    <input type="hidden" id="selected-course-choice-@(courseId+modifier)" value="0" />
+    <script type="text/javascript">
+        (function() {
+
+            var readOnly = @Html.Raw(Json.Encode(readOnly));
+            var fade = @Html.Raw(Json.Encode(fade));
+            var course_choices = @Html.Raw(Json.Encode(coursechoices));
+            Ext.onReady(function () {
+                if (readOnly) {
+
+                } else {
+
+                    var coursechoiceItems = [];
+                    var radiobutton_dom = '';
+                    for (var i = 0; i < @(coursechoices.Count); i++)
+                    {
+                        coursechoiceItems.push({
+                            name: 'ccradio',
+                            boxLabel: course_choices[i]["CourseChoice1"],
+                            inputValue: course_choices[i]["CourseChoiceId"]
+                        });
+                        var sufxname = '@sufxname';
+                        radiobutton_dom += '<input type="radio" name="ccradio' + sufxname +'" value='+course_choices[i]["CourseChoiceId"]+' /> ' + course_choices[i]["CourseChoice1"] + '<br />';
+                    }
+                    $('#course-choice-container-@(courseId+modifier)').append(radiobutton_dom);
+                    var radiogroup = Ext.create('Ext.form.RadioGroup', {
+                        //id: 'course-choice-radiogroup-@(courseId+modifier)',
+                        name: 'course-choice-radiogroup-@(courseId+modifier)',
+                        renderTo: 'course-choice-container-@(courseId+modifier)',
+                        cls: fade ? 'item-fade' : '',
+                        items: coursechoiceItems,
+                        columns: 1,
+                        vertical: true,
+                        //hidden : true,
+                        listeners: {
+                            change: function(radiogroup, radio)
+                            {
+                                //document.getElementById("selected-course-choice-@(courseId+modifier)").value = radio.ccradio;
+                                document.getElementsByName("selected-course-choice-@(courseId+modifier)").value = radio.ccradio;
+                            },
+                            afterRender : function(radiogroup, radio)
+                            {
+                                //This control should be rendered first before turned to hidden, something's giving an issue, if this control isnt used
+                                //Will investigate further
+                                radiogroup.setVisible(false);
+                            }
+                        }
+                    });
+                    }
+            });
+        })();
+    </script>
+}

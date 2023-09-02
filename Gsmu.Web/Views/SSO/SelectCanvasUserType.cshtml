@@ -1,0 +1,15 @@
+﻿
+@{
+    ViewBag.Title = "Choose Your Role";
+    Layout = "~/Areas/Public/Views/Shared/_Layout.cshtml";
+}
+<div style="font-size:16px; width:100%; text-align:center;">
+    <h2> @ViewBag.Title</h2>
+
+    <form action="">
+        <div style="font-weight:bold; cursor:pointer; float:left; left:40%;position: relative; display: @ViewBag.ShowStudentIcon;" onclick="membership.loginCanvas('ST')"><img alt="student" src="~/Areas/Public/Images/Interface-Icons/usertypeicons/iconstudent64x64_thumb.png" /><br /> @Gsmu.Api.Data.School.Terminology.TerminologyHelper.Instance.GetTermCapital(Gsmu.Api.Data.School.Terminology.TermsEnum.Student)</div>
+        <div style="font-weight:bold;cursor:pointer; float:left; left:42%;position: relative;display: @ViewBag.ShowInstructorIcon;" onclick="membership.loginCanvas('IN')"><img alt="student" src="~/Areas/Public/Images/Interface-Icons/usertypeicons/iconinstructor64x64_thumb.png" /><br />  @Gsmu.Api.Data.School.Terminology.TerminologyHelper.Instance.GetTermCapital(Gsmu.Api.Data.School.Terminology.TermsEnum.Instructor)</div>
+        <div style="font-weight:bold;cursor:pointer; float:left; left:43%;position: relative;display: @ViewBag.ShowSupervisorIcon;" onclick="membership.loginCanvas('SP')"><img alt="student" src="~/Areas/Public/Images/Interface-Icons/usertypeicons/iconsupervisor64x64_thumb.png" /><br />  @Gsmu.Api.Data.School.Terminology.TerminologyHelper.Instance.GetTermCapital(Gsmu.Api.Data.School.Terminology.TermsEnum.Supervisor)</div>
+
+    </form>
+</div>

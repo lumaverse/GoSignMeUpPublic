@@ -1,0 +1,258 @@
+﻿@using Gsmu.Api.Data;
+@using Gsmu.Api.Data.School.Terminology;
+@{
+    ViewBag.Title = "Account Recovery for " + ViewBag.Type_Text;
+    
+    var UsernameLabel = Gsmu.Api.Data.Settings.Instance.GetFieldSpecs("username").FieldLabel;
+    UsernameLabel = string.IsNullOrWhiteSpace(UsernameLabel) ? "Username" : UsernameLabel;
+    var layoutConfig = Gsmu.Api.Data.ViewModels.Layout.LayoutManager.PublicLayoutConfiguration;
+
+}
+
+@Scripts.Render("~/Areas/Public/Scripts/ExtFieldValidation.js")
+<script type="text/javascript">
+
+    Ext.onReady(function () {
+
+        Ext.create('Ext.form.Panel', {
+            id: 'recovoption1ExtForm',
+            border: false,
+            width: 250,
+            renderTo: Ext.get('recovoption1fields'),
+            bodyPadding: 10,
+            fieldDefaults: {
+                labelWidth: 125,
+                msgTarget: 'under',
+                autoFitErrors: true,
+                anchor: '100%'
+            },
+            defaultType: 'textfield',
+            items: [{
+                xtype: 'hidden',
+                name: 'recovrtyp',
+                value: 'pass'
+            }, {
+                xtype: 'label',
+                text: '@Html.Raw(UsernameLabel)',
+            }, {
+                name: 'username',
+                allowBlank: false,
+            }, {
+                xtype: 'label',
+                text: 'Email',
+            }, {
+                name: 'email',
+                vtype: 'email',
+                allowBlank: false
+            }]
+        });
+
+        Ext.create('Ext.form.Panel', {
+            id: 'recovoption2ExtForm',
+            renderTo: Ext.get('recovoption2fields'),
+            width: 250,
+            border: false,
+            bodyPadding: 10,
+            fieldDefaults: {
+                labelWidth: 125,
+                msgTarget: 'under',
+                autoFitErrors: true,
+                anchor: '100%'
+            },
+            defaultType: 'textfield',
+            items: [{
+                xtype: 'hidden',
+                name: 'recovrtyp',
+                value: 'user'
+            }, {
+                xtype: 'label',
+                text: 'First name'
+            }, {
+                name: 'first',
+                allowBlank: false
+            }, {
+                xtype: 'label',
+                text: 'Email'
+            }, {
+                name: 'email',
+                vtype: 'email',
+                allowBlank: false
+            }]
+        });
+
+        $('#hideable-box1').hide();
+        $('#hideable-box2').hide();
+    });
+
+
+
+    function recovOption1() {
+        ClearError();
+        $('#hideable-box2').slideUp('slow');
+        $('#hideable-box1').slideDown('slow');
+        if ($('#accountype2').is(":checked")) {
+            $('#span_reset').text("Username");
+            $('#label-1020').html('UserName');
+        }
+        else if ($('#accountype3').is(":checked")) {
+            $('#span_reset').text("Username");
+            $('#label-1020').html('UserName');
+        }
+    }
+
+    function recovOption2() {
+        ClearError();
+        $('#hideable-box1').slideUp('slow');
+        $('#hideable-box2').slideDown('slow');
+        if ($('#accountype2').is(":checked")) {
+            $('#span_reset').text("Username");
+
+        }
+        else if ($('#accountype3').is(":checked")) {
+            $('#span_reset').text("Username");
+
+        }
+    }
+
+
+    function CheckRecover() {
+        var selectedUserType = '@ViewBag.userType';
+        if ($("#recovoption1").is(":checked") == false && $("#recovoption2").is(":checked") == false) {
+            $('#ErrorMsg').text("Please select one of the following options.")
+            ShowError();
+        } else {
+            
+            if ($("#recovoption1").is(":checked")){
+                var form = Ext.getCmp('recovoption1ExtForm').getForm();
+                var valrecovrtyp = "pss";
+                if ($('#accountype1').is(":checked")) {
+
+                }
+                else if ($('#accountype2').is(":checked")) {
+
+                }
+                else if ($('#accountype3').is(":checked")) {
+
+
+                }
+
+
+
+            }else{
+                var form = Ext.getCmp('recovoption2ExtForm').getForm();
+                var valrecovrtyp = "user";
+            }
+
+            if (form.isValid()) {
+
+                form.submit({
+                    url: '/Public/User/SubmitRecover?usertype=' + selectedUserType,
+                    method: 'POST',
+                    waitMsg: 'Processing...',
+                    success: function (form, action) {
+                        $("#RecovrMsg").html(action.result.msg);
+                        $("#RecovrWrap").hide();
+                        $("#RecovrMsg").fadeIn("slow");
+
+                    },
+                    failure: function (form, action) {
+                        Ext.Msg.alert('Account Recovery', action.result.msg);
+                    }
+                });
+            } else {
+                Ext.Msg.alert('Account Recovery', 'Please see Error or Invalid value(s).');
+            }
+
+        }
+    }
+    function ClearError() {
+        $('#ErrorMsg').hide('slow');
+        $('#ErrorMsg').text("");
+    }
+
+    function ShowError() {
+        $('#ErrorMsg').show('slow');
+    }
+
+
+</script>
+
+
+<div id="RecovrMsg" style="display:none; text-align:center; height:300px; padding:70px;"></div>
+
+<div id="RecovrWrap" style="position:relative;min-height:300px;direction:ltr">
+
+<div style="padding:0 44px"><h2>Having trouble logging in?</h2>
+    <div id="ErrorMsg" style="color:red; display:none;line-height:18px;"></div>
+  <div style="font-weight:bold">Account Type:</div> 
+@if(layoutConfig.HideStudentLogin ==0){
+<text>
+        <input type="radio" id="accountype1" name="accountype" value="student" style="float:left;margin-top:1px" 
+        @if(ViewBag.userType=="student"){<text>checked</text>}
+        >
+            <label class="cssradio-label" for="accountype1" style="margin-left:22px;display:block;line-height:18px; cursor:pointer"
+		>@TerminologyHelper.Instance.GetTermCapital(TermsEnum.Student)</label>
+</text>
+}
+@if(Settings.Instance.GetMasterInfo3().hideInstructorLogin ==0){
+<text>
+    <input type="radio" id="accountype2" name="accountype" value="instructor" style="float:left;margin-top:1px"
+        @if(ViewBag.userType=="instructor"){<text>checked</text>} >  
+            <label class="cssradio-label" for="accountype2" style="margin-left:22px;display:block;line-height:18px; cursor:pointer"
+		        > @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Instructor)</label>
+</text>
+}
+@if(Settings.Instance.GetMasterInfo3().HideSupervisorLogin ==0){
+        <text>
+            <input type="radio" id="accountype3" name="accountype" value="supervisor" style="float:left;margin-top:1px" 
+            @if(ViewBag.userType=="supervisor"){<text>checked</text>}> 
+            <label class="cssradio-label" for="accountype3" style="margin-left:22px;display:block;line-height:18px; cursor:pointer"
+		        > @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Supervisor)</label>
+        </text>
+}
+<hr />  
+<p></p>
+	<div style="position:relative">
+		<input type="radio" id="recovoption1" name="recovoption" value="yes" style="float:left;margin-top:1px" onclick="recovOption1()">
+		<label for="recovoption1" style="margin-left:22px;display:block;line-height:18px; cursor:pointer"
+		>I don't know my password</label>
+			<div id="hideable-box1" style="display:block">
+			  <div>
+				<p></p>
+				  <div style="font-size:11px;color:#666;line-height:18px"
+				  >To reset your Password, enter your <span id="span_reset"> @Html.Raw(UsernameLabel) </span>  and Email address.</div>
+					<p></p>
+                        <div id="recovoption1fields"></div>
+			  </div>
+			</div>
+	</div>
+<p></p>
+<p></p>
+	<div class="cssradio-option" style="position:relative">
+ 		<input type="radio" id="recovoption2" name="recovoption" style="float:left;margin-top:1px" onclick="recovOption2()">
+		<label class="cssradio-label" for="recovoption2" style="margin-left:22px;display:block;line-height:18px; cursor:pointer"
+		>I don't know my @Html.Raw(UsernameLabel.ToLower())</label>
+			<div id="hideable-box2" style="display:block">
+			  <div class="hideable-box">
+				<p></p>
+				  <div class="csssecondary" style="font-size:11px;color:#666;line-height:18px"
+				  >To retrieve your @Html.Raw(UsernameLabel.ToLower()), enter your First name and Email address.</div>
+					<p></p>
+                        <div id="recovoption2fields"></div>
+			  </div>
+			</div>
+	</div>
+
+<p></p>
+<p></p>
+<p>&nbsp;</p>
+
+    <input type="button" name="sgnBt" value="Continue" class="btn btn-prim sd-sgnBtn" onclick="CheckRecover()">
+
+</div>
+<p></p>
+<p></p>
+
+</div>
+
+

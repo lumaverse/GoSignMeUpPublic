@@ -1,0 +1,269 @@
+﻿
+@{
+    ViewBag.Title = "Payment";
+
+    string _appID = Gsmu.Api.Data.Settings.Instance.GetMasterInfo().SquareAppID.Trim();
+    var sqjspath = "https://js.squareup.com/v2/paymentform";
+    if (_appID.Contains("sandbox")) { sqjspath = "https://js.squareupsandbox.com/v2/paymentform"; }
+}
+
+
+<title>Square Payment Form</title>
+
+<link href="Areas/Public/Styles/Layout.css" rel="stylesheet" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script type="text/javascript" src="@sqjspath"></script>
+<script type="text/javascript">
+
+
+        var appID = "@_appID";
+        var OrderNo = "@ViewBag.OrderNo";
+
+        if (OrderNo == "") {
+            document.location = config.getUrl('public/course/browse');
+        }
+
+        var sqPaymentForm = new SqPaymentForm({
+            // Replace this value with your application's ID (available from the merchant dashboard).
+            // If you're just testing things out, replace this with your _Sandbox_ application ID,
+            // which is also available there.
+            applicationId: appID,
+
+            inputClass: 'sq-input',
+            cardNumber: {
+                elementId: 'sq-card-number',
+                placeholder: "0000 0000 0000 0000"
+            },
+            cvv: {
+                elementId: 'sq-cvv',
+                placeholder: 'CVV'
+            },
+            expirationDate: {
+                elementId: 'sq-expiration-date',
+                placeholder: 'MM/YY'
+            },
+            postalCode: {
+                elementId: 'sq-postal-code',
+                placeholder: 'Postal Code'
+            },
+            inputStyles: [
+              // Because this object provides no value for mediaMaxWidth or mediaMinWidth,
+              // these styles apply for screens of all sizes, unless overridden by another
+              // input style below.
+              {
+                  fontSize: '14px',
+                  padding: '3px'
+              },
+              // These styles are applied to inputs ONLY when the screen width is 400px
+              // or smaller. Note that because it doesn't specify a value for padding,
+              // the padding value in the previous object is preserved.
+              {
+                  mediaMaxWidth: '400px',
+                  fontSize: '18px',
+              }
+            ],
+            callbacks: {
+                cardNonceResponseReceived: function (errors, nonce, cardData) {
+                    var errorDiv = document.getElementById('errors');
+                    if (errors) {
+                        console.log(errors)
+                        $("#btnSubmit").attr("disabled", false);
+                        errorDiv.innerHTML = "";
+                        var p = document.createElement('p');
+                        p.innerHTML = "VALIDATION ERROR:";
+                        errorDiv.appendChild(p);
+                        errors.forEach(function (error) {
+                            var p = document.createElement('p');
+                            p.innerHTML = error.message;
+                            errorDiv.appendChild(p);
+                        });
+                    } else {
+                        var errorDiv = document.getElementById('errors');
+                        errorDiv.innerHTML = "";
+
+                        var prcsDiv = document.getElementById('prcssqr');
+                        prcsDiv.innerHTML = "Processing Payment...";
+
+                        var nonceField = document.getElementById('cardNonce');
+                        nonceField.value = nonce;
+
+                        var sqFirstName = $("#sq-card-firstname").val();
+                        var sqLastName = $("#sq-card-lastname").val();
+                        if (!sqFirstName) {
+                            $("#prcssqr").html("")
+                            $("#errors").html("ERROR:<br>First Name is required.")
+                            $("#sq-card-firstname").focus()
+                            $("#btnSubmit").attr("disabled", false);
+                            return;
+                        }
+                        if (!sqLastName) {
+                            $("#prcssqr").html("")
+                            $("#errors").html("ERROR:<br>Last Name is required.")
+                            $("#sq-card-lastname").focus()
+                            $("#btnSubmit").attr("disabled", false);
+                            return;
+                        }
+
+                        $.ajax({
+                            type: "POST",
+                            data: JSON.stringify({
+                                nonce: nonce,
+                                firstname: sqFirstName,
+                                lastname: sqLastName
+                            }),
+                            url: "Public/Cart/SquarePaymentChargeAsync ",
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            error: function (rslt, textStatus, errorThrown) {
+                                console.log(rslt)
+                                var result = rslt.responseText
+                                if (result.length > 0) {
+                                    console.log(result)
+                                    document.getElementById('prcssqr').innerHTML = ""
+                                    $("#errors").html("-ERROR IN PROCESSING: " + result)
+                                    return;
+                                } else {
+                                    var errorDiv = document.getElementById('prcssqr');
+                                    errorDiv.innerHTML = "Payment Successful and Confirmation complete.";
+                                    window.location = "/Public/cart/ShowConfirmationReceipt?OrderNumber=" + OrderNo
+                                }
+
+
+                                    },
+                            success: function (rslt) {
+                                console.log(rslt)
+                                var result = rslt.responseText
+                                console.log(result)
+                                if (result.length > 0) {
+                                    $("#btnSubmit").attr("disabled", false);
+                                    document.getElementById('prcssqr').innerHTML = ""
+                                    var errorDiv = document.getElementById('errors');
+                                    var p = document.createElement('p');
+                                    p.innerHTML = "+ERROR IN PROCESSING: ";
+                                    errorDiv.innerHTML(result);
+
+                                    return;
+                                }
+                                var errorDiv = document.getElementById('prcssqr');
+                                errorDiv.innerHTML = "Payment Successful and Confirmation complete.";
+                                window.location = "/Public/cart/ShowConfirmationReceipt?OrderNumber=" + OrderNo
+
+                            }
+                        });
+
+                    }
+                },
+                unsupportedBrowserDetected: function () {
+                    alert("Sorry your browser is not supported. Please contact the administrator.")
+                    // Alert the buyer that their browser is not supported
+                }
+            }
+        });
+        function submitButtonClick(event) {
+            $("#btnSubmit").attr("disabled", true);
+            event.preventDefault();
+            sqPaymentForm.requestCardNonce();
+        }
+        function SendNonce() {
+            PageMethods.Charge(document.getElementById('cardNonce').value, OnSuccess);
+        }
+        function Clear() {
+            // Submit the form
+            document.getElementById('form').submit();
+        }
+
+
+
+</script>
+<style id="Style1" type="text/css" runat="server">
+    .sq-input {
+        border: 1px solid #CCCCCC;
+        margin-bottom: 10px;
+        padding: 1px;
+    }
+
+    .sq-input--focus {
+        outline-width: 5px;
+        outline-color: #70ACE9;
+        outline-offset: -1px;
+        outline-style: auto;
+    }
+
+    .sq-input--error {
+        outline-width: 5px;
+        outline-color: #FF9393;
+        outline-offset: 0px;
+        outline-style: auto;
+    }
+</style>
+
+<div class="cart-steps-wrap">
+    <div class="cart-steps cart-step3"></div>
+    <ul class="cart-steps-text" style="list-style-type: none;">
+        <li class="cart-step-1 current-step">Log in/ Create Account</li>
+        <li class="cart-step-2">Review</li>
+        <li class="cart-step-3">Payments</li>
+        <li class="cart-step-4">Receipt & Confirmation</li>
+    </ul>
+</div>
+
+
+
+
+<div style="float:left;">
+
+
+
+
+    <div style="width:50%;float: left; padding:10px; position:relative; text-align:left;">
+        <h1>Payment</h1>
+
+        <div style="font-size: 18px;margin-top : 8px; margin-bottom: 8px; margin-left:8px; text-align:right;">
+            Amount: &nbsp; @ViewBag.PaymentTotalLbl
+        </div>
+
+        <div style="font-size: 18px;margin-top : 8px; margin-bottom: 8px; margin-left:8px; text-align:right;">
+            Order Number: &nbsp;@ViewBag.OrderNo
+        </div>
+
+
+
+        <form id="form" runat="server" novalidate="novalidate">
+            <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePageMethods="true">
+            </asp:ScriptManager>
+            <label>First Name</label>
+            <div><input id="sq-card-firstname" class="sq-input" type="text" style="width:100%;font-size: 14px;"></div>
+            <label>Last Name</label>
+            <div><input id="sq-card-lastname" class="sq-input" type="text" style="width:100%;font-size: 14px;"></div>
+            <label>Credit Card</label>
+            <div id="sq-card-number"></div>
+            <label>CVV</label>
+            <div id="sq-cvv"></div>
+            <label>Expiration Date</label>
+            <div id="sq-expiration-date"></div>
+            <label>Postal Code</label>
+            <div id="sq-postal-code"></div>
+            <input type="hidden" id="cardNonce" name="nonce" />
+            <asp:HiddenField ID="OrderNo" runat="server" Value="" />
+
+            <input type="submit" onclick="submitButtonClick(event)" id="btnSubmit" value="Pay Now" />
+            &nbsp;
+            <input type="button" onclick="location.href='/public/course/browse'" value="Cancel" />
+        </form>
+        <div id="prcssqr" style="color:blue; margin-top: 20px;"></div>
+        <div id="errors" style="color:red;"></div>
+    </div>
+
+    <div style="width:30%;float: right;  position:relative; padding-top:50px;
+                                text-align: left; font-size: small; color: rgb(221, 221, 221);">
+        <p></p>
+        <p></p>
+        <p></p>
+        Powered by:<p></p>
+        <img src="/images/Square_credit-card-logos.png" height="110"/ style="padding: 20px;"><br>
+    </div>
+</div>
+
+
+

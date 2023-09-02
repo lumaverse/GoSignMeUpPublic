@@ -1,0 +1,35 @@
+﻿.login-popup {
+    background-color: #eee;
+    padding: 5px;
+    border: 1px solid #ccc;
+
+    background-image: -webkit-linear-gradient(top,#cccccc,#eeeeee);
+    background-image: -moz-linear-gradient(top,#cccccc,#eeeeee);
+    background-image: -ms-linear-gradient(top,#cccccc,#eeeeee);
+    background-image: -o-linear-gradient(top,#cccccc,#eeeeee);
+    background-image: linear-gradient(top,#cccccc,#eeeeee);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#cccccc",endColorstr="#eeeeee");
+}
+
+#link-login {
+    padding: 3px;
+    border: 1px solid transparent;
+    border-bottom: none;
+}
+
+.login-popup-link {
+    background-color: rgb(204, 204, 204);
+    color: #000 !important;
+    border: 1px solid #ccc !important;
+    border-bottom: none;
+    padding: 3px;
+    text-decoration: none !important;
+}
+
+.login-popup .x-form-error-wrap-under {
+}
+
+.login-popup .x-form-invalid-under {
+    color: #330000;
+}
+

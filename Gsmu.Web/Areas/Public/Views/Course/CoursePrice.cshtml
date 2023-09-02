@@ -1,0 +1,25 @@
+﻿@model Gsmu.Api.Data.School.Course.CourseModel
+@{
+    var courseModel = Model;
+    var course = courseModel.Course;
+    var csetting = courseModel.CourseSettings;
+
+    var modifier = "CourseDetails";
+    var wgname = "Price";
+    var wgcontainer = "Course" + wgname + "Container";
+    var wgcontainerDet = "Course" + wgname + "ContainerDet";
+    var isLoggedIn = Gsmu.Api.Authorization.AuthorizationHelper.CurrentUser.IsLoggedIn;
+    var isShowLoginPricingLabel = Gsmu.Api.Data.Settings.Instance.GetMasterInfo().Membership_Status; 
+}
+<div id="@wgcontainer" class="course-widgetbox" style="position:inherit; min-height:80px;">
+    <div class="course-widgetbox-smheader">
+    Pricing
+    </div>
+   <div id="@wgcontainerDet" style="padding:5px;margin:5px; ">
+       @if (isLoggedIn == false && isShowLoginPricingLabel != 0)
+       {
+        <text><span>* Login or continue to select Member pricing.</span><br /><br />  </text>
+       }
+      @{Html.RenderPartial("ListingPrices", courseModel, new ViewDataDictionary { { "Modifier", modifier }, { "Width", 180 } });}
+    </div>
+</div>

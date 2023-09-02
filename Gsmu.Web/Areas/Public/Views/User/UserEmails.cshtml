@@ -1,0 +1,229 @@
+﻿@using Gsmu.Api.Data;
+@using Gsmu.Api.Data.School.User;
+@using Gsmu.Api.Data.School.Terminology;
+@using System.Configuration;
+@model UserModel
+
+@{
+    string cmd = ViewBag.cmd;
+    string PubDateFormatWidth =  (Settings.Instance.GetMasterInfo2().usePubDateFormat==1 ? "110" : "75");
+    string jsPubDateFormat = Settings.Instance.GetJsPubDateFormat();
+    var userModel = Model;
+    var usr = new UserInfo();
+    usr = userModel.CommonUserInfo;
+	string username= "";
+    var studentsessionId ="";
+    try{
+         username= usr.username;
+         studentsessionId = userModel.Student.UserSessionId.Value.ToString();
+    }catch{}
+    string adminPath = ConfigurationManager.AppSettings["V3InstructorImage"];
+    if (adminPath.StartsWith("/admin/"))
+    {
+        adminPath = "admin/";
+    }
+    else 
+    {
+        adminPath = "old/";
+    }
+}
+<script type="text/javascript">
+
+    //destroy first main panel if exist for the edit mode to prevent duplicate
+    var emailCmp = Ext.getCmp('UserDashboardReceivedEmail');
+    if (emailCmp != null) { emailCmp.destroy(); }
+
+    Ext.onReady(function () {
+
+        //ST118752
+        @if(cmd=="addnew"){
+    <text>
+        var store = null;
+        </text>
+    }else{
+    <text>
+        var store = Ext.create('Ext.data.Store', {
+            autoLoad: true,
+            autoSync: true,
+            pageSize: 5,
+            remoteFilter: true,
+            remoteSort: true,
+            remoteSort: true,
+            model: 'EmailAuditTrail',
+            proxy: {
+                type: 'ajax',
+                url: config.getUrl('public/user/email?userid=@usr.userid'),
+                reader: {
+                    type: 'json',
+                    rootProperty: 'Result',
+                    totalProperty: 'TotalCount',
+                    listeners: {
+                        exception: function (reader, response, error, opts) {
+                            log(error);
+                        }
+                    }
+                }
+            }
+        });
+        </text>
+    }
+        var searchField = Ext.create('Ext.form.field.Text', {
+            region: 'north',
+            emptyText: 'Search'
+        });
+
+        searchField.on('change', function (that, value, oldValue, options) {
+            store.filter(
+                [{ id: 'keyword', property: 'keyword', value: value }]
+            );
+        }, searchField, {
+            buffer: 500
+        });
+
+        var emailIcon = config.getUrl('images/icons/famfamfam/email_open.png');
+
+        var grid = Ext.create('Ext.grid.Panel', {
+            region: 'center',
+            dockedItems: [
+                {
+                    xtype: 'pagingtoolbar',
+                    store: store,
+                    dock: 'top',
+                    displayInfo: true
+                }
+            ],
+            store: store,
+            emptyText: 'No e-mails found',
+            columns: [
+                {
+                    text: 'Date',
+                    dataIndex: 'AuditDate',
+                    width: 120,
+                    renderer: Ext.util.Format.dateRenderer('@jsPubDateFormat')
+                },
+                {
+                    text: 'Subject',
+                    dataIndex: 'EmailSubject',
+                    flex: 1
+                },
+                {
+                    xtype: 'actioncolumn',
+                    width: 22,
+                    items: [
+                        {
+                            icon: emailIcon,
+                            tooltip: 'View e-mail',
+                            handler: function (view, rowIndex, colIndex, item, e, record) {
+
+                                var data = record.data;
+
+                                var attachments = 'None';
+                                if (data.AttachmentNameMemo != null && data.AttachmentNameMemo != '') {
+                                    var list = data.AttachmentNameMemo.split('|');
+                                    var count = 1;
+                                    if (list.length > 0) {
+                                        attachments = '';
+                                        for (var index = 0; index < list.length; index++) {
+                                            if (list[index] != '') {
+                                                attachments += '<a target="_blank" href="@(adminPath)datastores/datastore-user.asp?uname=@username&rubyrequest=1&action=get-file&usersessionid=@(studentsessionId)&param=' + encodeURIComponent(list[index]) + '">Attachment ' + count + '</a><br/>';
+                                                count++;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                var window = Ext.create('Ext.window.Window', {
+                                    icon: emailIcon,
+                                    title: 'E-mail details',
+                                    layout: {
+                                        type: 'fit',
+                                        manageOverflow: 2
+                                    },
+                                    modal: true,
+                                    width: 800,
+                                    height: 400,
+                                    items: [
+                                        {
+                                            xtype: 'form',
+                                            autoScroll: true,
+                                            items: [
+                                                {
+                                                    xtype: 'displayfield',
+                                                    fieldLabel: 'Audit date',
+                                                    value: Ext.Date.format(data.AuditDate, '@jsPubDateFormat')
+                                                },
+                                                {
+                                                    xtype: 'displayfield',
+                                                    fieldLabel: 'Subject',
+                                                    value: data.EmailSubject
+                                                },
+                                                {
+                                                    xtype: 'displayfield',
+                                                    fieldLabel: 'From',
+                                                    value: data.EmailFrom
+                                                },
+                                                {
+                                                    xtype: 'displayfield',
+                                                    fieldLabel: 'To',
+                                                    value: data.EmailTo
+                                                },
+                                                {
+                                                    xtype: 'displayfield',
+                                                    fieldLabel: 'Pending',
+                                                    value: data.Pending == '0' ? 'No' : 'Yes'
+                                                },
+                                                {
+                                                    xtype: 'displayfield',
+                                                    fieldLabel: 'Attachments',
+                                                    value: attachments
+                                                },
+                                                {
+                                                    xtype: 'displayfield',
+                                                    fieldLabel: 'Body',
+                                                    fieldCls: 'font:normal 19px calibri,tahoma,arial,verdana,sans-serif', 
+                                                    value: data.EmailBody
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                });
+                                window.show();
+
+                            }
+                        }
+                    ]
+                }
+            ]
+        });
+
+        var cmp = Ext.create('Ext.panel.Panel', {
+            id: 'UserDashboardReceivedEmail',
+            frame: true,
+            renderTo: 'UserEmailsContainerPanel',
+            layout: {
+                type: 'border'
+            },
+            height: 235,
+            autoScroll: false,
+            title: 'Received Email',
+            tools: [
+                {
+                    hidden: (dasboardadminmode ? false : true),
+                    type: 'cross',
+                    tooltip: 'Delete this widget ',
+                    handler: function (e, toolEl, panel, tc) {
+                        DeleteUserWidget(GetwidgetColIDbyPlID('UserDashboardReceivedEmail'), GetwidgetIDbyPlID('UserDashboardReceivedEmail'));
+                    }
+                }
+            ],
+            items: [
+                searchField,
+                grid
+            ]
+        });
+    });
+</script>
+
+<div id="UserEmailsContainerPanel" style="position:relative;min-height:100px; padding-bottom:20px"></div>
+
+

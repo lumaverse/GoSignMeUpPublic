@@ -1,0 +1,247 @@
+﻿@using Gsmu.Api.Authorization
+@using Gsmu.Api.Language
+@using Gsmu.Api.Data
+@using Gsmu.Api.Data.School
+@using Gsmu.Api.Data.School.Entities
+@using Gsmu.Api.Data.School.Student
+@using Gsmu.Api.Data.ViewModels.Grid
+@using Gsmu.Api.Data.School.Course
+@using Gsmu.Api.Data.School.Terminology
+@using Gsmu.Api.Commerce.ShoppingCart;
+@model CourseModel
+
+@{
+    var modifier = "CourseDetails";
+    var autoselectmaterial = Settings.Instance.GetMasterInfo3().materialdefault;
+    var courseModel = Model;
+    var course = courseModel.Course;
+    var times = courseModel.CourseTimes;
+    var materials = courseModel.Materials;
+    var maincat = courseModel.MainCategory;
+    var subcat = courseModel.SubCategory;
+    var csetting = courseModel.CourseSettings;
+    var bgcolor = "";
+    Course_Time start = Model.CourseStart;
+    var showCourseNum = ((Settings.Instance.GetMasterInfo2().HideCourseNumber == 0) ? true : false);
+    var masterSettings = Settings.Instance.GetMasterInfo2().HideSeatsAvailable;
+}
+   
+<script type="text/javascript">
+        function CourseInstructorsOpenWindow(InstFulInfoID) {
+
+            var htmldta = $("." + InstFulInfoID).html();
+
+            var cntrpanel = Ext.create('Ext.form.Panel', {
+                border: false,
+                frame: false,
+                bodyPadding: 10,
+                html: htmldta
+            });
+
+            var window = Ext.create('Ext.window.Window', {
+                modal: true,
+                bodyStyle: {
+                    backgroundColor: '#ffffff'
+                },
+                layout: 'anchor',
+                tbar: false,
+                title: 'Biography',
+                width: 700,
+                height: document.documentElement.clientHeight - 40,
+                autoScroll: true,
+                items: cntrpanel
+            });
+
+            window.show();
+
+
+        }
+ 
+    </script>
+
+<div data-course-id="@course.COURSEID" data-course-name="@HttpUtility.HtmlEncode(course.COURSENAME)" style="float: left; width: 100%; height: 100%; padding: 0px; margin: 0px; background-color: #EEEEEE">
+    @if(course.eventid>0){
+        <text></text>
+    }
+    else{
+        <text>
+    <div style="float: left; width: 100%; border: thin; border-color: #EEEEEE; background-color: #CCCCCC; padding: 0px; margin: 0px; height: 40px">
+        <div style="float: left; height: 100%; width: 18px">&nbsp;</div>
+        <div class="socialicon" onclick="CourseSearch.prototype.ShowCourseShareLinks(@course.COURSEID,'in')">
+            <img alt="" style="height: 23px" src="../../images/share/in.png" />
+        </div>
+        <div class="socialicon" onclick="CourseSearch.prototype.ShowCourseShareLinks(@course.COURSEID,'tw')">
+            <img alt="" style="height: 23px" src="../../images/share/tw.png" />
+        </div>
+        <div class="socialicon" onclick="CourseSearch.prototype.ShowCourseShareLinks(@course.COURSEID,'fb')">
+            <img alt="" style="height: 23px" src="../../images/share/fb.png" />
+        </div>
+        <div class="socialicon" onclick="CourseSearch.prototype.ShowCourseShareLinks(@course.COURSEID,'ml')">
+            <img alt="" style="height: 23px" src="../../images/share/ml.png" />
+        </div>
+        <div class="socialicon" onclick="CourseSearch.prototype.ShowCourseShareLinks(@course.COURSEID,'lk')">
+            <img alt="" style="height: 23px" src="../../images/share/lk.png" />
+        </div>
+        <div style="float: left; height: 100%; width: 18px">&nbsp;</div>
+        <div style="float: left; height: 100%; margin-top: 12px; font-size: 11px; color: #2f055e"><a href="javascript:window.CourseSearchInstance.CloseCourseDetailsWindow()">Home</a></div>
+        <div id="coursetreebrowse" style="float: left; height: 100%; margin-top: 12px; font-size: 11px; color: #2f055e">Home&nbsp;>&nbsp;Main Category&nbsp;>&nbsp;Sub Category&nbsp;</div>
+        <div style="float: left; height: 100%; margin-top: 12px; font-size: 11px; color: #2f055e">
+
+            @if (Settings.Instance.GetMasterInfo2().HideCourseNumber == 0)
+            {
+                @Html.Raw(course.COURSENUM)
+                <text>
+                    &nbsp;
+                </text>
+            }
+            @Html.Raw(course.COURSENAME)
+
+        </div>
+        <div class="coursedetcloseicon" onclick="CourseSearch.prototype.CloseCourseDetailsWindow()">
+            <img title="Close popup window or press 'Esc' key)" style="height: 15px" src="~/Areas/Public/Images/Layout/close.png" />
+        </div>
+    </div>
+        </text>
+    }
+    <div id="divCourseLinkAction" style="float: left; width: 100%; border: thin; border-color: #EEEEEE; padding: 0px; margin: 0px; overflow:auto; display:none">
+    </div>
+    @if(course.eventid>0){
+        <text><div style="width: 100%; float: left; padding: 10px 10px 10px 20px;"></text>
+        
+    }
+    else{
+        <text><div style="width: 75%; float: left; padding: 10px 10px 10px 20px;"></text> 
+    }
+        <div>
+            @{Html.RenderPartial("CourseNameDesc");}
+        </div>
+        @if(course.coursetype == 1)
+        {
+        <div style="padding-top: 10px;">
+            @{Html.RenderPartial("CourseEvent");}
+        </div>
+        }
+        <div>
+            <div style="float: left; width: 50%; padding-right: 10px">
+
+                @if (course.ContactName != "" && course.ContactPhone != "")
+                {
+                    <div style="float: left; width: 100%; padding-top: 10px">@{Html.RenderPartial("CourseContact");}</div>
+                }
+                @if (Model.CreditOption==0) 
+                {
+                    if (courseModel.Credits.Count > 0)
+                    {
+                        <div style="float: left; width: 100%; padding-top: 10px">@{Html.RenderPartial("CourseCredits");}</div>
+                    }
+                }
+                <div style="padding-top: 10px;float: left; width: 100%;">
+                    @{Html.RenderPartial("CourseLocation");}
+                </div>
+                <div style="padding-top: 10px;float: left; width: 100%;">
+                    @{Html.RenderPartial("CoursePhoto");}
+                </div>
+
+
+            </div>
+            <div style="float: left; width: 50%;">
+
+                <div style="padding-top: 10px;">@{Html.RenderPartial("CourseDateTime");}</div>
+                @if(course.coursetype != 1){
+                <div style="padding-top: 10px;">@{Html.RenderPartial("CourseInstructors");}</div>
+                }
+                @if ((!WebConfiguration.HideAdditionalCourseOffering && courseModel.Courses != null) && showCourseNum)
+                {
+
+                    <div style="padding-top: 10px;">@{Html.RenderPartial("CourseSimilarCourseNumber");}</div>
+                }
+            </div>
+        </div>
+
+
+
+
+    </div>
+    @if(course.eventid>0){
+         <text><div style="width: 25%; float: left; padding: 10px 10px 10px 0px; visibility:hidden"></text>
+    }
+    else{
+        <text><div style="width: 25%; float: left; padding: 10px 10px 10px 0px;"></text>
+    }
+        @if (Model.Course.CoursesType == 0)
+        {
+            <div>@{Html.RenderPartial("CourseAccessCode");}</div>
+        }
+        else
+        {
+            <div>@{Html.RenderPartial("CourseTypeText");}</div>
+        }
+        @if (masterSettings > 0)
+        {
+            <div div style=" width: 100%; padding-top: 10px">
+                @{Html.RenderPartial("CourseSeatsAvailable");}
+            </div>
+        }
+        @* have a setting perhaps *@
+        <div class="col-md-12" style="padding: 10px 0px 0px 0px;"> 
+            @{Html.RenderPartial("CoursePrerequisites");}
+        </div>
+         @if (Model.EffectivePrices.Count > 0)
+        {
+            <div class="col-md-12" style="padding: 10px 0px 0px 0px;">&nbsp;@{Html.RenderPartial("CoursePrice");}</div>
+        }
+        @if(Model.CertificateProgram!=""){
+         <div style="padding-top: 10px;" >&nbsp;
+                <div class="course-widgetbox">
+                  <div style=" width: 100%; padding-top: 10px;">
+                        <div class="course-widgetbox-smheader">
+                             Certificate Program
+
+                        </div>
+                   </div>
+                   <div style="margin:10px;"> @Model.CertificateProgram</div>
+             </div>
+        </div>
+        }
+        @if (course.ShowPrerequisite != 0 && course.sessionid == 0)
+        {
+            <div class="col-md-12" style="padding: 10px 0px 0px 0px;">&nbsp;@{Html.RenderPartial("CourseRequisite");}</div>
+        }
+        @if (materials.Count > 0)
+        {
+            <div class="col-md-12" style="padding: 10px 0px 0px 0px;">&nbsp;@{Html.RenderPartial("CourseMaterials");}</div>
+        }
+        else
+        {
+            <div style=" width: 0; height:0; padding-top: 10px; visibility:hidden;">@{Html.RenderPartial("CourseMaterials");}</div>
+        }
+
+        @if (Settings.Instance.GetMasterInfo2().ShowCourseType != 0 && Model.Course.StudentChoiceCourse > 0)
+        {
+
+              <div class="col-md-12" style="padding: 10px 0px 0px 0px;">@{Html.RenderPartial("CourseChoices");}</div>
+
+        }
+        @if (Settings.Instance.GetMasterInfo3().FastTrackCoursesOn > 0 && courseModel.BundledCourses.Count > 0)
+        {
+            <div class="col-md-12" style="padding: 10px 0px 0px 0px;">@{Html.RenderPartial("BundledCourses");}</div>
+        }
+        @if (Model.CreditOption!=0) 
+        {
+            if (courseModel.Credits.Count > 0)
+            {
+                 <div class="col-md-12" style="padding: 10px 0px 0px 0px;">@{Html.RenderPartial("CourseCredits");}</div>
+            }
+        }
+        @*
+            @if (!string.IsNullOrEmpty(Settings.Instance.GetPDFHeaderFooterInfo().SocialMediaLogo))
+            {
+                <div class="col-md-12" style="padding: 10px 0px 0px 0px;">@{Html.RenderPartial("SocialMediaLogo");}</div>
+            }
+        *@
+    </div>
+
+</div>
+
+
+

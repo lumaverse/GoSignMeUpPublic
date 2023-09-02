@@ -1,0 +1,9 @@
+﻿<script type="text/javascript">
+    var widgetConfig = {
+            noProfileImage: config.getUrl(@Html.Json(Url.Content(Gsmu.Api.Data.WebConfiguration.NoProfileImageVirtualPath))),
+            profileImagePath: config.getUrl(@Html.Json(Url.Content(Gsmu.Api.Data.WebConfiguration.InstructorProfileImageVirtualDirectory))),
+            profileImageMaxWidth: @Html.Json(Gsmu.Api.Data.WebConfiguration.ProfileImageWidgetWidth),
+            profileImageMaxHeight: @Html.Json(Gsmu.Api.Data.WebConfiguration.ProfileImageWidgetHeight)
+    };
+</script>
+@RenderBody()

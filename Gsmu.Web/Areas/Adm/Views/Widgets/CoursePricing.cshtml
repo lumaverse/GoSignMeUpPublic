@@ -1,0 +1,90 @@
+﻿<div id="widget-course-pricing">
+    <div class="panel panel-default">
+        <div class="panel-heading gsmu-sub-panel-heading">
+            <div class="panel-title pull-left">
+                Course Pricing
+            </div>
+            <div class="pull-right">
+                <div id="course-social-btns">
+                    <div>
+                        <div class="toggle-middle">Display Price <input type="checkbox" id="course-display-price" class="bootstrap-toggle" data-size="mini"></div>
+                        <button type="button" class="btn btn-warning btn-xs manage" onclick="coursePricingEditor.navigateToMange()">Manage &nbsp; <span class="fa fa-cog"></span></button>
+                        <button type="button" class="btn btn-success btn-xs edit" onclick="coursePricingEditor.save()">Save Changes &nbsp; <span class="glyphicon glyphicon-ok"></span></button>
+                    </div>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <div class="panel-body gsmu-sub-panel-body panel-collapse collapse in">
+            <ul class="nav nav-tabs">
+                <li role="presentation" class="active"><a href="#course-pricing-membership-non-member" data-toggle="tab">Membership : Non-Member</a></li>
+                <li role="presentation"><a href="#course-pricing-membership-member" data-toggle="tab">Membership : Member</a></li>
+                <li role="presentation"><a href="#course-pricing-membership-special" data-toggle="tab">Membership : Special</a></li>
+                <li role="presentation"><a href="#course-pricing-coupons" data-toggle="tab">Coupons</a></li>
+
+            </ul>
+            <div class="tab-content">
+                <div id="course-pricing-membership-non-member" class="tab-pane fade in active">
+                    <div class="row pad-bot-10">
+                        <label class="col-xs-3 label-middle">First Payment</label>
+                        <div class="col-xs-4">
+                            <input type="number" class="form-control input-sm" id="non-member-first-payment" />
+                        </div>
+                        <label class="col-xs-1 pad-x-0 label-middle">$</label>
+                    </div>
+                    <div class="row pad-bot-10">
+                        <label class="col-xs-3 label-middle">Enter a Price</label>
+                        <div class="col-xs-4">
+                            <input type="number" class="form-control input-sm" id="non-member-price" />
+                        </div>
+                        <label class="col-xs-1 pad-x-0 label-middle">$</label>
+                    </div>
+                    <div class="row pad-x-5 pad-top-10 border-top-gray">
+                        <table id="course-pricing-membership-non-member-grid" class="table table-striped table-hover"></table>
+                    </div>
+                </div>
+                <div id="course-pricing-membership-member" class="tab-pane fade in">
+                    <div class="row pad-bot-10">
+                        <label class="col-xs-3 label-middle">First Payment</label>
+                        <div class="col-xs-4">
+                            <input type="number" class="form-control input-sm" id="member-first-payment" />
+                        </div>
+                        <label class="col-xs-1 pad-x-0 label-middle">$</label>
+                    </div>
+                    <div class="row pad-bot-10">
+                        <label class="col-xs-3 label-middle">Enter a Price</label>
+                        <div class="col-xs-4">
+                            <input type="number" class="form-control input-sm" id="member-price" />
+                        </div>
+                        <label class="col-xs-1 pad-x-0 label-middle">$</label>
+                    </div>
+                    <div class="row pad-x-5 pad-top-10 border-top-gray">
+                        <table id="course-pricing-membership-member-grid" class="table table-striped table-hover"></table>
+                    </div>
+                </div>
+                <div id="course-pricing-membership-special" class="tab-pane fade in">
+                    <div class="row pad-bot-10">
+                        <label class="col-xs-3 label-middle">First Payment</label>
+                        <div class="col-xs-4">
+                            <input type="number" class="form-control input-sm" id="special-member-first-payment" />
+                        </div>
+                        <label class="col-xs-1 pad-x-0 label-middle">$</label>
+                    </div>
+                    <div class="row pad-bot-10">
+                        <label class="col-xs-3 label-middle">Enter a Price</label>
+                        <div class="col-xs-4">
+                            <input type="number" class="form-control input-sm" id="special-member-price" />
+                        </div>
+                        <label class="col-xs-1 pad-x-0 label-middle">$</label>
+                    </div>
+                    <div class="row pad-x-5 pad-top-10 border-top-gray">
+                        <table id="course-pricing-membership-special-grid" class="table table-striped table-hover"></table>
+                    </div>
+                </div>
+                <div id="course-pricing-coupons" class="tab-pane fade in">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/Areas/Adm/Scripts/Widgets/CoursePricing.js")

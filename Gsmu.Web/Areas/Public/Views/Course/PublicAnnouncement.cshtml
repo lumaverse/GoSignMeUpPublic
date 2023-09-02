@@ -1,0 +1,15 @@
+﻿@using Gsmu.Api.Data;
+@{
+    string PublicAnnouncementTxt = "";
+    if(String.IsNullOrEmpty(Settings.Instance.GetMasterInfo2().PublicAnnouncement2) == false)
+    {
+        PublicAnnouncementTxt = Settings.Instance.GetMasterInfo2().PublicAnnouncement2.ToString();
+    }
+}
+    <div style="width:97%; margin:auto">
+
+    @Html.Raw(PublicAnnouncementTxt)
+
+    </div>
+
+<!--<div style="display: inline-block;" class="cart-button"  onclick="window.CourseSearchInstance.Invoke();">Continue</div>-->

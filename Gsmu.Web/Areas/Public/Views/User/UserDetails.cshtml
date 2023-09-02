@@ -1,0 +1,88 @@
+﻿@using Gsmu.Api.Data;
+@using Gsmu.Api.Data.School.User;
+@using Gsmu.Api.Data.School.Terminology;
+@model UserModel
+
+@{
+    string cmd = ViewBag.cmd;
+    string activetab = ViewBag.activetab;
+    if(string.IsNullOrEmpty(activetab)){
+        activetab = "0";
+    }
+
+    string formTitle = "UserDetails";
+    var userModel = Model;
+    var usr = new UserInfo();
+    usr = userModel.CommonUserInfo;
+    
+
+}
+<script type="text/javascript">
+    
+       var UserUserDetailsTab = Ext.create('Ext.tab.Panel', {
+           layout: 'fit',
+           activeTab:@activetab,
+                items: [{
+                    title:  'Demographic' ,
+                    listeners: {
+                        activate: function () {
+                            UserDemographicFormvar.show();
+                            UserAffiliationFormvar.hide();
+                        }
+                    }
+                }, {
+                    title: 'Affiliation',
+                    listeners: {
+                        activate: function () {
+                            UserAffiliationFormvar.show();
+                            UserDemographicFormvar.hide();
+                        }
+                    }
+                //}, {
+                //    title: 'Roles',
+                //    listeners: {
+                //        activate: function () {
+                //        }
+                //    }
+                }
+                ]
+            });
+
+
+
+    Ext.onReady(function () {
+
+        Ext.create('Ext.Panel', {
+            renderTo: Ext.get('UserDetailsrender'),
+            frame: true,
+            header: false,
+            autoScroll: false,
+            title: 'UserDetails',
+            items: [
+                UserUserDetailsTab,
+                UserDemographicFormvar,
+                UserAffiliationFormvar
+            ],
+        });
+
+    });
+
+    reloadUserDetailsForm = function(cmd,userid,usergroup) {
+
+        Ext.Ajax.request({
+            url: config.getUrl('public/user/UserUserDetails'),
+            params: {
+                cmd: cmd,
+                usergroup: usergroup
+            },
+            success: function (data) {
+                $("#UserDetailsContainer").html(data.responseText);
+            }
+        })
+    }
+
+</script>
+
+<div id="UserDetailsrender" style="position:relative;min-height:100px; padding-bottom:20px"></div>
+
+

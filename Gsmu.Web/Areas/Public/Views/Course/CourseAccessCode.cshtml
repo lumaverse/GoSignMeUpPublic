@@ -1,0 +1,57 @@
+﻿@using Gsmu.Api.Data;
+@model Gsmu.Api.Data.School.Course.CourseModel
+@{
+    var courseModel = Model;
+    var course = courseModel.Course;
+    var csetting = courseModel.CourseSettings;
+
+    var modifier = "CourseDetails";
+    var wgname = "AccessCode";
+    var wgcontainer = "Course" + wgname + "Container";
+    var wgcontainerDet = "Course" + wgname + "ContainerDet";
+}
+<div id="@wgcontainer" class="course-widgetbox" style="position:inherit; min-height:50px; background-color:#b8eca7 ">
+
+    <div id="@wgcontainerDet" style="padding:5px;">
+        @if ((Gsmu.Api.Authorization.AuthorizationHelper.CurrentUser.IsLoggedIn) && ((Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser != null)||(Gsmu.Api.Authorization.AuthorizationHelper.CurrentInstructorUser != null)||(Gsmu.Api.Authorization.AuthorizationHelper.CurrentAdminUser != null || Gsmu.Api.Authorization.AuthorizationHelper.CurrentSubAdminUser != null)||(Gsmu.Api.Authorization.AuthorizationHelper.CurrentStudentUser != null && Settings.Instance.GetMasterInfo2().AllowStudentMultiEnroll == 1)))
+        {
+            <div style="width: 100%; height:80px">
+                @{Html.RenderPartial("ListingCartButton", courseModel, new ViewDataDictionary { { "style", "float: center;" }, { "Modifier", modifier } });}
+            </div>
+        }
+        else
+        {
+                    <div style="width: 100%;">
+                        @{Html.RenderPartial("ListingCartButton", courseModel, new ViewDataDictionary { { "style", "float: center;" }, { "Modifier", modifier } });}
+                    </div>
+
+        }
+
+    <div style="width: 100%; margin-top: 30px;">
+        <div id="verificationresult" style="font-weight: bold;"></div>
+        @if (Model.Course.AccessCodeRequired)
+            {
+            <text>
+                <div id="accesscodeinputcontainer" style="font-weight: bold; margin-top: 80px;">
+                    Access Code:
+                    <input type="text" id="accesscode" style="width: 160px; margin-bottom: 10px;" /><div style="float: right; color: red;" id="accesscodeerror"></div>
+                    <div id="accesscodebuttoncontainer" onclick="cart.VerifyAccess();" class="hudbtn primary button-enrolled button-component">Verify</div>
+
+                </div>
+
+            </text>
+            }
+        <input type="hidden" value="1" id="accessvalid" />
+        <input type="hidden" value="@course.COURSEID" id="cid" />
+    </div>
+    <div id="coursedetailserror" style="color: #FF3333; font-weight: bold; margin: 5px 5px 0px 5px; padding-bottom: 0px; display: none;">
+        Please make the desired selections in the highlighted areas then click @Gsmu.Api.Data.Settings.Instance.GetMasterInfo4().PublicButtonLabelAddToCart.
+    </div>
+    <div id="coursedetailserrorspacer" style="color: #FF3333; font-weight: bold; margin: 0px 5px 0px 5px; padding-bottom: 0px; display: block;">
+        <br />
+        <br />
+        <br />
+    </div>
+</div>
+
+</div>

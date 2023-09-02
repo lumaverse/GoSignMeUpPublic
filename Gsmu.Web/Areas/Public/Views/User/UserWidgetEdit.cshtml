@@ -1,0 +1,285 @@
+﻿@using Gsmu.Api.Data
+@using Gsmu.Api.Data.School;
+@using Gsmu.Api.Data.School.User;
+@using Newtonsoft.Json.Linq;
+@{
+    ViewBag.Title = "";
+    string adminmode = ViewBag.adminmode;
+    string usergroup = ViewBag.usergroup;
+    
+    var usr = new UserInfo();
+    DataLists dlists = new DataLists();
+
+    WidgetInfo widgetmodel = new WidgetInfo();
+    UserWidget userwidget = new UserWidget();
+    WidgetFldProp userfld = new WidgetFldProp();
+
+    
+    widgetmodel = Json.Decode<WidgetInfo>(ViewBag.txtwidgetmodel);
+    userwidget = Json.Decode<UserWidget>(ViewBag.txtuserwidget);
+    userfld = Json.Decode<WidgetFldProp>(ViewBag.txtfld);
+    
+    
+    List<UserRegFieldSpecs> userregfieldspec = null;
+    if (usergroup == "IT")
+    {
+        //userregfieldspec = dlists.AllInstructorUserFields.ToList();
+    }
+    else
+    {
+        //userregfieldspec = dlists.AllStudentUserFields.ToList();
+    }
+    userregfieldspec = userfld.data.ToList();
+        
+    int wdgtID = widgetmodel.ID;
+    int ixst = 0;
+    int inew = 0;
+    
+}
+
+<script>
+
+
+
+    Ext.onReady(function () {
+
+        var usereditwidgetcontID = '#usereditwidgetcont'+ '@wdgtID'
+        $(usereditwidgetcontID +' .sortable-list').sortable({
+        connectWith: usereditwidgetcontID +' .sortable-list',
+        placeholder: 'placeholder',
+        opacity: 0.6, 
+        update: function (event, ui) {
+            //CheckIfFieldAlreadyExist(ui,@wdgtID);
+            UserWigetEditgetItems(usereditwidgetcontID, @wdgtID);
+        }
+    });
+    @{
+    ixst = 0;  
+    foreach (var wdgt in userwidget.WidgetItems.Where(w => w.WidgetID == wdgtID).OrderBy(l => l.DispSort))
+    {
+        ixst += 1;
+        string fldname = wdgt.FieldName;
+        
+    <text>
+        UserWidgetFieldButtonOptions('@fldname', @wdgtID);
+        UserWidgetFieldButtonDelete('@fldname', @wdgtID);
+    </text>
+    }
+    }
+
+
+
+        Ext.create('Ext.Button', {
+            text: 'Click on Field Below to Add',
+            renderTo: Ext.get("UserWidgetFieldList" + "@wdgtID"),
+            menu: {
+                xtype: 'menu',
+                showSeparator: false,
+                scrollable:{
+                    x:false,
+                    y:true
+                },
+                maxHeight: 400,
+                cls: 'no-icon-menu',
+                items: [
+
+                @{
+                ixst = 0;  
+                foreach (var item in userregfieldspec.Where(f => f.FieldVisible))
+                {
+                    inew += 1;
+                    string txtinew = inew.ToString().Length == 1 ? "0" + inew.ToString() : inew.ToString();
+                    string containerIDlst = "new" + txtinew + item.FieldName;
+                    string fldtxt = item.FieldName + " : <strong>" + item.FieldLabel + "</strong>";
+                           fldtxt = fldtxt.Replace("'", "`");
+                    string fldstatus = "available";
+                    string widgtTitle = "";
+
+                    int fldusedother = userwidget.WidgetItems.Where(w => w.FieldName == item.FieldName).Count();
+                    if (fldusedother > 0) { 
+                        fldstatus = "useinother";
+                        WidgetItemList otherwdgt = userwidget.WidgetItems.Where(w => w.FieldName == item.FieldName).First();
+                        try{
+                            WidgetInfo otherWidget = userwidget.Widgets.Where(w => w.ID == otherwdgt.WidgetID).First();
+                            widgtTitle = otherWidget.Title;
+                        }
+                        catch{
+                            fldstatus = "available";
+                        }
+                        
+                    }
+
+                    int fldusedcurrent = userwidget.WidgetItems.Where(w => w.WidgetID == wdgtID && w.FieldName == item.FieldName).Count();
+                    if (fldusedcurrent > 0) { fldstatus = "useincurrent"; }
+
+
+
+                    if (fldstatus == "available")
+                    {
+                
+                    <text>
+                    {
+                        text: '@Html.Raw(fldtxt)',
+                        tooltip: 'Available',
+                        icon: '/Images/Icons/FamFamFam/add.png',
+                        handler: function() {
+                            UserWigetAddField('@Html.Raw(item.FieldName)', @wdgtID);
+                        }
+                        
+                    },
+                    </text>
+                    }
+                    else if (fldstatus == "useinother")
+                    {
+                
+                    <text>
+                    {
+                        text: '@Html.Raw(fldtxt)',
+                        tooltip: 'Used in " '+ '@widgtTitle' +' " widget',
+                        icon: '/Images/Icons/FamFamFam/error_add.png',
+                        handler: function() {
+                            UserWigetAddField('@Html.Raw(item.FieldName)', @wdgtID);
+                        }
+                        
+                    },
+                    </text>
+                    }
+                    else
+                    {
+                    <text>
+                    {
+                        text: '@Html.Raw(fldtxt)',
+                        tooltip: 'Used in current widget',
+                        disabled: true,
+                        tooltip: 'Already exist in current widget',
+                        icon: '/Images/Icons/FamFamFam/delete.png',
+                    },
+                    </text>
+                    }
+                }
+                }
+                ]
+            }
+        });
+
+  
+
+
+
+        Ext.create('Ext.Button', {
+            tooltip: 'Return to display view',
+            icon: '/Images/Icons/FamFamFam/arrow_refresh_small.png',
+            border: 0,
+            renderTo: Ext.get("UserWidgetReturnView" + "@wdgtID"),
+            handler: function() {
+                loadWidgetFields(widgt.Widgets[GetwidgtIndex(@wdgtID)],cmd,usergroup);
+            }
+
+        });
+ 
+});
+
+</script>
+
+<div  id="@Html.Raw("usereditwidgetcont"+ wdgtID)" style="width:100%">
+
+	
+    <div class="x-panel x-panel-default-framed x-border-box" style="height: 100%;">
+        <div class="x-panel-header x-header x-header-horizontal x-docked x-unselectable 
+            x-panel-header-default-framed x-horizontal x-panel-header-horizontal x-panel-header-default-framed-horizontal 
+            x-top x-panel-header-top x-panel-header-default-framed-top x-docked-top x-panel-header-docked-top 
+            x-panel-header-default-framed-docked-top"
+             style="width: 101%; right: auto; left: -1px; top: -1px;">
+            <div class="x-header-body x-panel-header-body x-panel-header-body-default-framed 
+                x-panel-header-body-horizontal x-panel-header-body-default-framed-horizontal x-panel-header-body-top 
+                x-panel-header-body-default-framed-top x-panel-header-body-docked-top x-panel-header-body-default-framed-docked-top 
+                x-box-layout-ct x-panel-header-body-default-framed-horizontal x-panel-header-body-default-framed-top 
+                x-panel-header-body-default-framed-docked-top" style="width: 100%;">
+                <div class="x-box-inner "  
+                    style="width: 100%; height: 16px;">
+                    <div class="x-box-target" style="width: 100%;">
+                        <div class="x-component x-header-text-container x-panel-header-text-container 
+                            x-panel-header-text-container-default-framed x-box-item x-component-default" 
+                             style="right: auto; left: 0px; top: 0px; margin: 0px; width: 100%;">
+                            <span class="x-header-text x-panel-header-text x-panel-header-text-default-framed" 
+                              style="cursor:pointer" id="@Html.Raw("title" + wdgtID.ToString())" ondblclick="ActivateEditmode(this.id,'wdgtitle','@wdgtID')">@widgetmodel.Title</span>
+                            <span id="@Html.Raw("UserWidgetReturnView"+ wdgtID.ToString())"  style="float:right; height:30px; width:25px; padding-right:12px"></span>
+                            <span id="@Html.Raw("UserWidgetFieldList"+ wdgtID.ToString())" style="float:right; height:30px; width:160px"></span>
+
+                        </div></div></div></div></div>
+
+		<ul class="sortable-list" id="sortbl1" style="margin-top:30px">
+            @{
+            ixst = 0;   
+            foreach (var wdgt in userwidget.WidgetItems.Where(w => w.WidgetID == wdgtID).OrderBy(l => l.DispSort))
+            {
+                ixst += 1;
+                string txtixst = ixst.ToString().Length == 1 ? "0"+ ixst.ToString() : ixst.ToString();
+                string fldname = wdgt.FieldName;
+                string containerID = "xst" + txtixst + fldname;
+                string fldlabel = "[no label]";
+                string prf = "divUserWidgetField";
+                string FieldGrp = "none";
+                string FieldReadOnly = "false";
+                string FieldRequired = "false";
+                string FieldRequiredAll ="false";
+                string ConfirmRequired = "false";
+                string MaskTxt = "No Mask";
+                string AddtlInfo = "";
+                string FieldListValue = "";
+                string FieldStore = "";
+                int? FieldListType = 0;
+                if (fldname == "profileimage") { AddtlInfo = "<I>(display always on top)</I>"; }
+
+                try {
+                    UserRegFieldSpecs itemdet = userregfieldspec.Where(f => f.FieldName == wdgt.FieldName).First();
+                    FieldGrp = itemdet.FieldGrp;
+                    FieldReadOnly = itemdet.FieldReadOnly.ToString().ToLower();
+                    FieldRequired = itemdet.BoolFieldRequired.ToString().ToLower();
+                    FieldRequiredAll =  itemdet.BoolFieldRequiredAll.ToString().ToLower();
+                    ConfirmRequired = itemdet.ConfirmRequired.ToString().ToLower();
+                    MaskTxt = itemdet.MaskTxt;
+                    FieldListType = itemdet.FieldListType;
+                    FieldStore = itemdet.FieldStore;
+                    FieldListValue = itemdet.FieldListValue;
+                    fldlabel = (string.IsNullOrEmpty(itemdet.FieldLabel) ? "[no label]" : itemdet.FieldLabel);
+                    fldlabel = (fldname == "profileimage" ? "" : fldlabel);
+
+                }
+                catch { }
+
+                string fldnameTxt = (fldname == "studnum" ? "password" : fldname);
+                
+                string fldtxt = "<div style='float:left'>" + fldnameTxt + ": </div>&nbsp;&nbsp;<div style='float:left; font-weight:bold;  padding-left:12px; cursor:pointer' id='fldlbl" + fldname + "' ondblclick='ActivateEditmode(this.id,\"" + fldname + "\")'>" + fldlabel + "</div>" + AddtlInfo; 
+                
+                
+                <text>
+			    <li class="sortable-item" id="@containerID"  style="text-align: left; cursor:ns-resize">
+                    <div style="width:100%; height:30px;">
+                        <div style="float:left; width:70%"> @Html.Raw(fldtxt)</div>
+                        <div id="@Html.Raw(prf + "ButtonDelete" + fldname)" style="float:right; width:20px; cursor:pointer"></div>
+                        <div id="@Html.Raw(prf + "ButtonOptions" + fldname)" style="float:right; width:20px; cursor:pointer"></div>
+                        <div style="float:right; width:20px; cursor:pointer"></div>
+                        <div style=" display:none">
+                            <input id="@Html.Raw(prf + "FieldName" + fldname)" type="hidden" value="@fldname" />
+                            <input id="@Html.Raw(prf + "FieldGrp" + fldname)" type="hidden" value="@FieldGrp" />
+                            <input id="@Html.Raw(prf + "FieldReadOnly" + fldname)" type="hidden" value="@FieldReadOnly"/>
+                            <input id="@Html.Raw(prf + "FieldRequired" + fldname)" type="hidden" value="@FieldRequired"/>
+                            <input id="@Html.Raw(prf + "FieldRequiredAll" + fldname)" type="hidden" value="@FieldRequiredAll"/>
+                             <input id="@Html.Raw(prf + "ConfirmRequired" + fldname)" type="hidden" value="@ConfirmRequired"/>
+                            <input id="@Html.Raw(prf + "MaskTxt" + fldname)" type="hidden" value="@MaskTxt" />
+                            <input id="@Html.Raw("FieldListValue" + fldname)" type="hidden" value="@Html.Raw(FieldListValue)" />
+                            <input id="@Html.Raw("FieldListType" + fldname)" type="hidden" value="@Html.Raw(FieldListType)" />
+                            <input id="@Html.Raw("FieldStore" + fldname)" type="hidden" value="@Html.Raw(FieldStore)" />
+                        </div>
+                    </div>
+			    </li>
+                </text>
+            }
+            }
+
+		</ul>
+        </div>
+	 
+</div>
+

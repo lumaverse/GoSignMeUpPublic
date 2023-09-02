@@ -1,0 +1,280 @@
+﻿@using Gsmu.Api.Data
+@using Gsmu.Api.Data.ViewModels.Layout
+@{
+    ViewBag.Title = "Labels and button labels";
+    var layoutConfig = LayoutManager.PublicLayoutConfiguration;
+
+    // sames as in _Layout.cshtml
+    var menuDivider = "<span style=\"opacity: 0.3;\">|</span>";    
+}
+
+
+@section Head {
+    <script type="text/javascript">
+    Ext.onReady(function () {
+        window.LAYOUT.State.isButtonPage = true;
+        window.LAYOUT.EnsureButtonEditing();
+        window.LAYOUT.EnsurePixelLabel();
+    });
+    </script>
+
+    <style type="text/css">
+        .component-pixel-size {
+            text-align: left; 
+            text-shadow: rgb(230, 230, 230) 2px 2px 3px;
+        }
+
+        #button-admin fieldset {
+            border: 2px solid #cccccc;
+            border-radius: 3px;
+            margin-bottom: 20px;
+        }
+
+        #button-admin fieldset legend {
+            font-size: 1.4em;
+            font-weight: bold;
+            padding-top: 3px;
+            padding-bottom: 3px;
+        }
+
+        .button-box {
+            float: left;
+            margin-right: 5px;
+        }
+
+        .button-box-title {
+            margin-bottom: 5px;
+            margin-top: 10px;
+        }
+
+        .button-box-button {
+            float: left;
+            cursor: pointer;
+        }
+
+        .button-search {
+            font-weight: bold;
+            font-size: 1.5em;
+            color: #bbbbbb;
+            display: block;
+            width: 400px;
+            border: solid 1px #aaaaaa;
+            padding: 3px;
+            cursor: pointer;
+        }
+    </style>
+}
+
+<div id="button-admin">
+    <fieldset>
+        <legend>
+            <img src="@Url.Content("~/images/icons/famfamfam/information.png")" style="vertical-align: middle;"/> Information
+        </legend>
+
+        To edit the labels/buttons, just double click the actual text or use the pencil icon that appears when you hover your mouse over the button ...
+    </fieldset>
+
+    <fieldset>
+        <legend>
+            Commerce
+        </legend>
+
+        <div class="button-box">
+            <div class="button-box-title">
+                Add to cart
+            </div>
+            <div class="button-box-button cart-button button-addtocart button-component" data-button-type="@LayoutButton.AddToCart.ToString()">
+                @Settings.Instance.GetMasterInfo4().PublicButtonLabelAddToCart
+            </div>
+        </div>
+        
+        <div class="button-box">
+            <div class="button-box-title">
+                Checkout
+            </div>
+            <div class="button-box-button hudbtn primary button-component button-checkout" data-button-type="@LayoutButton.Checkout.ToString()">
+                @Settings.Instance.GetMasterInfo4().PublicButtonLabelCheckout
+            </div>
+        </div>
+        
+        <div class="button-box">
+            <div class="button-box-title">
+                Empty cart
+            </div>
+            <div class="button-box-button">
+                <a href="javascript:;" class="hudbtn left button-component" data-button-type="@LayoutButton.EmptyCart.ToString()">@layoutConfig.LayoutButtons.EmptyCart</a>
+            </div>
+        </div>        
+        <div class="button-box">
+            <div class="button-box-title">
+                Continue Shopping Courses
+            </div>
+            <div class="button-box-button hudbtn primary button-component" data-button-type="@LayoutButton.ContinueShoppingCourse.ToString()">
+                @layoutConfig.LayoutButtons.ContinueShoppingCourse
+            </div>
+        </div>
+        <div class="button-box">
+            <div class="button-box-title">
+                Multiple Enrollment
+            </div>
+            <div class="button-box-button">
+                <a href="javascript:;" class="hudbtn left button-component" data-button-type="@LayoutButton.MultipleEnrollment.ToString()"> @Settings.Instance.GetMasterInfo4().MultipleEnrollment</a>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>
+            Course catalog
+        </legend>
+
+        <div class="button-box">
+            <div class="button-box-title">
+                Enrolled
+            </div>
+            <div class="button-box-button hudbtn info button-enrolled button-component" data-button-type="@LayoutButton.Enrolled.ToString()">
+                @Settings.Instance.GetMasterInfo4().PublicButtonLabelEnrolled
+            </div>
+        </div>
+    
+        <div class="button-box">
+            <div class="button-box-title">
+                Wait space available
+            </div>
+            <div>
+                <div class="button-box-button cart-button button-addtocart button-component" data-button-type="@LayoutButton.WaitSpaceAvailable.ToString()">
+                    @layoutConfig.LayoutButtons.WaitSpaceAvailable
+                </div>
+            </div>
+        </div>
+        <div class="button-box">
+           <div class="button-box-title">
+                Wait List
+            </div>
+            <div class="button-box-button hudbtn info button-enrolled button-component" data-button-type="@LayoutButton.OnWaitList.ToString()">
+                @layoutConfig.LayoutButtons.OnWaitList
+            </div>
+        </div>
+        <div class="button-box">
+            <div class="button-box-title">
+                Class full
+            </div>
+            <div class="button-box-button button-class-full button-component" data-button-type="@LayoutButton.ClassFull.ToString()">@layoutConfig.LayoutButtons.ClassFull</div>
+        </div>
+
+    </fieldset>
+
+    <fieldset>
+        <legend>
+            Membership
+        </legend>
+
+        <div class="button-box">
+            <div class="button-box-title">
+                Create account
+            </div>
+            <div class="button-box-button btn btn-prim sd-sgnBtn button-component" data-button-type="@LayoutButton.CreateAccount.ToString()">
+                @layoutConfig.LayoutButtons.CreateAccount
+            </div>
+        </div>
+
+        <div class="button-box">
+            <div class="button-box-title">
+                Login
+            </div>
+            <div class="button-box-button btn btn-prim sd-sgnBtn button-component" data-button-type="@LayoutButton.Login.ToString()">
+                @layoutConfig.LayoutButtons.Login
+            </div>
+        </div>
+        <div class="button-box">
+            <div class="button-box-title">
+                Shibboleth Login
+            </div>
+            <div class="button-box-button btn btn-prim sd-sgnBtn button-component" data-button-type="@LayoutButton.Shibb_Login.ToString()">
+                @layoutConfig.LayoutButtons.Shibb_Login
+            </div>
+        </div>
+        <div class="button-box">
+            <div class="button-box-title">
+                CAS Login
+            </div>
+            <div class="button-box-button btn btn-prim sd-sgnBtn button-component" data-button-type="@LayoutButton.Cas_Login.ToString()">
+                @layoutConfig.LayoutButtons.Cas_Login
+            </div>
+        </div>
+        <div class="button-box">
+            <div class="button-box-title">
+                Canvas Login
+            </div>
+            <div class="button-box-button btn btn-prim sd-sgnBtn button-component" data-button-type="@LayoutButton.Canvas_Login.ToString()">
+                @layoutConfig.LayoutButtons.Canvas_Login
+            </div>
+        </div>
+        <div style="clear: both;"></div>
+
+        <div class="button-box" id="word-top-increase-component">
+            <div class="button-box-title">
+                Public Settings
+            </div>
+            <div id="component-pixel-size-renderer">
+            </div>
+            <div class="grad_stud_top_info_word_top component-pixel-size component-pixel-top-row" style="width: 500px; font-size: @(layoutConfig.IncreaseWordTopRow)px;">
+                <a id="link-browse" href="javascript: void(0);">Home</a>
+                @Html.Raw(menuDivider)
+                <a id="link-browse" href="javascript: void(0);">Create account</a>
+                @Html.Raw(menuDivider)
+                <a id="link-browse" href="javascript: void(0);">Calendar</a>
+                @Html.Raw(menuDivider)
+                <a id="link-browse" href="javascript: void(0);">Login</a>
+            </div>
+        </div>
+
+    </fieldset>
+
+        <fieldset>
+        <legend>
+            Misc.
+        </legend>
+
+        <div class="button-box">
+            <div class="button-box-title">
+                Search
+            </div>
+            <div>
+                <div class="button-box-button button-search button-component" data-button-type="@LayoutButton.Search.ToString()">
+                    @layoutConfig.LayoutButtons.Search
+                </div>
+            </div>
+        </div>
+           
+        <div class="button-box">
+            <div class="button-box-title">
+                Search From
+            </div>
+
+            <div>
+                <div class="button-box-button button-search button-component" data-button-type="@LayoutButton.SearchFrom.ToString()">
+                    @layoutConfig.LayoutButtons.SearchFrom
+                </div>
+            </div>
+        </div>
+        <div class="button-box">
+            <div class="button-box-title">
+                Search Until
+            </div>
+
+            <div>
+                <div class="button-box-button button-search button-component" data-button-type="@LayoutButton.SearchTo.ToString()">
+                    @layoutConfig.LayoutButtons.SearchTo
+                </div>
+            </div>
+        </div>
+
+    </fieldset>
+
+
+
+
+
+
+</div>

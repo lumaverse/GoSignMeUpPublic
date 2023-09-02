@@ -1,0 +1,21 @@
+﻿@model Gsmu.Api.Data.School.Course.CourseModel
+@{
+    var courseModel = Model;
+    var course = courseModel.Course;
+    var csetting = courseModel.CourseSettings;
+    var coursechoices = courseModel.CourseChoices;
+
+    var modifier = "CourseDetails";
+    var wgname = "Choice";
+    var wgcontainer = "Course" + wgname + "Container";
+    var wgcontainerDet = "Course" + wgname + "ContainerDet";
+}
+
+<div id="@wgcontainer" class="course-widgetbox" style="position:inherit; min-height:180px;">
+    <div class="course-widgetbox-smheader">
+    Course Choices
+    </div>
+   <div id="@wgcontainerDet" style="padding:5px;margin:5px; ">
+      @{Html.RenderPartial("ListingCourseChoices", courseModel, new ViewDataDictionary { { "Modifier", modifier }, { "Width", 180 } });}
+    </div>
+</div>

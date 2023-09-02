@@ -1,0 +1,81 @@
+﻿@using Gsmu.Api.Data
+@using Gsmu.Api.Networking.Mail
+@{
+    Layout = "~/Areas/Adm/Views/Shared/_Layout.cshtml";
+}
+@Scripts.Render("~/Areas/Adm/Scripts/Networking/Networking.js")
+<div class="container-fluid">
+    <div class="col-lg-12">
+        <div class="panel panel-default" id="accordion">
+            <div class="panel-heading gsmu-main-panel-heading">
+                <div class="pull-left heading-title">
+                    Email Utility Functions
+                </div>
+                <div class="gsmu-spacer"></div> <!--make sure to include spacer if panel header contains both pull left and right-->
+            </div>
+            <div class="panel-body gsmu-main-body gsmu-form">
+                <div class="panel panel-default">
+                    <div class="panel-heading gsmu-sub-panel-heading">
+                        <div class="panel-title">
+                            Email Sending
+                            <span class="pull-right clickable">
+                                <a href="#commonPanel" data-toggle="collapse" data-parent="#accordion" title="" class="btn-icon btn-xs glyphicon glyphicon-chevron-up"></a>
+                            </span>
+                        </div>
+                    </div>
+                    <div id="commonPanel" class="panel-body gsmu-sub-panel-body panel-collapse collapse in">
+                        <div class="row form-group form-group-sm">
+                            <div class="col-lg-4">
+                                Mail Type:
+                            </div>
+                            <div class="col-lg-8">
+                                <select name="MailType" id="mail-type" class="form-control">
+                                    <option value="0">Confirmation</option>
+                                    <option value="1">Cancellation</option>
+                                    <option value="2">Wait List To Confirmation</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group form-group-sm">
+                            <div class="col-lg-4">
+                                Order # :
+                            </div>
+                            <div class="col-lg-8">
+                                <input type="text" name="OrderNumber" id="order-number" placeholder="Enter Order #" class="form-control" />
+                                <input type="hidden" id="email-networking-id" />
+                            </div>
+                        </div>
+                        <div class="row form-group form-group-sm">
+                            <div class="col-lg-4">
+                                Email Preview : ( Subject / Body )
+                            </div>
+                            <div class="col-lg-8">
+                                <div class="btn-block" style="padding-bottom: 5px;">
+                                    <button style="display:none" type="button" id="gsmu-email-enable-editing" onclick="Networking.editing(this)" data-value="enable" class=" gsmu-panel-footer-button btn-xs btn btn-default"><i id="editing-icon" class="glyphicon glyphicon-ok-circle"></i>&nbsp;Enable Editing</button>
+                                    <button style="display:none" type="button" id="gsmu-email-enable-send-preview" onclick="Networking.editingSendPreview(this)" data-value="enable" class=" gsmu-panel-footer-button btn-xs btn btn-default">
+                                        <i id="editing-prev-icon" class="glyphicon glyphicon-ok-circle"></i>
+                                        <i class="glyphicon glyphicon-envelope"></i>&nbsp;Enable Send Preview
+                                    </button>
+                                </div>
+                                <div class="btn-block" style="padding-bottom: 5px;">
+                                    <button type="button" id="gsmu-email-preview" onclick="Networking.previewEmailTemplate(false)" class=" gsmu-panel-footer-button btn-xs btn btn-default"><i class="glyphicon glyphicon-eye-open"></i>&nbsp;Preview Template</button>
+                                    <button type="button" id="gsmu-email-preview-with-token" onclick="Networking.previewEmailTemplate(true)" class="gsmu-panel-footer-button btn-xs btn btn-default"><i class="glyphicon glyphicon-eye-open"></i>&nbsp;Preview with Token</button>
+                                    <button type="button" id="gsmu-email-clear-preview" onclick="Networking.clearPreviewEmailTemplate()" class="gsmu-panel-footer-button btn-xs btn btn-default"><i class="glyphicon glyphicon-remove"></i>&nbsp;Clear</button>
+                                </div>
+                                <div class="gsmu-content">
+                                    <input value="Subject" type="text" id="gsmu-email-subject-preview" class="form-control" />
+                                    <div id="gsmu-email-body-preview" class="well-sm form-control" contenteditable="true">
+                                        Body
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <button type="button" id="gsmu-email-send-btn" class="gsmu-panel-header-button btn btn-primary" onclick="Networking.sendEmail(this)"><i class="glyphicon glyphicon-envelope"></i>&nbsp; Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

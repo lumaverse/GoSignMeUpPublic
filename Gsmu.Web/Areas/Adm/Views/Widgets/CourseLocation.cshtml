@@ -1,0 +1,103 @@
+﻿<div id="widget-course-location">
+    <div class="panel panel-default">
+        <div class="panel-heading gsmu-sub-panel-heading">
+            <div class="panel-title pull-left">Location</div>
+            <div class="pull-right">
+                <div id="course-location-btns">
+                    <div>
+                        <button type="button" class="btn btn-warning btn-xs edit" onclick="courseLocationEditor.initEditor()"><span class="glyphicon glyphicon-pencil"></span></button>
+                        <button type="button" class="btn btn-success btn-xs save" onclick="courseLocationEditor.save()"><span class="glyphicon glyphicon-ok"></span></button>
+                        <button type="button" class="btn btn-danger btn-xs cancel" onclick="courseLocationEditor.initView()"><span class="glyphicon glyphicon-remove"></span></button>
+                        <button type="button" id="map-preview-link" class="btn btn-info btn-xs map" onclick="" title="Visit Location on Map"><span class="glyphicon glyphicon-map-marker"></span></button>
+                        @*<span class="clickable"><a href="" id="map-preview-link" data-toggle="collapse" title="Visit Location on Map" class="fa fa-map-marker fa-2x" style="color:#f76058"></a></span>*@
+                    </div>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <div class="panel-body gsmu-sub-panel-body medium-panel panel-collapse collapse in scroll-y">
+            <div class="row form-group form-group-sm">
+                <div class="col-lg-12">
+                    <div class="pad-x-5">
+                        <div id="course-location-map" style="display:none; width: 100%; height: 300px;">
+                        </div>
+                    </div><br />
+                    <div id="course-location-info">
+                        <div class="pad-x-5 pad-bot-10">
+                            <b><span id="course-location-location"></span></b><br />
+                            <span id="course-location-street"></span>,
+                            <span id="course-location-city">,</span>
+                            <span id="course-location-state"></span>
+                            <span id="course-location-zip"></span><br />
+                        </div>
+                    </div>
+                    <div id="course-location-editor">
+                        <div class="pad-x-5">
+                            <div class="row pad-bot-5">
+                                <div class="col-lg-3">Room</div>
+                                <div class="col-lg-8">
+                                    <select id="course-location-rooms" name="Room" class="form-control input-sm"></select>
+                                </div>
+                            </div>
+                            <div class="row pad-bot-5">
+                                <div class="col-lg-3">Room Directions</div>
+                                <div class="col-lg-8">
+                                    <select id="course-location-room-directions" name="RoomDirectionsId" class="form-control input-sm"></select>
+                                </div>
+                            </div>
+                            <div class="row pad-bot-5">
+                                <div class="col-lg-3">Location</div>
+                                <div class="col-lg-8">
+                                    <select id="course-location-locations" name="Location" class="form-control input-sm"></select>
+                                </div>
+                            </div>
+                            <div class="row pad-bot-5">
+                                <div class="col-lg-3">Street</div>
+                                <div class="col-lg-8">
+                                    <input id="course-location-street-input" type="text" name="Street" class="form-control input-sm" />
+                                </div>
+                            </div>
+                            <div class="row pad-bot-5">
+                                <div class="col-lg-3">City</div>
+                                <div class="col-lg-8">
+                                    <input id="course-location-city-input" type="text" name="City" class="form-control input-sm" />
+                                </div>
+                            </div>
+                            <div class="row pad-bot-5">
+                                <div class="col-lg-3">State</div>
+                                <div class="col-lg-8">
+                                    <input id="course-location-state-input" type="text" name="State" class="form-control input-sm" />
+                                </div>
+                            </div>
+                            <div class="row pad-bot-5">
+                                <div class="col-lg-3">Zip</div>
+                                <div class="col-lg-8">
+                                    <input id="course-location-zip-input" type="text" name="Zip" class="form-control input-sm" />
+                                </div>
+                            </div>
+                            <div class="row pad-bot-5">
+                                <div class="col-lg-3">Country</div>
+                                <div class="col-lg-8">
+                                    <select id="course-location-country-input" name="Country" class="form-control input-sm"></select>
+                                </div>
+                            </div>
+                            <div class="row pad-bot-5">
+                                <div class="col-lg-3">Location Url</div>
+                                <div class="col-lg-8">
+                                    <input id="course-location-url-input" type="text" name="Locationurl" class="form-control input-sm" />
+                                </div>
+                            </div>
+                            <div class="row pad-bot-5">
+                                <div class="col-lg-3">Location Info</div>
+                                <div class="col-lg-8">
+                                    <input id="course-location-info-input" type="text" name="LocationAdditionInfo" class="form-control input-sm" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/Areas/Adm/Scripts/Widgets/CourseLocation.js")

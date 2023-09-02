@@ -1,0 +1,440 @@
+﻿@using Gsmu.Api.Data.ViewModels.Layout;
+@using Gsmu.Api.Data.School.Terminology;
+@using Gsmu.Api.Authorization;
+@using Gsmu.Api.Data;
+@using System.Configuration;
+@{
+    ViewBag.Title = "Login";
+    var layoutConfig = Gsmu.Api.Data.ViewModels.Layout.LayoutManager.PublicLayoutConfiguration;
+    string shibbRedirectPopup = ConfigurationManager.AppSettings["ShowShibbRedirectPopup"] +"";
+    string DisplayShibbolethbutton = ConfigurationManager.AppSettings["DisplayShibbolethbutton"] +"";
+    string DisplayShibbolethicon = ConfigurationManager.AppSettings["DisplayShibbolethicon"] +"";
+    string hideCanvasLoginLink = ConfigurationManager.AppSettings["hideCanvasLoginLink"];
+    string AppSettingHide_InstructorLogin_onCartCheckOut = ConfigurationManager.AppSettings["hide_InstructorLogin_onCartCheckOut"] +"";
+    var hideLoginBtn = false;
+    var hideSupervisorLogin = 0;
+    var hideInstructorLogin = 0;
+    var hide_InstructorLogin_onCartCheckOut = ViewBag.hide_InstructorLogin_onCartCheckOut;
+    if (hide_InstructorLogin_onCartCheckOut == null) { hide_InstructorLogin_onCartCheckOut = 0; }
+    if(Settings.Instance.GetMasterInfo3().hideInstructorLogin == 1 || AppSettingHide_InstructorLogin_onCartCheckOut == "1"){
+        hideInstructorLogin = 1;
+    }
+    if (Settings.Instance.GetMasterInfo3().HideSupervisorLogin == 1 || Settings.Instance.GetMasterInfo3().HideSupervisorLogin == 2)
+    {
+        hideSupervisorLogin = 1;
+    }    
+    
+}
+<script type="text/javascript">
+    var prvCmp = Ext.getCmp('membershiploginformusername');
+    if (prvCmp != null) { prvCmp.destroy(); }
+
+    var prvCmp = Ext.getCmp('membershiploginformpassword');
+    if (prvCmp != null) { prvCmp.destroy(); }
+
+    Ext.onReady(function () {
+        var shibsetting = @Settings.Instance.GetMasterInfo4().shibboleth_sso_enabled;
+        var shib_allow_gsmu_auth = @Settings.Instance.GetMasterInfo4().shibboleth_allow_gsmu_login;
+        var cas_allow_gsmu_auth = '@ViewBag.CASConfigLoginGsmu';
+        var cas_authurl = "@Settings.Instance.GetMasterInfo2().CASAuthURL";
+        if((shibsetting == 1 || shibsetting == 2) && (shib_allow_gsmu_auth == 0)) {
+            if('@Session["ShibbolethStudent"]' == ''){
+                membership.ShibbolethLogin();
+            }
+            else
+            {
+                membership.loginShibboleth('ST')
+            }
+            
+        }
+        if(cas_allow_gsmu_auth=="0")
+        {
+           // membership.CasLogin(cas_authurl);
+        }
+       
+
+        var username = Ext.create('Ext.form.field.Text', {
+            renderTo: Ext.get('divmembershiploginformusername'),
+            id: 'membershiploginformusername',
+            name: 'username',
+            height: 30,
+            width: 305,
+            allowBlank: false,
+            value: window.MEMBERSHIP.getStoredUsername(),
+            validateOnBlur: false,
+            enableKeyEvents: true,
+            listeners: {
+                keyUp: function (that, e, opts) {
+                    if (e.getKey() == e.ENTER) {
+                        password.focus();
+                    }
+                }
+            }
+
+        });
+
+        var password = Ext.create('Ext.form.field.Text', {
+            renderTo: Ext.get('divmembershiploginformpassword'),
+            id: 'membershiploginformpassword',
+            name: 'password',
+            inputType: 'password',
+            height: 30,
+            width: 305,
+            allowBlank: false,
+            validateOnBlur: false,
+            enableKeyEvents: true,
+            listeners: {
+                keyUp: function (that, e, opts) {
+                    if (e.getKey() == e.ENTER) {
+                        membership.login('login2');
+                    }
+                }
+            }
+        });
+
+        var lastLogonType = membership.getLastLogonType();
+
+        
+        if(lastLogonType==null){
+            lastLogonType = "instructor";
+            if(@layoutConfig.HideStudentLogin == 1 && @hideInstructorLogin == 1){
+                lastLogonType = "supervisor";
+            }
+
+            if(@layoutConfig.HideStudentLogin == 1 && @hideSupervisorLogin == 1){
+                lastLogonType = "instructor";
+            }
+
+            if(@layoutConfig.HideStudentLogin == 0){
+                lastLogonType = "student";
+            }
+
+        }
+
+        Ext.get('login-inst-redirect').enableDisplayMode();
+        Ext.get('login-inst-redirect').setVisible(false);
+
+        var loginTypes = Ext.dom.Query.select('[name=logintype]');
+        loginTypes.forEach(function(dom) {
+            var el = Ext.get(dom);
+            el.on('change', function() {
+
+                var setVisible = function(button, visibility) {
+                    if (button != null) {
+                        button.enableDisplayMode();
+                        button.setVisible(visibility);
+                    }
+                }
+                
+                var loginform = Ext.get('loginform');
+                var loginbtn = Ext.get('login-button');
+                var canvas = Ext.get('login-sso-canvas');
+                var google = Ext.get('login-sso-google');
+                var instredct = Ext.get('login-inst-redirect');
+                var shibboleth = Ext.get('login-sso-shibb');
+                
+                // 1 - student
+                // 2 - instructor
+                // 3 - supervisor
+                switch(dom.value) {
+                    case '1':
+                        membership.storeLastLogonType('student');
+                        setVisible(loginform, true);
+                        setVisible(loginbtn, true);
+                        setVisible(canvas, true);
+                        setVisible(google, true);
+                        setVisible(shibboleth, true);
+                        setVisible(instredct, false);
+                        $('#forgot_password_link_page').attr("href", config.getUrl('Public/User/AccountRecovery?usertype=student'))
+                        $('#forgot_password_link_page').show();                
+                        @if(Settings.Instance.GetMasterInfo2().disallownewuser !=0 || Settings.Instance.GetMasterInfo2().HideForgotPassword != 0){
+                            <text>
+                                         $('#forgot_password_link_page').hide();
+                            </text>
+                        }                        
+                        break;
+
+
+                    case '2': 
+                        membership.storeLastLogonType('instructor');
+                        setVisible(loginform, true);
+                        setVisible(loginbtn, true);
+                        setVisible(canvas, false);
+                        setVisible(google, false);
+                        setVisible(shibboleth, true);
+                        setVisible(instredct, false);
+                        $('#forgot_password_link_page').hide();
+                        break;
+
+                    case '3':
+                        membership.storeLastLogonType('supervisor');
+                        setVisible(loginform, true);
+                        setVisible(loginbtn, true);
+                        setVisible(canvas, false);
+                        setVisible(google, false);
+                        setVisible(shibboleth, false);
+                        setVisible(instredct, false);    
+                        $('#forgot_password_link_page').attr("href", config.getUrl('Public/User/AccountRecovery?usertype=supervisor'))
+                        $('#forgot_password_link_page').show();                
+                        break;
+                }
+            })
+
+            $("[name='logintype']").click();
+        });
+
+        loginTypes.forEach(function(dom) {
+            var el = Ext.get(dom);
+            if (lastLogonType == 'student' && dom.id =='student-radio') {
+                dom.checked = true;
+                el.fireEvent('change');
+            } else if (lastLogonType == 'instructor' && dom.id =='instructor-radio') {
+                dom.checked = true;
+                el.fireEvent('change');
+            } else if (lastLogonType == 'supervisor' && dom.id =='supervisor-radio') {
+                dom.checked = true;
+                el.fireEvent('change');
+            }
+        });
+
+        $("#LoginreturnUrlhash").val(window.location.hash);
+
+        if (username.getValue() + '' == '') {
+            username.focus();
+        } else {
+            password.focus();
+        }
+    });
+
+</script>
+<div id="loginmaincnt" class="sd-bc">
+            @if (Settings.Instance.GetMasterInfo2().disallownewuser != -1) 
+                {
+					var actiontoredirect="";
+                    if (Settings.Instance.GetPDFHeaderFooterInfo().Forcelogin == 1 || Settings.Instance.GetPDFHeaderFooterInfo().Forcelogin == 2){
+                        actiontoredirect="";
+                    }
+					else{
+                        actiontoredirect="checkout";
+                    }
+                    <div id="rContainer" class="sd-rCont">
+                        <div class="sd-rcc" id="newUserCnt" style="margin-top: 80px;">
+                            <div class="sd-rts">@Html.Raw(Settings.Instance.GetMasterInfo2().RegisterNewUserLinkText) click below to create a new account.</div>
+                            <div class="sd-rts" style="height:50px"></div>
+
+                            <div>
+                                  @if (string.IsNullOrWhiteSpace(Settings.Instance.GetMasterInfo().NewAcctDisclaimer))
+                                 {
+                                       <button name="register_signin" class="btn btn-prim sd-sgnBtn button-component" data-button-type="@LayoutButton.Login.ToString()" 
+                                       onclick="window.CART.setPostRegistrationAction('@actiontoredirect'); window.location.href = '/Public/User/RegisterUser';">
+                                     @layoutConfig.LayoutButtons.CreateAccount
+                                </button>
+                                }else{
+                                       <button name="register_signin" class="btn btn-prim sd-sgnBtn  button-component" data-button-type="@LayoutButton.Login.ToString()" 
+                                       onclick="window.CART.setPostRegistrationAction('@actiontoredirect'); window.location.href = '@Settings.Instance.GetMasterInfo().NewAcctDisclaimer';">
+                                           @layoutConfig.LayoutButtons.CreateAccount
+                                           </button>
+                                }
+                            </div>
+
+                        </div>
+                    </div>  
+                }
+@{
+    String pubicloginmessage = Settings.Instance.GetMasterInfo2().pubicloginmessage;
+    if (String.IsNullOrWhiteSpace(pubicloginmessage))
+    {
+        pubicloginmessage = "Please " + layoutConfig.LayoutButtons.Login.ToLower() + " below";
+    }
+
+    String returl = Request.QueryString["returnUrl"];
+
+    var PwLabel = Settings.Instance.GetFieldSpecs("studnum").FieldLabel;
+    PwLabel = string.IsNullOrWhiteSpace(PwLabel) ? "Password" : PwLabel;
+
+    var UsernameLabel = Settings.Instance.GetFieldSpecs("username").FieldLabel;
+    UsernameLabel = string.IsNullOrWhiteSpace(UsernameLabel) ? "Username" : UsernameLabel;
+
+    var EmailLabel = Settings.Instance.GetFieldSpecs("email").FieldLabel;
+    EmailLabel = string.IsNullOrWhiteSpace(EmailLabel) ? "Email" : EmailLabel;
+
+    var LoginAuthOption = Settings.Instance.GetMasterInfo4().LoginAuthOption;
+
+    var AuthLabel = "Username";
+    if (LoginAuthOption == 1)
+    {
+        AuthLabel = EmailLabel;
+    }
+    else if (LoginAuthOption == 2)
+    {
+        AuthLabel = UsernameLabel + " / " + EmailLabel;
+    }
+
+     string DisplyLoginCSS = "";
+    if(Gsmu.Api.Integration.Canvas.Configuration.Instance.HideLoginFormIfUserInCanvas)
+    {
+        DisplyLoginCSS = "display:none;"; 
+    }
+
+    if(layoutConfig.HideStudentLogin == 1 && hideSupervisorLogin == 1 && hideInstructorLogin == 1)
+    {
+        DisplyLoginCSS = "display:none;"; 
+        hideLoginBtn = true;
+    }
+   
+}
+
+    <div class="sd-lCont sd-lCont" style="min-height:250px;">
+        <input id="LoginreturnUrl" type="hidden" value="@returl" />
+        <input id="LoginreturnUrlhash" type="hidden" value="" />
+    <div>
+        <span class="sd-txtA">@Html.Raw(pubicloginmessage)</span>
+        <div style="color:red;" id="errormsg"> </div>
+    </div>
+    <div>
+
+                <div id="loginform" style="@DisplyLoginCSS">
+                    <div class="sd-uid">
+                        <div class="sd-ezp"><span><span class="sd-eym"></span></span></div>
+                        <div></div>
+                        <div class="sd-sd">
+                            <span class="sd-unl">
+                                <label for="userid" style="text-wrap:none">@Html.Raw(AuthLabel)</label></span>
+                                 <div id="divmembershiploginformusername"></div>   
+                        </div>
+                        <div>
+                            <span class="sd-unl">
+                                <label for="pass">@Html.Raw(PwLabel)</label></span>
+                                <div id="divmembershiploginformpassword"></div>
+                            <div>&nbsp;
+                                @if (Settings.Instance.GetMasterInfo2().HideForgotPassword != 1 && Settings.Instance.GetMasterInfo2().disallownewuser ==0)
+                                {
+                                <a id="forgot_password_link_page" href="/public/user/AccountRecovery"><span class="sd-sv">Forgot your @Html.Raw(UsernameLabel.ToLower()) or password?</span></a>
+                                }
+                                else{<a id="forgot_password_link_page" href="/public/user/AccountRecovery" style="display:none;"><span class="sd-sv">Forgot your @Html.Raw(UsernameLabel.ToLower()) or password?</span></a>}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sd-ezp" style="@DisplyLoginCSS">
+                    <div class="sd-km">
+                        @if ((hideInstructorLogin != 1 || hideSupervisorLogin != 1 ) 
+                                && layoutConfig.HideStudentLogin != 1){
+                        <b class="sd-pcs">
+                            <input type="radio" name="logintype" value="1" id="student-radio" checked="checked">
+
+                        </b>
+                            <span class="sd-pcsm"><label for="student-radio" style="cursor:pointer; margin-bottom:-2px !important;">@TerminologyHelper.Instance.GetTermCapital(TermsEnum.Student)</label></span>
+                        <br />
+						}
+
+                        @if (hideInstructorLogin == 1 && hideSupervisorLogin == 1 ){
+                            <input style="display:none" type="radio" name="logintype" value="1" id="student-radio" checked="checked">
+                        }
+
+                        @if (hideInstructorLogin != 1){
+                        <b class="sd-pcs">
+                            <input type="radio" name="logintype" value="2" id="instructor-radio">
+
+                        </b>
+                            <span class="sd-pcsm"><label for="instructor-radio" style="cursor:pointer; margin-bottom:-2px !important;">@TerminologyHelper.Instance.GetTermCapital(TermsEnum.Instructor)</label></span>
+                        <br />
+                        }
+                        @if (hideSupervisorLogin != 1){
+                        <b class="sd-pcs">
+                            <input type="radio" name="logintype" value="3" id="supervisor-radio">
+                        </b>
+                            <span class="sd-pcsm"><label for="supervisor-radio" style="cursor:pointer; margin-bottom:-2px !important;">@TerminologyHelper.Instance.GetTermCapital(TermsEnum.Supervisor)</label></span>
+                        }
+                    </div>
+                </div>
+           
+                <div class="sd-sb">
+            @if(!Gsmu.Api.Integration.Canvas.Configuration.Instance.HideLoginFormIfUserInCanvas && !hideLoginBtn)
+            {
+
+                    <span id="login-button">
+                        <button name="sgnBt" id="sgnBt" class="btn btn-prim sd-sgnBtn button-component" data-button-type="@LayoutButton.Login.ToString()" onclick="membership.login('login2')">
+                            @layoutConfig.LayoutButtons.Login
+                        </button>
+                    </span>
+
+                    <span id="login-inst-redirect">
+                        <button name="sgnBt" id="sgnBt" class="btn btn-prim sd-sgnBtn button-component" data-button-type="@LayoutButton.Login.ToString()" onclick="membership.instructorredirect()">
+                            Proceed
+                        </button>
+                    </span>
+
+            }
+                    @if (DisplayShibbolethbutton !="hide") {
+                        if((Settings.Instance.GetMasterInfo4().shibboleth_sso_enabled == 1 || Settings.Instance.GetMasterInfo4().shibboleth_sso_enabled == 2) && (Settings.Instance.GetMasterInfo4().shibboleth_allow_gsmu_login == 1))
+                        {
+                                <span id="login-sso-shibb" 
+                                    @if(DisplayShibbolethicon != "hide"){
+                                    <text>
+                                    style="margin-left:-27px;"
+                                    </text>
+                                    }>
+                                    @if (DisplayShibbolethicon != "hide"){
+                            	    <img src="@Url.Content("Images/IntegrationPartners/shibbolethicon.png")" style="position: relative; top: 0px; left: 35px;" />
+                                    }
+                                   <button type="button" style="padding-left: 32px;" id="shib-login-button" class="btn btn-prim sd-sgnBtn" onclick="membership.ShibbolethLogin()">
+                                    @layoutConfig.LayoutButtons.Shibb_Login
+                                </button>
+                            </span>
+                        }
+                        if((Settings.Instance.GetMasterInfo4().shibboleth_sso_enabled == 1 || Settings.Instance.GetMasterInfo4().shibboleth_sso_enabled == 2) && (Settings.Instance.GetMasterInfo4().shibboleth_allow_gsmu_login == 2))
+                        {   <div><hr />
+                                <span id="login-sso-shibb" 
+                                    @if(DisplayShibbolethicon != "hide"){
+                                    <text>
+                                    style="margin-left:-27px;"
+                                    </text>
+                                    }>
+                                    @if (DisplayShibbolethicon != "hide"){
+                            	    <img src="@Url.Content("Images/IntegrationPartners/shibbolethicon.png")" style="position: relative; top: 0px; left: 35px;" />
+                                    }
+                                   <button type="button" style="padding-left: 32px;" id="shib-login-button" class="btn btn-prim sd-sgnBtn" onclick="membership.ShibbolethLogin()">
+                                    @layoutConfig.LayoutButtons.Shibb_Login
+                                    </button>
+                                </span>
+                            </div>
+                        }
+                    }
+                    @if((Settings.Instance.GetMasterInfo2().useCASAuth == 1) || (Settings.Instance.GetMasterInfo2().useCASAuth == -1)){
+                         <span id="login-sso-cas">
+                               <button type="button" style="padding-left: 32px;" id="cas-login-button" class="btn btn-prim sd-sgnBtn" onclick="membership.CasLogin('@Settings.Instance.GetMasterInfo2().CASAuthURL')">
+                                @layoutConfig.LayoutButtons.Cas_Login
+                            </button>
+                        </span>
+                    }
+                </div>
+                @if ((Gsmu.Api.Integration.Google.GoogleHelper.SsoEnabled) ||  (Gsmu.Api.Integration.Canvas.Configuration.Instance.EnableOAuth2Authentication)){
+                <div> <hr />
+                    @if (Gsmu.Api.Integration.Google.GoogleHelper.SsoEnabled)
+                    {
+                        <span id="login-sso-google" style="margin-left:-30px; margin-right:30px;">
+                            <img src="@Url.Content("Images/Icons/socialmediaicons/google-24x24.png")" style="position: relative; top: 0px; left: 35px;" />
+                            <button type="button" style="padding-left: 32px;" id="google-login-button" class="btn btn-prim sd-sgnBtn" onclick="membership.GoogleLogin(true)">
+                                Google @layoutConfig.LayoutButtons.Login
+                            </button>
+                        </span>
+                    }
+
+                    @if (Gsmu.Api.Integration.Canvas.Configuration.Instance.EnableOAuth2Authentication && Gsmu.Api.Integration.Canvas.Configuration.Instance.enableGSMUMasterAuthentication == false && hideCanvasLoginLink !="hide")
+                    {
+                        <span id="login-sso-canvas"  style="margin-left:-30px;">
+                            <img src="@Url.Content("Images/IntegrationPartners/canvas-24x24.png")" style="position: relative; top: 0px; left: 35px;" />
+                            <button type="button" style="padding-left: 32px;" id="canvas-login-button" class="btn btn-prim sd-sgnBtn" onclick="membership.CanvasLogin(true,'student')">
+                                @layoutConfig.LayoutButtons.Canvas_Login
+                            </button>
+                        </span>
+                    }
+                </div>
+                }
+                <div>
+                </div>
+    </div>
+</div>
+</div>
+

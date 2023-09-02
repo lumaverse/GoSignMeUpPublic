@@ -1,0 +1,291 @@
+@using System;
+@using System.Collections.Generic;
+@using System.Linq;
+@using System.Text;
+@using System.Threading.Tasks;
+@using System.Web;
+@using System.Web.Mvc;
+@using System.Web.Mvc.Html;
+@using Gsmu.Api.Commerce.ShoppingCart;
+@using Gsmu.Api.Data;
+@using Gsmu.Api.Data.School.Course;
+@using Gsmu.Api.Data.School.Student;
+@using Gsmu.Api.Data.ViewModels.Layout;
+@model CourseModel
+
+@{
+    var courseModel = Model;
+    var course = courseModel.Course;
+    var gotWarningText = "";
+    var modifier = ViewData["Modifier"] != null ? ViewData["Modifier"].ToString() : string.Empty;
+    var addToCartDisplayCourse = ViewData["AddToCartDisplayCourse"] != null ? (bool)ViewData["AddToCartDisplayCourse"] : false;
+    string currentAction = (ViewContext.RouteData.Values["Action"] as string).ToLower();
+
+    var mdfdstyl = "";
+    var detailcartstyle = "cart-button";
+    var SupervisorAdvanceOption= 1;
+    if(Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser!=null)
+    {
+        SupervisorAdvanceOption = Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser.AdvanceOptions.Value;
+    }
+    if(currentAction == "list"){ mdfdstyl = "width: 100%; padding-right: 2px;padding-left:2px;"; }
+    if (modifier == "CourseDetails")
+    {
+        if (Model.Course.AccessCodeRequired)
+        {
+            mdfdstyl = "width:100%; text-align:center;margin-left:25%; height: 73px;font-size: 15px;line-height: 73px; margin-bottom: 10px;";
+        }
+        else
+        {
+            mdfdstyl = "width:100%; text-align:center;height: 73px;font-size: 15px;line-height: 73px;";
+        }
+        detailcartstyle = "hudbtn primary";
+    }
+
+    var cartIcon = Url.Content("~/" + Gsmu.Api.Data.WebConfiguration.CartButtonListIcon);
+    var cartIconPositionTop = 0;
+    if (modifier == "CourseDetails")
+    {
+        cartIcon = Url.Content("~/" + Gsmu.Api.Data.WebConfiguration.CartButtonExpandedIcon);        
+        cartIconPositionTop = -5;
+    }
+    
+    var accessCodeItem = "<img style=\"position: relative; top: " + cartIconPositionTop + "px;\" src=\"" + Url.Content(cartIcon) + "\"/>";
+
+    if (Model.Course.AccessCodeRequired && modifier.Trim() != "CourseDetails")
+    {
+        accessCodeItem = "<img style=\"position: relative; top: 4px;\" src=\"" + Url.Content("~/" + Gsmu.Api.Data.WebConfiguration.PublicCourseAccessCodeImage) + "\" title=\"Access Code Required.\" />";
+    }    
+}
+<div style="white-space: nowrap; @ViewData["style"]">
+    @{
+        var courseId = Model.Course.COURSEID;
+        var enrollment = Gsmu.Api.Data.School.Entities.Student.GetAllStudentEnrollmentInCourse(courseId);
+        var inShoppingCart = CourseShoppingCart.Instance.ContainsCourse(courseId);
+        var enrollmentStatistics = Model.Course.EnrollmentStatistics;
+        var bundlecoursestatus = Model.BundleCourseStatus;
+        var layoutConfig = LayoutManager.PublicLayoutConfiguration;
+
+        if (course.coursetype == 1 && modifier == "CourseDetails")
+        {
+            var CrsDetText = "Add to Cart";
+            if(inShoppingCart){ CrsDetText = "Update Cart";}
+            if (enrollment != null)
+            {
+                var onclick = string.Empty;
+                var onclick_multipleenroll = string.Empty;
+                if (enrollment.Roster.DATEADDED.HasValue)
+                 {
+                     if (enrollment.Roster.WAITING != 0)
+                    {
+                              <div style="display: inline-block; @Html.Raw(mdfdstyl)" class="hudbtn info button-enrolled button-component" data-button-type="@LayoutButton.OnWaitList.ToString()" data-checkout-button="@courseId" @Html.Raw(onclick)>@layoutConfig.LayoutButtons.OnWaitList</div>
+                    }else
+                    {
+                          <div style="display: inline-block; @Html.Raw(mdfdstyl)" class="hudbtn info button-enrolled button-component" data-button-type="@LayoutButton.Enrolled.ToString()" data-checkout-button="@courseId" @Html.Raw(onclick)>@Settings.Instance.GetMasterInfo4().PublicButtonLabelEnrolled</div>
+                    }
+                     onclick = "onclick=\"membership.enrollmentInfo('" + enrollment.Roster.DATEADDED.Value.ToShortDateString() + "')\";";
+                    }
+            }else{
+                 if (enrollmentStatistics.EnrollmentStatus == CourseEnrollmentStatus.Expired)
+                {
+                    if((Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 0 && SupervisorAdvanceOption!=0) || (Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 2 && Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser != null && SupervisorAdvanceOption!=0)){
+                    <div style="display: inline-block;@Html.Raw(mdfdstyl)" class="button-class-full button-component" data-button-type="@LayoutButton.ClosedEnrollment.ToString()">
+                        @layoutConfig.LayoutButtons.ClosedEnrollment
+                    </div>
+                    } else {
+                    	if (!Gsmu.Api.Authorization.AuthorizationHelper.CurrentUser.IsLoggedIn && Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 2) {
+                    		<div style="font-weight:bold;cursor:pointer; float:left;">Please login to your @Gsmu.Api.Data.School.Terminology.TerminologyHelper.Instance.GetTermCapital(Gsmu.Api.Data.School.Terminology.TermsEnum.Supervisor) Account <br /> to register your student.</div>
+                    	}
+                    }                    
+                }
+                else{
+                 <text>
+                        <div id="AddEvent" style="display: inline-block; @Html.Raw(mdfdstyl)" class="@detailcartstyle button-addtocart button-component"
+                         onclick="cart.AddEvent(@courseId.ToString(), 'MainEvent')">
+                         @Html.Raw(accessCodeItem)
+                            @CrsDetText
+                        </div>
+                 </text>
+                }
+            }
+        }
+
+
+        else if (course.coursetype == 1 && modifier != "CourseDetails" && !inShoppingCart){
+            <text>
+             <div style="display: inline-block; @Html.Raw(mdfdstyl)" class="@detailcartstyle button-addtocart button-component"
+                onclick="window.CourseSearchInstance.ShowCourseDetails(@courseId)">
+                See Details
+            </div>
+            </text>
+     
+        }
+
+       else if (course.sessionid >0)
+        {
+            <div style="display: inline-block; text-align: center;  @Html.Raw(mdfdstyl)"
+                 class="button-class-full button-component"
+                 data-button-type="Course Cancelled">
+                Event Detail
+            </div>
+        }
+
+       else if (Model.Course.IsCancelled)
+        {
+            <div style="display: inline-block; text-align: center;  @Html.Raw(mdfdstyl)"
+                 class="button-class-full button-component"
+                 data-button-type="Course Cancelled">
+                Course Cancelled
+            </div>
+        }
+
+        else if (enrollment != null)
+        {
+            var onclick = string.Empty;
+            var onclick_multipleenroll = string.Empty;
+            if (enrollment.Roster.DATEADDED.HasValue)
+            {
+                if (enrollment.Roster.WAITING != 0)
+                {
+                    <div style="display: inline-block; @Html.Raw(mdfdstyl)" class="hudbtn info button-enrolled button-component" data-button-type="@LayoutButton.OnWaitList.ToString()" data-checkout-button="@courseId" @Html.Raw(onclick)>@layoutConfig.LayoutButtons.OnWaitList</div>
+                }else
+                {
+                    <div style="display: inline-block; @Html.Raw(mdfdstyl)" class="hudbtn info button-enrolled button-component" data-button-type="@LayoutButton.Enrolled.ToString()" data-checkout-button="@courseId" @Html.Raw(onclick)>@Settings.Instance.GetMasterInfo4().PublicButtonLabelEnrolled</div>
+                }
+                onclick = "onclick=\"membership.enrollmentInfo('" + enrollment.Roster.DATEADDED.Value.ToShortDateString() + "')\";";
+            }
+
+        }
+        else if (!inShoppingCart)
+        {
+            
+            if ((enrollmentStatistics.EnrollmentStatus != CourseEnrollmentStatus.Full) && (bundlecoursestatus != CourseEnrollmentStatus.Full))
+            {
+
+                string onclick;
+                string onclick_multipleenroll;
+                if (addToCartDisplayCourse && (Model.EffectivePrices.Count > 1 || Model.Materials.Count > 0 || Model.Course.PrereqiusiteRequired || Model.CourseChoices.Count > 1))
+                {
+
+                    onclick = "onclick=\"window.CourseSearchInstance.ShowCourseDetails(" + courseId.ToString() + ", '" + modifier + "', false)\";";
+                    onclick_multipleenroll = "";
+                }
+                else
+                {
+                    if ((Gsmu.Api.Authorization.AuthorizationHelper.CurrentUser.IsLoggedIn) && ((Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser != null) || (Gsmu.Api.Authorization.AuthorizationHelper.CurrentInstructorUser != null)|| (Gsmu.Api.Authorization.AuthorizationHelper.CurrentAdminUser != null || Gsmu.Api.Authorization.AuthorizationHelper.CurrentSubAdminUser != null)||(Gsmu.Api.Authorization.AuthorizationHelper.CurrentStudentUser != null && Settings.Instance.GetMasterInfo2().AllowStudentMultiEnroll == 1)) && (modifier == ""))
+                    {
+                        onclick = "onclick=\"window.CourseSearchInstance.ShowCourseDetails(" + courseId.ToString() + ", '" + modifier + "', false)\";";
+
+                    }
+                    else
+                    {
+                        onclick = "onclick=\"cart.AddCourse(" + courseId.ToString() + ", '" + modifier + "')\";";
+                    }
+                    onclick_multipleenroll = "onclick=\"cart.Multiple_Enrollment(" + courseId.ToString() + ", '" + modifier + "')\";";
+                }
+                if (addToCartDisplayCourse && ((Model.CreditOption == 2) || (Model.CreditOption == 1)))
+                {
+                    onclick = "onclick=\"window.CourseSearchInstance.ShowCourseDetails(" + courseId.ToString() + ", '" + modifier + "', false)\";";
+                }
+
+                if (enrollmentStatistics.EnrollmentStatus == CourseEnrollmentStatus.WaitSpaceAvailable)
+                {
+                    if ((Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 0 && SupervisorAdvanceOption!=0) || (Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 2 && Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser != null && SupervisorAdvanceOption!=0))
+                    {
+                    <div style="display: inline-block; @Html.Raw(mdfdstyl)" class="@detailcartstyle button-waitspace button-component" @Html.Raw(onclick) data-cart-button="@(courseId + modifier)" data-button-type="@LayoutButton.WaitSpaceAvailable.ToString()" data-access-code-required="@Json.Encode(Model.Course.AccessCodeRequired)">
+                        @Html.Raw(accessCodeItem)
+                        @layoutConfig.LayoutButtons.WaitSpaceAvailable
+                    </div>
+                    } else {
+                    	if (!Gsmu.Api.Authorization.AuthorizationHelper.CurrentUser.IsLoggedIn && Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 2) {
+                            gotWarningText = "1";
+                    		<div style="font-weight:bold;cursor:pointer; float:left;">Please login to your @Gsmu.Api.Data.School.Terminology.TerminologyHelper.Instance.GetTermCapital(Gsmu.Api.Data.School.Terminology.TermsEnum.Supervisor) Account <br /> to register your student.</div>
+                    	}
+                    }
+
+                    if ((Gsmu.Api.Authorization.AuthorizationHelper.CurrentUser.IsLoggedIn) && ((Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser != null)||(Gsmu.Api.Authorization.AuthorizationHelper.CurrentInstructorUser != null) ||(Gsmu.Api.Authorization.AuthorizationHelper.CurrentAdminUser != null || Gsmu.Api.Authorization.AuthorizationHelper.CurrentSubAdminUser != null)||(Gsmu.Api.Authorization.AuthorizationHelper.CurrentStudentUser != null && Settings.Instance.GetMasterInfo2().AllowStudentMultiEnroll == 1)) && (modifier =="CourseDetails"))
+                    {
+                        if (CourseShoppingCart.Instance.MultipleOrder_PrincipalStudent!=0){
+                               if((Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 0 && SupervisorAdvanceOption!=0) || (Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 2 && Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser != null && SupervisorAdvanceOption!=0)){
+                                        <div class="button-waitspace button-component hudbtn" style=" margin-top:10px; float:left; width:100%; text-align:center; color:white;  cursor:pointer; line-height:50px; height:50px;" @Html.Raw(onclick_multipleenroll) data-checkout-button="AllStudents@courseId">@Settings.Instance.GetMasterInfo4().MultipleEnrollment</div>
+                                }
+                        }
+                    } else {
+                    	if (gotWarningText == "" && !Gsmu.Api.Authorization.AuthorizationHelper.CurrentUser.IsLoggedIn && Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 2) {
+                    		<div style="font-weight:bold;cursor:pointer; float:left;">Please login to your @Gsmu.Api.Data.School.Terminology.TerminologyHelper.Instance.GetTermCapital(Gsmu.Api.Data.School.Terminology.TermsEnum.Supervisor) Account <br /> to register your student.</div>
+                    	}
+                    }
+                }
+                else if (enrollmentStatistics.EnrollmentStatus == CourseEnrollmentStatus.Expired)
+                {
+                    if((Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 0 && SupervisorAdvanceOption!=0) || (Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 2 && Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser != null && SupervisorAdvanceOption!=0)){
+                    <div style="display: inline-block;@Html.Raw(mdfdstyl)" class="button-class-full button-component" data-button-type="@LayoutButton.ClosedEnrollment.ToString()">
+                        @layoutConfig.LayoutButtons.ClosedEnrollment
+                    </div>
+                    } else {
+                    	if (!Gsmu.Api.Authorization.AuthorizationHelper.CurrentUser.IsLoggedIn && Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 2) {
+                    		<div style="font-weight:bold;cursor:pointer; float:left;">Please login to your @Gsmu.Api.Data.School.Terminology.TerminologyHelper.Instance.GetTermCapital(Gsmu.Api.Data.School.Terminology.TermsEnum.Supervisor) Account <br /> to register your student.</div>
+                    	}
+                    }
+                }
+                else
+                {
+                	var tempDisplay = 0;
+                    if ((Gsmu.Api.Authorization.AuthorizationHelper.CurrentAdminUser != null || Gsmu.Api.Authorization.AuthorizationHelper.CurrentSubAdminUser != null) || ((Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 0 && SupervisorAdvanceOption!=0) || (Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 2 && Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser != null && SupervisorAdvanceOption!=0))){
+				tempDisplay = 1;
+                             if (((Gsmu.Api.Authorization.AuthorizationHelper.CurrentInstructorUser != null) &&(CourseShoppingCart.Instance.MultipleOrder_PrincipalStudent==0))|| (Gsmu.Api.Authorization.AuthorizationHelper.CurrentAdminUser != null || Gsmu.Api.Authorization.AuthorizationHelper.CurrentSubAdminUser != null) &&(CourseShoppingCart.Instance.MultipleOrder_PrincipalStudent==0)){
+                             }else{
+                                    <div style="display: inline-block; @Html.Raw(mdfdstyl)" class="@detailcartstyle button-addtocart button-component" @Html.Raw(onclick) data-cart-button="@(courseId + modifier)" data-button-type="@LayoutButton.AddToCart.ToString()" data-access-code-required="@Json.Encode(Model.Course.AccessCodeRequired)">
+                                            @Html.Raw(accessCodeItem)
+                                            @Settings.Instance.GetMasterInfo4().PublicButtonLabelAddToCart 
+                                    </div>
+                                    <div class="@detailcartstyle" id="PreRegMsg" style="white-space: normal; display: none; background: none; border: none; color: orangered; box-shadow: unset; float: left">
+                                        <div style="font-size: 15px;font-weight: normal;line-height: 15px;text-shadow: none;margin-top: 2px;">
+                                            You may not continue registering for the course because one or more course prerequisites have not been completed.
+                                        </div>
+                                    </div>
+                        }
+                    }
+
+                    if ((Gsmu.Api.Authorization.AuthorizationHelper.CurrentUser.IsLoggedIn) && ((Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser != null) || (Gsmu.Api.Authorization.AuthorizationHelper.CurrentInstructorUser != null) || (Gsmu.Api.Authorization.AuthorizationHelper.CurrentAdminUser != null || Gsmu.Api.Authorization.AuthorizationHelper.CurrentSubAdminUser != null) || (Gsmu.Api.Authorization.AuthorizationHelper.CurrentStudentUser != null && Settings.Instance.GetMasterInfo2().AllowStudentMultiEnroll == 1)) && (modifier == "CourseDetails"))
+                    {
+                    	tempDisplay = 1;
+                        if (CourseShoppingCart.Instance.MultipleOrder_PrincipalStudent != 0)
+                        {
+                            if ((Gsmu.Api.Authorization.AuthorizationHelper.CurrentAdminUser != null || Gsmu.Api.Authorization.AuthorizationHelper.CurrentSubAdminUser != null) || (Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 0 && SupervisorAdvanceOption != 0) || (Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 2 && Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser != null && SupervisorAdvanceOption != 0))
+                            {
+                                 <div class="button-waitspace button-component hudbtn" style=" margin-top:10px; float:left; width:100%; text-align:center; color:white;  cursor:pointer; line-height:50px; height:50px;" @Html.Raw(onclick_multipleenroll) data-checkout-button="AllStudents@courseId">@Settings.Instance.GetMasterInfo4().MultipleEnrollment </div>
+                            }
+
+                        }
+                    }
+			if (!Gsmu.Api.Authorization.AuthorizationHelper.CurrentUser.IsLoggedIn && Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 2 && tempDisplay == 0) {
+				<div style="font-weight:bold;cursor:pointer; float:left;">Please login to your @Gsmu.Api.Data.School.Terminology.TerminologyHelper.Instance.GetTermCapital(Gsmu.Api.Data.School.Terminology.TermsEnum.Supervisor) Account <br /> to register your student.</div>
+			}                    
+                }
+                
+            }
+            else
+            {
+                <div style="display: inline-block; text-align: center;  @Html.Raw(mdfdstyl)" class="button-class-full button-component" data-button-type="@LayoutButton.ClassFull.ToString()">
+                    @layoutConfig.LayoutButtons.ClassFull
+                </div>
+            }
+        }
+        else
+        {
+            <div style="display: inline-block; @Html.Raw(mdfdstyl)" class="hudbtn primary button-component button-checkout" onclick="cart.checkout();" data-checkout-button="@courseId" data-button-type="@LayoutButton.Checkout.ToString()">@Settings.Instance.GetMasterInfo4().PublicButtonLabelCheckout</div>
+
+            if ((Gsmu.Api.Authorization.AuthorizationHelper.CurrentUser.IsLoggedIn) && ((Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser != null) ||(Gsmu.Api.Authorization.AuthorizationHelper.CurrentInstructorUser != null)||(Gsmu.Api.Authorization.AuthorizationHelper.CurrentAdminUser != null || Gsmu.Api.Authorization.AuthorizationHelper.CurrentSubAdminUser != null) ||(Gsmu.Api.Authorization.AuthorizationHelper.CurrentStudentUser != null && Settings.Instance.GetMasterInfo2().AllowStudentMultiEnroll == 1)) && (modifier =="CourseDetails"))
+            {
+                    if((Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 0 && SupervisorAdvanceOption!=0) || (Settings.Instance.GetMasterInfo().PublicSignupAbilityOff == 2 && Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser != null && SupervisorAdvanceOption!=0)){
+                        <div class="button-waitspace button-component hudbtn" style=" margin-top:10px; float:left; width:100%; text-align:center; color:white;  cursor:pointer; line-height:50px; height:50px;" onclick="cart.DisplayAllStudents_ForEnrollment(@courseId);" data-checkout-button="AllStudents@courseId">@Settings.Instance.GetMasterInfo4().MultipleEnrollment</div>
+                    }
+            }
+        <br />
+         }
+    }
+
+</div>
+
+

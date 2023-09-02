@@ -1,0 +1,92 @@
+﻿@model Gsmu.Api.Data.School.Course.CourseModel
+@using Gsmu.Api.Commerce.ShoppingCart
+
+@{
+    var credits = Model.Credits;
+    var creditWord = @Gsmu.Api.Data.GrammarHelper.GetConditionallyPluralizedWord(credits.Count, "Credit");
+    var inline = ViewData["Inline"] != null && (bool)ViewData["Inline"] == true ? true : false;
+    var fade = ViewData["Fade"] != null && (bool)ViewData["Fade"] == true ? true : false;
+    var courseIdWithModifier =  Model.Course.COURSEID.ToString();
+}
+@if (inline)
+{
+    if(Model.CreditOption==0){
+        foreach(var credit in credits) {
+         <div>
+            <span style="font-weight: bold;">
+                @credit.Label 
+            </span>: @credit.Credit
+        </div>
+         }
+    }
+    else
+     {
+            if(Model.CreditOption==2){
+        
+                    
+                        foreach(var credit in credits) {
+                        <div>
+                        <input type="checkbox" id="@credit.CourseCreditType" value="@credit.CourseCreditType" onchange="Cart.prototype.SetSelectedCredit('@courseIdWithModifier','@credit.CourseCreditType')"><span style="font-weight: bold;">@credit.Label</span>: @credit.Credit <br>
+                         </div>
+                        }
+                   
+            }
+            if(Model.CreditOption ==1){
+
+                        foreach(var credit in credits) {
+                        <div>
+                        <input type="radio" id="credittypes" name="credittypes" value="@credit.CourseCreditType" onchange="Cart.prototype.SetSelectedCredit('@courseIdWithModifier','@credit.CourseCreditType','single')"><span style="font-weight: bold;">@credit.Label</span>: @credit.Credit<br>
+                         </div>
+                        }
+
+            }
+     }
+}
+else
+{
+    <script type="text/javascript">   
+        Ext.onReady(function () {
+            var credits = @(Html.Raw(Json.Encode(credits)));
+            var containerId = "course-credits-container-@(Model.Course.COURSEID.ToString())";
+            var courseId = @(Json.Encode(Model.Course.COURSEID));
+            var creditIcon = config.getUrl('Areas/Public/Images/TileJuly/credits.png');
+            if (credits.length == 0) {
+                return;
+            } else if (false == true && credits.length == 1) {
+                var credit = credits[0];
+                var container = Ext.get(containerId);
+                var details = '<img style="vertical-align: text-bottom;" src="' + creditIcon + '"/><span style="color: black;">' + credit.Label + ': ' + Ext.util.Format.number(credit.Credit, '0.00') + '</span>';
+                container.setHtml(details);
+                return;
+            } 
+
+            var creditItems = [];
+            for(var index = 0; index < credits.length; index++) {
+                var credit = credits[index];
+            
+                var creditMenuItem = {
+                    text: '<div style="float: right; text-align: right;">' + Ext.util.Format.number(credit.Credit, '0.00') + '</div><div style="font-weight: bold; white-space: normal !important;">' + credit.Label + '</div>',
+                    xtype: 'menuitem',
+                    plain: true,
+                    style: window.LAYOUT.Options.plainMenuItemStyle
+                };
+                creditItems.push(creditMenuItem);
+            }
+
+            var button = Ext.create('Ext.button.Button', {
+                renderTo: containerId,
+                text: '@creditWord',
+                icon: creditIcon,
+                textAlign: 'left',
+                menuAlign: 'tr-br?',
+                menu: new Ext.menu.Menu({
+                    showSeparator: false,
+                    items: creditItems
+                })
+            });
+
+        });
+    </script>
+
+    <div id="course-credits-container-@Model.Course.COURSEID" class="@(fade ? "item-fade" : "" )"></div>
+}

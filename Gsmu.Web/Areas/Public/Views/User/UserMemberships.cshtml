@@ -1,0 +1,68 @@
+﻿@using Gsmu.Api.Data;
+@using Gsmu.Api.Data.School.User;
+@using Gsmu.Api.Data.School.Terminology;
+@model UserModel
+
+@{
+    string cmd = ViewBag.cmd;
+
+    string formTitle = "Memberships";
+    string membershiplist ="";
+
+    var userModel = Model;
+    var usr = new UserInfo();
+    usr = userModel.CommonUserInfo;
+
+}
+  <script type="text/javascript">
+      var Membershipshtml='<div style="float: left;width: 100%; text-align:right; padding-right: 10px;">Expiry Date</div>';
+
+    @foreach (var item in usr.courses.Where(c => c.COURSENUM == "~ZZZZZZ~"))
+      {
+          <text> 
+          var alinkpost = '<div style="float: left;width: 100%; margin-bottom: 8px; padding-left: 5px;">';
+          alinkpost += '  <div style="style="float: left; margin-left: 10px; margin-top: 3px;">';
+          alinkpost += '    &nbsp; ';
+          alinkpost += '  </div>';
+          alinkpost += '  <div style="style="float: left; width:100%; height: 12px; margin-bottom: 5px; margin-left: 20px;">';
+          alinkpost += '      <div style="float: left;width: 80%; color: black; padding-left: 8px;">@item.COURSENAME ';
+          alinkpost += '      </div>';
+          alinkpost += '      <div style="float: left; width:18%; color: black; text-align: right;">@item.MaxDate.Value.ToShortDateString()';
+          alinkpost += '      </div>';
+          alinkpost += '   </div>';
+          alinkpost += '</div>';
+
+          Membershipshtml =Membershipshtml+ alinkpost;
+          </text>
+      }
+
+
+    //destroy first main panel if exist for the edit mode
+    var membrCmp = Ext.getCmp('UserDashboardMemberships');
+    if (membrCmp != null) {membrCmp.destroy();}
+    Ext.onReady(function () {
+
+        Ext.create('Ext.Panel', {
+            id: 'UserDashboardMemberships',
+            renderTo: Ext.get('Membershipsrender'),
+            frame: true,
+            autoScroll: false,
+            title: 'Memberships',
+            html: ['<div>' + Membershipshtml + '</div>'],
+            tools: [
+                {
+                    hidden: (dasboardadminmode ? false : true),
+                    type: 'cross',
+                    tooltip: 'Delete this widget ',
+                    handler: function (e, toolEl, panel, tc) {
+                        DeleteUserWidget(GetwidgetColIDbyPlID('UserDashboardMemberships'), GetwidgetIDbyPlID('UserDashboardMemberships'));
+                    }
+                }
+            ],
+        });
+
+    });
+
+</script>
+
+<div id="Membershipsrender" style="position:relative;min-height:100px; padding-bottom:20px"></div>

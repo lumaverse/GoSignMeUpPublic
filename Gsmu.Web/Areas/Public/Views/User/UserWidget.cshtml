@@ -1,0 +1,1864 @@
+﻿@using Gsmu.Api.Data;
+@using Gsmu.Api.Data.School;
+@using Gsmu.Api.Data.School.User;
+@using json = Newtonsoft.Json;
+@using Gsmu.Api.Authorization;
+
+@using haiku = Gsmu.Api.Integration.Haiku;
+@using blackboard = Gsmu.Api.Integration.Blackboard;
+@model UserModel
+
+@{
+    string cmd = ViewBag.cmd;
+    string usergroup = ViewBag.usergroup;
+    bool adminmode = false;
+
+    DataLists dlists = new DataLists();
+    WidgetInfo widgetmodel = new WidgetInfo();
+    UserWidget userwidget = new UserWidget();
+    WidgetFldProp userfld = new WidgetFldProp();
+    bool useSchoolGradeFiltering = (dlists.GradeLevelsForFilter.Count > 0) ? true : false;
+    int? filtergrade = Settings.Instance.GetMasterInfo3().FilterDistSchoolPubStud;
+    int usernameMaskNum = Settings.Instance.GetFieldMasks("username", "Students").DefaultMaskNumber;
+    int AllowLoginEvenIfLDAPFails = Settings.Instance.GetMasterInfo3().AllowLoginEvenIfLDAPFails;
+    //allow non LDAP account to login - mask will need to ignore these account
+    int useLDAPAuthentication = Settings.Instance.GetMasterInfo2().LDAPOn;
+    bool haikuUsernameReal = haiku.Configuration.Instance.HaikuAuthenticationEnabled;
+    bool BlackboardSsoEnabled = blackboard.Configuration.Instance.BlackboardSsoEnabled;
+    bool canvasEnabled = Gsmu.Api.Integration.Canvas.Configuration.Instance.EnableOAuth2Authentication;
+    bool isBlackboardOwned = false;
+
+    if (ViewBag.cmode == "txt")
+    {
+        widgetmodel = Json.Decode<WidgetInfo>(ViewBag.txtwidgetmodel);
+        userwidget = Json.Decode<UserWidget>(ViewBag.txtuserwidget);
+        userfld = Json.Decode<WidgetFldProp>(ViewBag.txtfld);
+        adminmode = true;
+    }
+    else
+    {
+        widgetmodel = ViewBag.widgetmodel;
+        userwidget = ViewBag.userwidget;
+    }
+
+    string TableName = "Students";
+    var hideUsernameAndPassword = false;
+    var userManagementProvider = "GSMU";
+    if (haikuUsernameReal)
+    {
+        userManagementProvider = "Haiku";
+    }
+    List<UserRegFieldSpecs> userregfieldspec = null;
+
+    switch (usergroup)
+    {
+        case "IT":
+
+            TableName = "Instructors";
+            userregfieldspec = dlists.AllInstructorUserFields;
+
+            if (Model.Instructor.canvas_user_id > 0 && Model.Instructor.PASSWORD.IndexOf("canvas") > 0)
+            {
+                hideUsernameAndPassword = true;
+                userManagementProvider = "Canvas";
+            }
+            if (!string.IsNullOrWhiteSpace(Model.Instructor.lti_user_id))
+            {
+                hideUsernameAndPassword = true;
+                userManagementProvider = "LTI";
+            }
+
+            break;
+        case "SP":
+
+            TableName = "Supervisors";
+            userregfieldspec = dlists.AllSupervisorUserFields;
+
+            break;
+        default:
+
+            userregfieldspec = dlists.AllStudentUserFields;
+            if(Model.Student!=null){
+                if ((Model.Student.canvas_user_id > 0 && Gsmu.Api.Integration.Canvas.Configuration.Instance.enableGSMUMasterAuthentication == false) || Model.Student.haiku_user_id > 0 || !string.IsNullOrWhiteSpace(Model.Student.lti_user_id) || (Model.Student.google_user.HasValue && Model.Student.google_user != 0))
+                {
+                    hideUsernameAndPassword = true;
+                }
+                if (Model.Student.canvas_user_id > 0)
+                {
+                    userManagementProvider = "Canvas";
+                }
+                if (Model.Student.google_user.HasValue && Model.Student.google_user != 0)
+                {
+                    userManagementProvider = "Google";
+                }
+                if (!string.IsNullOrWhiteSpace(Model.Student.lti_user_id))
+                {
+                    userManagementProvider = "LTI";
+                }
+
+                if ((Settings.Instance.GetMasterInfo2().useCASAuth == 1) || (Settings.Instance.GetMasterInfo2().useCASAuth == -1))
+                {
+                    if (Model.Student.STUDNUM == "CAS Maintained")
+                    {
+                        hideUsernameAndPassword = true;
+                        userManagementProvider = "CAS";
+                    }
+                }
+                if ((Settings.Instance.GetMasterInfo4().shibboleth_sso_enabled == 1) || (Settings.Instance.GetMasterInfo4().shibboleth_sso_enabled == 2))
+                {
+                    if (string.IsNullOrEmpty(Model.Student.STUDNUM) == false)
+                    {
+                        if (Model.Student.STUDNUM.IndexOf("hibboleth Assign") > 0)
+                        {
+                            hideUsernameAndPassword = true;
+                            userManagementProvider = "User Identity Provider";
+                        }
+                    }
+                }
+                if (useLDAPAuthentication == 1 || useLDAPAuthentication == 2)
+                {
+                    //AllowLoginEvenIfLDAPFails
+                    if (usernameMaskNum == 98 && AllowLoginEvenIfLDAPFails ==1)
+                    {
+                        if (Model.Student.STUDNUM == "LDAP Assigned/Maintains")
+                        {
+                            hideUsernameAndPassword = true;
+                            userManagementProvider = "Active Directory";
+                        }
+                    }
+                    else
+                    {
+                        hideUsernameAndPassword = true;
+                        userManagementProvider = "Active Directory";
+                    }
+
+                }
+                if (Model.Student.date_imported_from_bb != null && BlackboardSsoEnabled)
+                {
+                    if (DateTime.Parse(Model.Student.date_imported_from_bb.ToString()).Year.ToString() != "1990" && (AuthorizationHelper.CurrentAdminUser == null && AuthorizationHelper.CurrentSubAdminUser == null))
+                    {
+                        hideUsernameAndPassword = true;
+                        isBlackboardOwned = true;
+                        userManagementProvider = "Blackboard";
+                    }
+                }
+            }
+            break;
+    }
+
+
+    var userModel = Model;
+
+    int widgetID = widgetmodel.ID;
+    int widgetColID = widgetmodel.ColID;
+    string strwidgetID = widgetID.ToString();
+
+
+    //VARIABLE IDS
+    string rand = DateTime.Now.Ticks.ToString();
+    string formId = "UserWdgt" + strwidgetID + "Form";
+    string ContformId = "UserWdgt" + strwidgetID + "FormCont";
+
+    string EditToolbarVar = formId + "EditToolbarvar";
+    string formVar = formId + "var";
+    string useridId = formId + "userid";
+    string renderDom = formId + "render";
+
+    //DEFAULTS or cmd == "addnew"
+    var usr = new UserInfo();
+    string defaultType = "textfield";
+    string labelwidth = "125";
+    string actvProfileImage = "";
+    string hideEditToolbar = "true";
+    string hideEditButton = "true";
+    string iconedittooltip = "";
+    string iconedit = "edit";
+    string ishidden = "false";
+    string supSave = "true";
+    if (widgetmodel.Title == null)
+    {
+        iconedittooltip = "Edit user Widget";
+    }
+    else
+    {
+        iconedittooltip = "Edit user " + widgetmodel.Title.ToLower();
+    }
+    bool DisallowUserPublicEdit = (Settings.Instance.GetMasterInfo2().DisallowUserPublicEdit == 0 ? false : true);
+    bool DisallowUserNameEdit = (Settings.GetVbScriptBoolValue(Settings.Instance.GetMasterInfo2().DisallowUserEdit));
+
+    bool WithProfileImage = false;
+    int checkProfileImage = 0;
+    try
+    {
+        checkProfileImage = userwidget.WidgetItems.Where(w => w.WidgetID == widgetID && w.FieldName == "profileimage").Count();
+        if (checkProfileImage > 0) { WithProfileImage = true; }
+    }
+    catch { }
+    string CourseRequirements = Settings.Instance.GetMasterInfo2().CourseRequirements.ToString();
+
+
+
+    if (cmd == "view")
+    {
+        adminmode = false;
+        defaultType = "displayfield";
+        usr = userModel.CommonUserInfo;
+        if(DisallowUserPublicEdit == false){
+            hideEditButton = "false";
+        }
+        else{
+            hideEditButton = "true";
+        }
+
+    }
+    else if (cmd == "edit" && DisallowUserPublicEdit == false)
+    {
+        adminmode = false;
+        usr = userModel.CommonUserInfo;
+        if ((ViewBag.SelectedUserid != 0) && (ViewBag.SelectedUserid != null))
+        {
+            usr.userid = ViewBag.SelectedUserid;
+            ishidden = "true";
+            supSave = "false";
+        }
+        hideEditToolbar = "false";
+
+        if (!string.IsNullOrEmpty(usr.TempProfileImage))
+        { actvProfileImage = usr.TempProfileImage; }
+        else if (!string.IsNullOrEmpty(usr.ProfileImage))
+        { actvProfileImage = usr.ProfileImage; }
+
+        if (DisallowUserPublicEdit)
+        {
+            iconedit = "lockedit";
+            iconedittooltip = Settings.Instance.GetMasterInfo2().DisallowUserPublicEditText;
+        }
+    }
+
+    if (cmd != "edit" || adminmode == true) {
+        DisallowUserNameEdit = false;
+    }
+
+}
+
+<script type="text/javascript">
+    if(UsrAdmin == undefined){
+        var UsrAdmin = false
+    }
+
+@if (WithProfileImage)
+{
+    <text>
+
+    var photoprvCmp = Ext.getCmp('uploadphotoform');
+    if (photoprvCmp != null) {photoprvCmp.destroy();}
+
+    var uploadphotoformbtns = '<div class="portlet-content" style="background-color:#FFFFFF; height:120px" id="IdentityrenderProfileImg"></div>';
+
+    var UserIdentityButtonFile = Ext.create('Ext.form.field.File', {
+        name: 'file',
+        msgTarget: 'bottom',
+        width: 110,
+        allowBlank: false,
+        buttonText: 'Select Photo...',
+        buttonOnly: true,
+        hideLabel: true,
+        listeners: {
+            'change': function(fb, v){
+                var form = Ext.getCmp('uploadphotoform').getForm();
+                form.submit({
+                    url: '/public/user/UploadProfileImage?abv=@usr.usergroupAbv&userid=@usr.userid',
+                    waitMsg: 'Uploading your photo...',
+                    success: function(fp, o) {
+                        reloadUserIdentityProfileImage('@cmd','@usr.usergroupAbv');
+                                    //for saving filename
+                                    Ext.getCmp("UserIdentityFormuseruserProfileImage").setValue(o.result.filename);
+                                }
+                });
+            }
+        }
+    });
+
+    var UserIdentityUploadPhotoForm = Ext.create('Ext.form.Panel', {
+        id:'uploadphotoform',
+        bodyPadding: '0 10 0 10',
+        bodyStyle:'padding:10px 0 5px 10px',
+        layout: 'hbox',
+        border: false,
+        items: [
+                        @if (cmd == "edit")
+                        {
+                        <text>
+                                UserIdentityButtonFile,
+                        </text>
+                        }
+                        {
+                            xtype: 'panel',
+                            width: 160,
+                            border: false,
+                            html: uploadphotoformbtns
+                        }
+                        ]
+
+    });
+
+    var reloadUserIdentityProfileImage = function(cmd,usergroup) {
+        Ext.Ajax.request({
+            url: config.getUrl('public/user/UserProfileImage'),
+            params: {
+                cmd: cmd,
+                usergroup: usergroup
+            },
+            success: function (data) {
+                $("#IdentityrenderProfileImg").html(data.responseText);
+            }
+        })
+    }
+
+    </text>
+}
+    //modified, foreach function won't work in some scenario
+    var previousCmp = Ext.getCmp('@formId');
+    if (previousCmp != null) {previousCmp.destroy();}
+
+    previousCmp = Ext.getCmp('@ContformId');
+    if (previousCmp != null) {previousCmp.destroy();}
+
+    var @formVar = Ext.create('Ext.form.Panel', {
+        id: '@formId',
+        border: false,
+        bodyPadding: 10,
+        fieldDefaults: {
+            labelWidth: @labelwidth,
+            msgTarget: 'under',
+            anchor: '100%'
+        },
+        defaultType: '@defaultType',
+        items: [
+
+            @if (widgetmodel.Title == "Identity")
+            {
+                if (hideUsernameAndPassword)
+                {
+                    <text>
+                    {
+                        xtype: 'displayfield',
+                        value: @Html.Raw(Json.Encode("<strong>This user is managed by " + userManagementProvider + ".</strong>")),
+                        hideLabel: true,
+                        submitValue: false
+                    },
+                    </text>
+                }
+
+            }
+
+            {
+                fieldLabel: 'userid',
+                id:'@useridId',
+                name: 'userid',
+                xtype: 'hidden',
+                value: '@usr.userid'
+            }, {
+                fieldLabel: 'usergroupAbv',
+                name: 'usergroupAbv',
+                xtype: 'hidden',
+                value: '@usergroup'
+                @if (WithProfileImage)
+            {
+                <text>
+            }, {
+                fieldLabel: 'ProfileImage',
+                id: 'UserIdentityFormuseruserProfileImage',
+                name: 'ProfileImage',
+                xtype: 'hidden',
+                value: '@actvProfileImage'
+                </text>
+            }
+                @foreach (var wdgt in userwidget.WidgetItems.Where(w => w.WidgetID == widgetID))
+            {
+                string FldName = wdgt.FieldName;
+
+
+                string MaskTxt = "No Mask";
+                string FieldCustomList = "";
+                bool BoolFieldRequired = false;
+                bool BoolFieldRequiredAll=false;
+                bool BoolFieldReadOnly = false;
+                string StudentSupervisorFieldType= "";
+                string FieldReadOnly = "true";
+                string allowBlank = "true";
+                string allowBlankSchool2 ="true";
+                string FieldRequiredAstrsk = "";
+                string FieldRequiredAstrskSchool="";
+
+                string fldname = FldName;
+                string fldid = formId + fldname;
+                string fldlbl = FldName;
+                string TblFieldName = fldname;
+                string fldvalue = "error: cannot found FieldName [" + fldname + "] for " + TableName + "!";
+                //string fldvalue = "";
+                int itmi = 0;
+
+                UserRegFieldSpecs item = new UserRegFieldSpecs();
+                try
+                {
+                    item = userregfieldspec.Where(f => f.FieldName == FldName).First();
+
+                    MaskTxt = item.MaskTxt;
+                    TblFieldName = (string.IsNullOrEmpty(item.TblFieldName) ? fldname : item.TblFieldName);
+                    FieldCustomList = item.FieldCustomList;
+
+                    BoolFieldRequired = item.BoolFieldRequired;
+                    BoolFieldRequiredAll = item.BoolFieldRequiredAll;
+                    BoolFieldReadOnly = item.FieldReadOnly;
+                    StudentSupervisorFieldType = item.StudentSupervisorFieldType;
+                    FieldReadOnly = (item.FieldReadOnly ? "true" : "false");
+                    FieldRequiredAstrsk = (BoolFieldRequired ? "<font style='color:red;font-size: 23px;font-family: Arial;'>*</font>" : "");
+                    allowBlank = (BoolFieldRequired ? "false" : "true");
+                    FieldRequiredAstrskSchool = (BoolFieldRequiredAll ? "<font style='color:red;font-size: 23px;font-family: Arial;'>*</font>" : "");
+                    allowBlankSchool2 = (BoolFieldRequiredAll ? "false" : "true");
+                    fldlbl = (string.IsNullOrEmpty(item.FieldLabel) ? "[empty label]" : item.FieldLabel);
+                    fldlbl = fldlbl + FieldRequiredAstrsk;
+                }
+                catch { }
+                try
+                {
+                    string addnewfldvalue = (string.IsNullOrWhiteSpace(item.DefaultValue) ? "": item.DefaultValue);
+                    fldvalue = (cmd == "addnew" ? addnewfldvalue : userModel.GetFieldStrValue(usr.userid, TblFieldName, TableName));
+                    if(cmd == "view" && BoolFieldRequired == true && string.IsNullOrWhiteSpace(fldvalue)){
+                            fldvalue = "<font style='color:red;font-size: 14px;font-family: Arial;font-style: italic;'>(Required field)</font>";
+                    }
+                }
+                catch { }
+
+                UserRegFieldSpecs sdlf = new UserRegFieldSpecs();
+                string fldlblTxt = Json.Encode(fldlbl);
+                if (adminmode == true)
+                {
+                    fldlblTxt = "GetfieldLabelbyFldnym('" + fldname + "')";
+
+                    sdlf = userfld.data.Where(f => f.FieldName == FldName).FirstOrDefault();
+                    if(sdlf!=null){
+                        MaskTxt = sdlf.MaskTxt;
+                        item.FieldStore = sdlf.FieldStore;
+                    }
+                }
+                		
+                if(string.IsNullOrWhiteSpace(MaskTxt) && fldname == "email"){ //if masking not set but a email field
+			        MaskTxt = "email";
+		        }
+
+                if(string.IsNullOrWhiteSpace(MaskTxt) && fldname == "username"){ //if masking not set but a username field
+			        MaskTxt = "username";
+		        }
+
+                fldid = formId + fldname;
+                <text>
+                //@MaskTxt
+                </text>
+
+
+
+                switch (MaskTxt)
+                {
+
+
+                    case "YYYY/MM/DD":
+                    case "MM/DD/YYYY":
+                        var dateformat = (MaskTxt == "YYYY/MM/DD" ? "Y/m/d" : "m/d/Y");
+
+                    <text>
+                        }, {
+                        format: '@dateformat',
+                        fieldLabel: @Html.Raw(fldlblTxt),
+                        xtype: '@(cmd == "view" || BoolFieldReadOnly ? "displayfield" : "datefield")',
+                        id: '@fldid',
+                        name: '@fldname',
+                        allowBlank: @allowBlank,
+                        value: @Html.Json(fldvalue),
+                        listeners :
+                        {
+                            blur : function(field)
+                            {
+                                var fldlbl = @Html.Raw(fldlblTxt)
+                                var flddate = new Date(field.getValue());
+                                var todaysDate = new Date();
+                                if(flddate > todaysDate && fldlbl.search(/birth/i) > -1){
+                                    var fldyear = flddate.getFullYear().toString();
+                                    var srtyr = fldyear.substr(0, 2);
+                                    var endyr = fldyear.substr(2, 2);
+                                    var srtyr = srtyr - 1
+                                    var nwdate = new Date(srtyr + endyr, flddate.getMonth(), flddate.getDate())
+                                    field.setValue(nwdate);
+                                }
+                            },
+                        }
+
+                    </text>
+                        break;
+
+
+                    case "Gender":
+                    case "Ethnicity 1":
+                    case "Yes/No":
+                    case "Ethnicity 2":
+                    case "country":
+                    case "distemployee":
+                    case "2LetterStateAbbrev":
+                    case "district":
+                    case "districtfiltered":
+                    case "school":
+                    case "schoolfiltered":
+                    case "grade":
+                    case "SelectionListSingleSelect":
+
+						item.FieldForceSelection = true;
+						string emptyText = "Input or select from the list";
+                        var storenamecb = item.FieldStore;
+                        var Orgfldvalue = fldvalue;
+                        if (MaskTxt == "Gender")
+                        {
+                            fldvalue = (cmd == "view" ? dlists.GenderGetTxt(fldvalue) : fldvalue);
+                        }
+                        else if (MaskTxt == "Ethnicity 1")
+                        {
+                            fldvalue = (cmd == "view" ? dlists.Ethnicity1GetTxt(fldvalue) : fldvalue);
+                        }
+                        else if (MaskTxt == "Yes/No")
+                        {
+                            fldvalue = (cmd == "view" ? dlists.YesNoGetTxt(fldvalue) : fldvalue);
+                        }
+                        else if (MaskTxt == "Ethnicity 2")
+                        {
+                            fldvalue = (cmd == "view" ? dlists.Ethnicity2GetTxt(fldvalue) : fldvalue);
+                        }
+                        else if (MaskTxt == "country")
+                        {
+                            fldvalue = (cmd == "view" ? dlists.CountryGetTxt(fldvalue) : fldvalue);
+                        }
+                        else if (MaskTxt == "distemployee")
+                        {
+                            fldvalue = (cmd == "view" ? dlists.DistemployeeGetTxt(fldvalue) : fldvalue);
+                        }
+                        else if (MaskTxt == "2LetterStateAbbrev")
+                        {
+                            fldvalue = (cmd == "view" ? dlists.StateGetTxt(fldvalue) : fldvalue);
+                        }
+                        else if (MaskTxt == "district" || MaskTxt == "districtfiltered")
+                        {
+                            fldvalue = (cmd == "view" ? dlists.DistrictGetTxt(fldvalue) : fldvalue);
+                            if(fldvalue=="0")
+                             {
+                                fldvalue="";
+                            }
+                        }
+                        else if (MaskTxt == "school")
+                        {
+                            fldvalue = (cmd == "view" ? dlists.SchoolGetTxt(fldvalue) : fldvalue);
+                            if(fldvalue=="0")
+                            {
+                                fldvalue="";
+                             }
+                        }
+                        else if (MaskTxt == "schoolfiltered")
+                        {
+							item.FieldForceSelection = true;
+							emptyText = "Select only from the list";
+                            fldvalue = (cmd == "view" ? dlists.SchoolGetTxt(fldvalue) : fldvalue);
+                            if(fldvalue=="0")
+                        {
+                            fldvalue="";
+                        }
+                            storenamecb ="store"+ fldname + "fieldForFilter";
+
+                        }
+                        else if (MaskTxt == "grade")
+                        {
+                            fldvalue = (cmd == "view" ? dlists.GradeLevelGetTxt(fldvalue) : fldvalue);
+                            if(fldvalue=="0")
+                            {
+                                fldvalue="";
+                            }
+                        }
+
+                        else if (MaskTxt == "SelectionListSingleSelect")
+                        {
+                            fldvalue = (cmd == "view" ? dlists.Ethnicity2GetTxt(fldvalue) : fldvalue);
+                            storenamecb = fldname + "storeCustomList";
+                        }
+
+
+                        if (item.FieldForceSelection)
+                        {
+                            emptyText = "Select only from the list";
+                        }
+
+                        //DisallowDistrictEdit
+                        if(cmd == "edit" && fldname == "district" && Settings.Instance.GetMasterInfo2().DisallowDistrictEdit.ToString() == "-1")
+                        {
+                            BoolFieldReadOnly = true;
+                            item.FieldForceSelection = false; //wrong old value will empty the control and force to select, but is readOnly   
+                            fldvalue = dlists.DistrictGetTxt(fldvalue);
+                        }
+
+                        //DisallowSchoolEdit
+                        if (cmd == "edit" && fldname == "school" && Settings.Instance.GetMasterInfo2().DisallowSchoolEdit.ToString() == "-1")
+                        {
+                            BoolFieldReadOnly = true;
+                            item.FieldForceSelection = false; //wrong old value will empty the control and force to select, but is readOnly
+                            fldvalue = dlists.SchoolGetTxt(fldvalue);
+                        }
+
+                        //DisallowGradeEdit
+                        if (cmd == "edit" && fldname == "grade" && Settings.Instance.GetMasterInfo2().DisallowGradeEdit.ToString() == "-1")
+                        {
+                            BoolFieldReadOnly = true;
+                            item.FieldForceSelection = false; //wrong old value will empty the control and force to select, but is readOnly
+                            fldvalue = dlists.GradeLevelGetTxt(fldvalue);
+                        }
+
+
+                        <text>
+            }, {
+                fieldLabel: @Html.Raw(fldlblTxt),
+                xtype: '@(cmd == "view" || BoolFieldReadOnly ? "displayfield" : "combobox")',
+                store: @storenamecb,
+                queryMode: 'local',
+                displayField: 'txt',
+                valueField: 'vlu',
+                emptyText: '@emptyText',
+                forceSelection: @item.FieldForceSelection.ToString().ToLower() ,
+                id: '@fldid',
+                name: '@fldname',
+                allowBlank: @allowBlank,
+                value: @Html.Json(fldvalue)
+                @if (MaskTxt == "districtfiltered")
+                            {
+                                <text>
+                                ,
+            listeners: {
+            afterRender: function(combo) {
+                districtcntrlid = '@fldid'
+                districtnewvalue = @Html.Json(Orgfldvalue)
+                @if(cmd == "edit" && !BoolFieldReadOnly){
+                    <text>
+
+                    var cmbxfld = Ext.getCmp('@formId' + 'school');
+                    var CmboStoreSchool = cmbxfld.getStore();
+                    CmboStoreSchool.filter([
+                        { id: 'district', property: 'district', value: @Html.Json(fldvalue) }
+                    ]);
+                    CmboStoreSchool.on('load', function() {
+                        cmbxfld.Text = '';
+                        if(CmboStoreSchool.data.length==0){
+                            cmbxfld.emptyText = 'No record available';
+                        }else{
+                            cmbxfld.emptyText = '@emptyText';
+                        }
+                        cmbxfld.applyEmptyText();
+                    })
+
+                    </text>
+                }
+            },
+                change: function (frm, newValue, oldValue, eOpts) {
+
+                var cmbxfld = Ext.getCmp(schoolcntrlid);
+                var cmbxgrd = Ext.getCmp(gradecntrlid);
+                if(newValue != null && typeof(cmbxfld)!='undefined'){
+                    var CmboStoreSchool = cmbxfld.getStore();
+                    cmbxfld.suspendEvents();
+                    if (cmbxgrd != undefined && cmbxgrd.xtype== 'combobox' ) {
+                        cmbxgrd.suspendEvents();
+                        cmbxgrd.emptyText = 'No record available';
+                        cmbxgrd.getStore().loadData([],false);
+                        cmbxgrd.setValue('');
+                        cmbxgrd.resumeEvents(false);
+                    }
+                    cmbxfld.setValue('');
+                    cmbxfld.resumeEvents(false);
+                    CmboStoreSchool.filter([
+                        { id: 'district', property: 'district', value: newValue }
+                    ]);
+                    CmboStoreSchool.on('load', function() {
+                        cmbxfld.Text = '';
+                        if(CmboStoreSchool.data.length==0){
+                            cmbxfld.emptyText = 'No record available';
+                        }else{
+                            cmbxfld.emptyText = '@emptyText';
+                        }
+                        cmbxfld.applyEmptyText();
+                    })
+                    districtnewvalue = newValue;
+                }
+            }
+            }
+                </text>
+            }
+                  @if (MaskTxt == "grade" && filtergrade==1)
+            {
+                <text>
+                ,
+                listeners: {
+                    afterRender: function(combo) {
+                        gradecntrlid = '@fldid'
+                        @if(cmd == "edit" && !BoolFieldReadOnly){
+                            <text>
+                        var cmbxfld = Ext.getCmp('@fldid').getStore()
+                            cmbxfld.filter([
+                            { id: 'schoolid', property: 'schoolid', value: schoolnewvalue+'', exactMatch: true }
+                        ],true);
+                            cmbxfld.on('load', function() {
+                                var cmbscl = Ext.getCmp(gradecntrlid);
+                                cmbscl.setValue(@Html.Json(fldvalue));
+                            })
+                            </text>
+                        }
+                    },
+                    focus: function (frm, newValue, oldValue, eOpts) {
+                                         
+                        var cmbxschool = Ext.getCmp(schoolcntrlid)
+                        if(schoolnewvalue =='' && typeof(cmbxschool)!='undefined')
+                        {
+                            var cmbxfld = Ext.getCmp(gradecntrlid);
+                            schoolnewvalue = cmbxschool.getValue();
+                            var store = cmbxfld.getStore();
+                            store.filter([
+                                { id: 'schoolid', property: 'schoolid', value: schoolnewvalue, exactMatch: true }
+                            ],true);
+                            store.reload();
+                        }
+                        if(schoolnewvalue ==''){
+                            var cmbxfld = Ext.getCmp('@formId' + 'grade');
+                            cmbxfld.Text = '';
+                            cmbxfld.emptyText = 'No record available';
+                            cmbxfld.applyEmptyText();
+                            var store = cmbxfld.getStore();
+                            store.filter([
+                                { id: 'schoolid', property: 'schoolid', value: 'no value', exactMatch: true }
+                            ],true);
+                            store.reload();
+                        }
+
+
+                    }
+                }
+                </text>
+            }
+                @if (MaskTxt == "schoolfiltered")
+            {
+                <text>
+                ,
+                listeners: {
+                    afterRender: function (combo) {
+
+                        schoolcntrlid = '@fldid'
+                        schoolnewvalue = @Html.Json(Orgfldvalue)
+                        @if(cmd == "edit" && !BoolFieldReadOnly){
+                            <text>
+                            var cmbscl = Ext.getCmp('@formId' + 'school');
+                            var CmboStoreSchool = cmbscl.getStore();
+							cmbscl.setValue(@Html.Json(Orgfldvalue));
+
+                            </text>
+                        }
+                    },
+
+                    change: function (frm, newValue, oldValue, eOpts) {
+                        schoolnewvalue = newValue;
+                        var cmbxfld = Ext.getCmp(gradecntrlid);
+                        if(newValue != null && typeof(cmbxfld)!='undefined' && cmbxfld.xtype== 'combobox'){
+                            var CmboStoreGrade = cmbxfld.getStore();
+                            var lastvalue = cmbxfld.initialConfig.value;
+                            cmbxfld.suspendEvents();
+                            cmbxfld.setValue('');
+                            cmbxfld.resumeEvents(false);
+                            CmboStoreGrade.filter([
+                                { id: 'schoolid', property: 'schoolid', value: newValue+'', exactMatch: true }
+                            ],true);
+                            CmboStoreGrade.on('load', function() {
+                                //cmbxfld.Text = '';
+                                var cmbxfld = Ext.getCmp(gradecntrlid);
+                                if(CmboStoreGrade.data.length==0){
+                                    cmbxfld.emptyText = 'No record available';
+                                    cmbxfld.setValue('')
+                                }
+                            })
+
+
+
+
+
+
+                        }
+                    }
+                    @if (filtergrade==1)
+                    {
+                        <text>,
+                        focus:function (frm, newValue, oldValue, eOpts) {
+                            var cmbxfld = Ext.getCmp(schoolcntrlid);
+                            if(districtnewvalue =='' && typeof(cmbxfld)!='undefined')
+                            {
+                                districtnewvalue = Ext.getCmp(districtcntrlid).getValue();
+                                var store = cmbxfld.getStore();
+                                store.filter([
+                                    { id: 'district', property: 'district', value: districtnewvalue, exactMatch: true }
+                                ],true);
+                                store.reload();
+                            }
+                            if(districtnewvalue=='')
+                            {
+                                var cmbxfld = Ext.getCmp(schoolcntrlid);
+                                cmbxfld.Text = '';
+                                cmbxfld.emptyText = 'No record available';
+                                cmbxfld.applyEmptyText();
+                                var store = cmbxfld.getStore();
+                                store.filter([
+                                     { id: 'district', property: 'district', value: 'no record', exactMatch: true }
+                                ],true);
+                                store.reload();
+                            }
+                        }
+                        </text>
+                    }
+                }
+                </text>
+            }
+
+                @if(adminmode== false && (MaskTxt == "school"|| MaskTxt == "schoolfiltered") && (CourseRequirements == "-1" || CourseRequirements == "2"))
+                            {
+                                string school2label = item.FieldLabel + " 2" + FieldRequiredAstrskSchool;
+                                <text>
+            }, {
+                fieldLabel: "@Html.Raw(school2label)",
+                xtype: '@(cmd == "view" || BoolFieldReadOnly ? "displayfield" : "combobox")',
+                store: @item.FieldStore,
+                queryMode: 'local',
+                displayField: 'txt',
+
+                valueField: 'vlu',
+                emptyText: '@emptyText',
+                forceSelection: @item.FieldForceSelection.ToString().ToLower() ,
+                name: 'LocationID2',
+                    allowBlank: @allowBlankSchool2,
+                value: '@(cmd == "addnew" ? "" :(cmd == "view" ? dlists.SchoolGetTxt(userModel.GetFieldStrValue(usr.userid, "LocationID2", TableName)) : userModel.GetFieldStrValue(usr.userid, "LocationID2", TableName)))'
+                </text>
+
+                                if(CourseRequirements == "-1")
+                                {
+                                    string school3label = item.FieldLabel + " 3" + FieldRequiredAstrskSchool;
+                                <text>
+            }, {
+                fieldLabel: "@Html.Raw(school3label)",
+                xtype: '@(cmd == "view" || BoolFieldReadOnly ? "displayfield" : "combobox")',
+                store: @item.FieldStore,
+                queryMode: 'local',
+                displayField: 'txt',
+                valueField: 'vlu',
+                emptyText: '@emptyText',
+                forceSelection: @item.FieldForceSelection.ToString().ToLower() ,
+                name: 'LocationID3',
+                    allowBlank: @allowBlankSchool2,
+                value: '@(cmd == "addnew" ? "" :(cmd == "view" ? dlists.SchoolGetTxt(userModel.GetFieldStrValue(usr.userid, "LocationID3", TableName)) : userModel.GetFieldStrValue(usr.userid, "LocationID3", TableName)))'
+                </text>
+                                }
+                        }
+
+
+                //@MaskTxt
+                //@fldname
+                </text>
+                            break;
+
+
+                    case "Race":
+                        <text>
+            }, {
+                fieldLabel: @Html.Raw(fldlblTxt),
+                xtype: 'fieldcontainer',
+                readOnly:@FieldReadOnly,
+                allowBlank: @allowBlank,
+                defaultType: 'checkboxfield',
+                items: [
+                    @foreach (var ritem in dlists.Races)
+                                    {
+                                        itmi += 1;
+                                        <text>
+                    {
+                        boxLabel: @Html.Json(ritem.txt),
+                        id: '@fldname@itmi',
+                        inputValue: '@ritem.vlu',
+                        checked: @(fldvalue.Contains(ritem.vlu) ? "true" : "false"),
+                        readOnly: @(cmd == "view" ? "true" : "false"),
+                        listeners	: {
+                            change	: function (thsfld,nwval,oldval) {
+                                multiseldta('@fldname',@dlists.Races.Count,'@fldid');
+                            }
+                        }
+                    },
+                    </text>
+                                    }
+                    {
+                        xtype: 'hidden',
+                        name: '@fldname',
+                        id:'@fldid',
+                        value: @Html.Json(fldvalue)
+                    }
+
+                ]
+                </text>
+                                    break;
+
+                    case "html":
+                        <text>
+            }, {
+                xtype:'htmleditor',
+                fieldLabel: @Html.Raw(fldlblTxt),
+                height: 250,
+                id: '@fldid',
+                readOnly:@FieldReadOnly,
+                name: '@fldname'
+                </text>
+                                    break;
+
+
+                    case "singlecheckbox":
+                        <text>
+            }, {
+                xtype:'checkboxfield',
+                fieldLabel: @Html.Raw(fldlblTxt),
+                checked:  @( fldvalue == "-1" || fldvalue == "1" ? "true" : "false"),
+                id: '@fldid',
+                readOnly:@FieldReadOnly,
+                name: '@fldname'
+                </text>
+                                    break;
+
+                    case "SelectionCheckbox":
+                                    itmi = 0;
+                                    string[] CustomListArr = FieldCustomList.Split('~');
+
+                        <text>
+            }, {
+                fieldLabel: @Html.Raw(fldlblTxt),
+                xtype: 'fieldcontainer',
+                allowBlank: @allowBlank,
+                readOnly:@FieldReadOnly,
+                defaultType: 'checkboxfield',
+                items: [
+                    @foreach (var ritem in CustomListArr)
+                                    {
+                                        if (!string.IsNullOrWhiteSpace(ritem))
+                                        {
+                                            itmi += 1;
+                                            <text>
+                            {
+                                boxLabel: @Html.Json(ritem),
+                                id: '@fldname@itmi',
+                                inputValue: '@ritem',
+                                checked: @(fldvalue.Contains(ritem) ? "true" : "false"),
+                                readOnly: @(cmd == "view" ? "true" : "false"),
+                                listeners	: {
+                                    change	: function (thsfld,nwval,oldval) {
+                                        multiseldta('@fldname',@CustomListArr.Count()-1,'@fldid');
+                                    }
+                                }
+                            },
+                            </text>
+                                        }
+                                    }
+                    {
+                        xtype: 'hidden',
+                        name: '@fldname',
+                        id:'@fldid',
+                        value: @Html.Json(fldvalue)
+                    }
+                ],
+                </text>
+                    break;
+
+                    case "supervisor":
+
+                            var isHiddenMultiselect = "false";
+                            var isHiddenSelectionOnly="false";
+
+                          var storename = fldname + "storeCustomList";
+                          if((MaskTxt == "supervisor")){
+                              storename = item.FieldStore;
+
+                              if(fldvalue=="0")
+                              {
+                                  fldvalue="";
+                              }
+                              if(Settings.Instance.GetMasterInfo3().AssignSup2StudVisible == 0 && Settings.Instance.GetMasterInfo3().AssignSup2Stud != 0){
+                                  isHiddenMultiselect = "true";
+                                  isHiddenSelectionOnly ="true";
+                              }
+                              if((Settings.Instance.GetMasterInfo3().AssignSup2Stud != 0)&&((AuthorizationHelper.CurrentSupervisorUser != null))){ //Logic changed to accomodate ticket 19182
+                                  isHiddenMultiselect = "false";
+                                  isHiddenSelectionOnly = "false";
+                              }
+                          }
+                          else{
+                              fldvalue = (cmd == "view" ? dlists.Ethnicity2GetTxt(fldvalue) : fldvalue);
+                          }
+    //workaround on allowedblank bug in multiselect
+
+                          var comntval = (string.IsNullOrEmpty(fldvalue) ?"//":"");
+                          var subnote = ((cmd != "view") ?" <font style='color:grey;font-size: 9px;'><br />Check all that apply<br />(PC = ctrl key / <br />Mac = command key)</font>":"");
+                          <text>
+                },
+                </text>
+                          string supervisorfieldtype="multiselect";
+                          int supervisorfieldheight =100;
+                          if(StudentSupervisorFieldType!="")
+                          {
+                              supervisorfieldtype=StudentSupervisorFieldType;
+                              if(supervisorfieldtype!="multiselect"){
+                                  supervisorfieldheight = 25;
+                              }
+                          }
+                if (cmd != "view")
+                {
+                    string fldvaluetxtvw ="['"+ fldvalue.Replace(",", "','") +"']";
+                    if((MaskTxt == "supervisor")){
+                        string fldvalue_sup= dlists.GetSupervisorsText(fldvalue);
+                        fldvalue =userModel.GetFieldStrValue(usr.userid, TblFieldName, TableName);
+                        comntval = (string.IsNullOrEmpty(fldvalue) ?"//":"");
+                        string fldvaluetxt = fldvalue_sup.Replace(",", " <br>") ;
+                        if(StudentSupervisorFieldType!="")
+                        {
+                            if(StudentSupervisorFieldType=="combobox"){
+                                fldvalue = fldvalue_sup;
+                            }
+                            fldvaluetxt="";
+                        }
+
+                        <text>
+                        {
+                        xtype: 'displayfield',
+                        value: @Html.Json(fldvaluetxt),
+                        hiddden:@isHiddenMultiselect,
+                        fieldLabel: @Html.Raw(fldlblTxt) +'',
+                        id:'supDisplayfield'
+                        },
+                        </text>
+                    }
+                    <text>
+                {
+                    xtype:'@supervisorfieldtype',
+                    store: @storename,
+                    height: @supervisorfieldheight,
+                    queryMode: 'local',
+                    hidden:@isHiddenSelectionOnly,
+                    displayField: "txt",
+                    valueField: "vlu",
+                    name: '@(fldname +"List")',
+                    anyMatch: true,
+                    autoLoadOnValue :true,
+                    typeahead :true,
+                    allowBlank: @allowBlank,
+                    @comntval value:@Html.Json(fldvalue),
+                    listeners: {
+                    </text>
+                    if(supervisorfieldtype != "combobox"){
+                        <text>
+                            'change': function(cmp, records, opts) {
+                                var data = cmp.getValue();
+                                multilistdta(data.join(','),'@fldid');
+                                cmp.inputEl.dom.value = '';
+                                </text>
+                                if(MaskTxt == "supervisor"){
+                                    <text>
+                                      var supervisors="";
+                                    for(var name in data) {
+                                        var r= this.getStore().find('vlu',data[name])
+                                        if('@supervisorfieldtype' =='multiselect'){
+                                            supervisors = supervisors +this.getStore().getAt(r).get('txt') +"<br>";
+                                        }
+
+                                    }
+                                    Ext.getCmp('supDisplayfield').setValue(supervisors);
+                                    </text>
+                                }
+                                <text>
+
+                                },
+                         'beforequery': function(qe){
+                             console.log(qe.query.length)
+                             if(qe.query.length<3){
+                                 return false;
+                             }
+                             else{
+                                 qe.query = new RegExp(qe.query, 'ig');
+                                 qe.forceAll = true;
+                             }
+                             console.log(qe.query)
+                         },
+                        </text>
+                    }
+                    else{<text>
+                    select: function(ele, rec, idx) {
+                        multilistdta(ele.value,'@fldid');
+                    },
+                    beforequery: function(qe){
+                        console.log(qe.query.length)
+                        if(qe.query.length<3){
+                            return false;
+                        }
+                        console.log(qe.query)
+                    },
+                        </text>
+                    }
+                         <text>
+
+                    },
+
+                     </text>
+                    if(MaskTxt != "supervisor"){
+                                   <text>
+                                   fieldLabel: @Html.Raw(fldlblTxt) +": "+ "@Html.Raw(subnote)",
+                                   labelSeparator : ""
+                },
+                    </text>
+
+                    }
+                     else{
+                            <text>
+                        },
+                        </text>
+                     }
+
+                }
+                else
+                {
+                    if((MaskTxt == "supervisor")){
+                        fldvalue= dlists.GetSupervisorsText(fldvalue);
+                    }
+                    string fldvaluetxt = fldvalue.Replace(",", " <br></br> ") + "<br>";
+                    <text>
+                        {
+                            xtype: 'displayfield',
+                            value: @Html.Json(fldvaluetxt),
+                            hiddden:@isHiddenMultiselect,
+                            fieldLabel: @Html.Raw(fldlblTxt)
+                        },
+                    </text>
+                }
+
+                      <text>
+                     {
+                         xtype: 'hidden',
+                         fieldLabel: @Html.Raw(fldlblTxt),
+                         name: '@fldname',
+                         id:'@fldid',
+                         value: @Html.Json(fldvalue)
+
+                </text>
+
+                    break;
+
+                    case "SelectionListMultiSelect":
+                        var storenamemlti = fldname + "storeCustomList";
+                        fldvalue = (cmd == "view" ? dlists.Ethnicity2GetTxt(fldvalue) : fldvalue);
+
+                         comntval = (string.IsNullOrEmpty(fldvalue) ?"//":"");
+                         subnote = ((cmd != "view") ?" <font style='color:grey;font-size: 9px;'><br />Check all that apply</font>":"");
+                    <text>
+                    },
+                    </text>
+
+                    if (cmd != "view")
+                    {
+                        string fldvaluetxtvw ="['"+ fldvalue.Replace(",", "','") +"']";
+                       <text>
+                    {
+                        xtype: 'box',
+                        id:'clrbtn'+ '@fldid',
+                        hiddden: true,
+                        html:'<div style="width:100%;"><button style="font-size: 9px; float: right;" type="button" onclick="javascript:Ext.getCmp(\'multsel\'\+ \'@fldid\').clearValue( );">Clear Selection(s)</button></div>'
+                    },
+                    {
+                        xtype:'multiselect',
+                        id:'multsel'+ '@fldid',
+                        store: @storenamemlti,
+                        fieldLabel: @Html.Raw(fldlblTxt) +": "+ "@Html.Raw(subnote)",
+                        labelSeparator : "",
+                        height: 100,
+                        listConfig: {
+                            simpleSelect: true,
+                        },
+                        queryMode: 'local',
+                        hidden:false,
+                        displayField: "txt",
+                        valueField: "vlu",
+                        name: '@(fldname +"List")',
+                        allowBlank: @allowBlank,
+                        @comntval value:@Html.Json(fldvalue),
+                        listeners: {
+                            afterrender : function(cmp, records, opts) {
+                                var data = cmp.getValue();
+                                if(data.length>0){
+                                    Ext.getCmp('clrbtn'+ '@fldid').show();
+                                }else{
+                                    Ext.getCmp('clrbtn'+ '@fldid').hide();
+                                    $('li.x-boundlist-item-over').removeClass('x-boundlist-item-over');
+                                }
+                            },
+                            'change': function(cmp, records, opts) {
+                                var data = cmp.getValue();
+								$('li.x-boundlist-item-over').removeClass('x-boundlist-item-over');
+                                if(data.length>0){
+                                    Ext.getCmp('clrbtn'+ '@fldid').show();
+                                }else{
+                                    Ext.getCmp('clrbtn'+ '@fldid').hide();
+                                    $('li.x-boundlist-item-over').removeClass('x-boundlist-item-over');
+                                }
+                                multilistdta(data.join(','),'@fldid');
+                                }
+                            }
+                        },
+                    </text>
+
+                    }
+                    else
+                    {
+                        string fldvaluetxt = fldvalue.Replace(",", " <br></br> ") + "<br>";
+                        <text>
+                            {
+                                xtype: 'displayfield',
+                                value: @Html.Json(fldvaluetxt),
+                                hiddden: false,
+                                fieldLabel: @Html.Raw(fldlblTxt)
+                            },
+                        </text>
+                    }
+
+                    <text>
+                   {
+                       xtype: 'hidden',
+                       fieldLabel: @Html.Raw(fldlblTxt),
+                       name: '@fldname',
+                       id:'@fldid',
+                       value: @Html.Json(fldvalue)
+
+                    </text>
+
+                  break;
+
+
+                    case "username":
+                    if (usernameMaskNum == 6 && !haikuUsernameReal)
+                        {
+                        <text>
+                            }, {
+                                xtype: 'displayfield',
+                                submitValue: false,
+                                fieldLabel: @Html.Raw(fldlblTxt),
+                            value: '<strong>Auto assign - LAST.FIRST(#)</strong>'
+                        </text>
+                        } else {
+                            if (!hideUsernameAndPassword && !DisallowUserNameEdit )
+                            {
+                                <text>
+                                    }, {
+                                        fieldLabel: @Html.Raw(fldlblTxt),
+                                        id: '@fldid',
+                                        name: '@fldname',
+                                        value: @Html.Json(fldvalue),
+                                        allowBlank: false,
+                                        //vtype: 'chkusername',
+                                        listeners :
+                                        {
+                                            blur : function(field)
+                                            {
+                                                if(currentValueForUsernameValidation!=field.getValue()){
+                                                    checkEmailAvailability(field.getValue(),field);
+                                                }
+                                                currentValueForUsernameValidation=field.getValue();
+                                            },
+                                            change : function (field)
+                                            {
+
+                                                    var delay = 5000; // 5 seconds delay after last input
+                                                    clearTimeout($('#'+field.id).data('timer'));
+                                                    $('#'+field.id).data('timer', setTimeout(function(){
+                                                        if(currentValueForUsernameValidation!=field.getValue()){
+                                                            $('#'+field.id).removeData('timer');
+                                                            checkEmailAvailability(field.getValue(),field);
+                                                        }
+                                                        currentValueForUsernameValidation=field.getValue();
+                                                    }, delay));
+                                                }
+
+
+
+                                        }
+                                </text>
+                            } else {
+                                <text>
+                                    }, {
+                                        xtype: 'hidden',
+                                        id: '@fldid',
+                                        name: '@fldname',
+                                        value: @Html.Json(fldvalue),
+                                    }, {
+                                        xtype: 'displayfield',
+                                        fieldLabel: @Html.Raw(fldlblTxt),
+                                        value: @Html.Json(fldvalue),
+                                        submitValue: true
+                                </text>
+                            }
+                        }
+                        break;
+
+                    case "usernameIT":
+                        if (!hideUsernameAndPassword)
+                        {
+                            <text>
+                                }, {
+                                    fieldLabel: @Html.Raw(fldlblTxt),
+                                    id: '@fldid',
+                                    name: '@fldname',
+                                    value: @Html.Json(fldvalue),
+                                    allowBlank: false,
+                                    vtype: 'chkusernameIT'
+                            </text>
+                        } else {
+                            <text>
+                                }, {
+                                    xtype: 'displayfield',
+                                    fieldLabel: @Html.Raw(fldlblTxt),
+                                    value: @Html.Json(fldvalue),
+                                    submitValue: true
+                            </text>
+                        }
+                        break;
+
+                    case "emailSP":
+                        <text>
+                        }, {
+                        fieldLabel: @Html.Raw(fldlblTxt) + ": <font style='color:grey;font-size: 9px;'><br>(Forgot Password goes to this one)</font>",
+                        id: '@fldid',
+                        name: '@fldname',
+                        value: @Html.Json(fldvalue),
+                        allowBlank: @allowBlank,
+                        labelSeparator : "",
+                        vtype: 'email'
+                        </text>
+                        break;
+
+                    case "textareafield":
+                        <text>
+                        }, {
+                        fieldLabel: @Html.Raw(fldlblTxt) + ": <font style='color:red;font-size: 9px;'><br>(Seperate by Semicolon)</font>",
+                        id: '@fldid',
+                        name: '@fldname',
+                        value: @Html.Json(fldvalue),
+                        allowBlank: @allowBlank,
+                        labelSeparator : "",
+                        maxLength: 245,
+                        height: 100,
+                        xtype: 'textarea'
+                        </text>
+                        break;
+
+                    case "emailusername":
+                        string defaultEmailUsernameMaskText = "(Your email address will be your username)";
+                        if (isBlackboardOwned) {
+                            defaultEmailUsernameMaskText = Model.Student.USERNAME + " - (Maintained by Blackboard)";
+                        }
+
+
+                        <text>
+                            }, {
+                                xtype: 'displayfield',
+                                fieldLabel: @Html.Raw(fldlblTxt),
+                                value: '@defaultEmailUsernameMaskText'
+                            }, {
+                                name: 'username',
+                                id: 'UserIdentityFormusername',
+                                value: '',
+                                xtype: 'hidden'
+
+                        </text>
+                                    break;
+                    case "email":
+                                    string emailcnfmid = fldid + "-cfrm";
+                                    string emailcnfmname = fldname + "-cfrm";
+                                    string vtypeemail = "email"; //verify email
+                                    if(usernameMaskNum == 97){
+                                        vtypeemail = "emailcon2"; //verify email and as username
+                                        }
+
+                        <text>
+                            }, {
+                                xtype: '@(cmd == "view" || BoolFieldReadOnly ? "displayfield" : "textfield")',
+                                fieldLabel: @Html.Raw(fldlblTxt),
+                                id: '@fldid',
+                                name: '@fldname',
+                                value: @Html.Json(fldvalue),
+                                allowBlank: false,
+                                validateOnBlur: true,
+                                validateOnChange: false, //       validateOnChange= false is still not working on the current extjs, next lines are the work around
+                                checkChangeEvents : [ 'blur' ],
+                                customizedvalidation: @(BoolFieldReadOnly ? "false" : "true"),
+                                vtype: 'emailval',
+                                vtypeclass:'@vtypeemail',
+                                listeners :
+                                {
+                                    blur : function(x)
+                                    {
+                                        //for customized validators
+                                        if(x.invalidText != undefined && x.invalidText !='' && !x.wasValid){
+                                            x.setActiveErrors(x.invalidText);
+                                        }else{
+                                            x.clearInvalid();
+                                        }
+                                    }
+                                }
+
+
+                            @if (cmd != "view" && !BoolFieldReadOnly)
+                            {
+                            <text>
+                            }, {
+                                fieldLabel: 'Confirm '+ @Html.Raw(fldlblTxt),
+                                id: '@emailcnfmid',
+                                name: '@emailcnfmname',
+                                vtype: 'emailcon',
+                                allowBlank: false,
+                                value: @Html.Json(fldvalue),
+                                initialPassField: '@fldid'
+                             </text>
+                            }
+
+
+                        </text>
+                            break;
+                    case "additionalemail":
+                            <text>
+                            },
+                            {
+                            xtype: '@(cmd == "view" || BoolFieldReadOnly ? "displayfield" : "textfield")',
+                            fieldLabel: @Html.Raw(fldlblTxt),
+                            id: '@fldid',
+                            name: '@fldname',
+                            value: @Html.Json(fldvalue),
+                            allowBlank:  @allowBlank,
+                            validateOnBlur: true,
+                            validateOnChange: false, //validateOnChange= false is still not working on the current extjs, next lines are the work around
+                            checkChangeEvents : [ 'blur' ],
+                            customizedvalidation: @(BoolFieldReadOnly ? "false" : "true"),
+                            vtype: 'emailCommaSeparated',
+                            listeners :
+                            {
+                                blur : function(x)
+                                {
+                                    //for customized validators
+                                    if(x.invalidText != undefined && x.invalidText !='' && !x.wasValid){
+                                        x.setActiveErrors(x.invalidText);
+                                    }else{
+                                        x.clearInvalid();
+                                    }
+                                }
+                            }
+                            </text>
+                    break;
+                    case "password":
+                        if (!hideUsernameAndPassword && !(BoolFieldReadOnly && cmd=="edit"))
+                        //if ( cmd=="edit")
+                        {
+                            string psscnfmid = fldid + "-cfrm";
+                            string psscnfmname = fldname + "-cfrm";
+                            fldname = "password";
+                            <text>
+                                }, {
+                                fieldLabel: @Html.Raw(fldlblTxt),
+                                id: '@fldid',
+                                name: '@fldname',
+                                allowBlank: @(cmd == "edit" ? "true" : "false"),
+                                inputType: 'password',
+                                emptyText: '**********',
+                                    value:'@(cmd == "view" ? "**********" :(fldlblTxt==""?"**********" : ""))' ,                               //not release until newsletter & email are out
+                                msgTarget: 'none',  // don't use the default built in error message display
+                                validateOnBlur: true,
+                                    validateOnChange: true,
+                                    customizedvalidation:true,
+                                validator: function(value){
+                                    var field = Ext.getCmp('@fldid');
+                                    var isSpecialCase = true;
+                                    if (@Html.Raw(Json.Encode(BlackboardSsoEnabled)) || @Html.Raw(Json.Encode(canvasEnabled)))
+                                    {
+                                        isSpecialCase = true;
+                                    }
+                                    return checkPasswordFormat(field.getValue(), field, isSpecialCase);
+                                }
+                                },{
+                                    xtype: 'displayfield', //for displaying custom error
+                                    id: 'errdisp'+ '@fldid',
+                                    submitValue: false,
+                                    hidden:true,
+                                    labelSeparator : "",
+                                    fieldLabel: ' ',
+                                    value: ''
+
+
+                                   @if (cmd != "view")
+                                    {
+                                        <text>
+                                        }, {
+                                    fieldLabel: 'Confirm '+ @Html.Raw(fldlblTxt),
+                                    id: '@psscnfmid',
+                                    inputType: 'password',
+                                    allowBlank: @(cmd == "edit" ? "true" : "false"),
+                                    emptyText: '**********',
+                                    name: '@psscnfmname',
+                                    vtype: 'password',
+                                    initialPassField: '@fldid',
+                                    msgTarget:'none',
+                                    },{
+                                        xtype: 'displayfield', //for displaying custom error
+                                        id: 'errdisp'+ '_psscnfmid',
+                                        submitValue: false,
+                                        hidden:true,
+                                        fieldCls:'errorStyle',
+                                        labelSeparator : "",
+                                        fieldLabel: ' ',
+                                        value: ''
+
+                                    </text>
+                                }
+
+
+                        </text>
+
+                        }
+                        else
+                        {
+                            <text>
+                                }, {
+                                xtype: 'displayfield',
+                                submitValue: false,
+                                fieldLabel: @Html.Raw(fldlblTxt),
+                                value: '@Html.Raw(BoolFieldReadOnly ? "**********" : "<strong>Maintained by " + userManagementProvider + "</text>.</strong>")'
+                            </text>
+                        }
+                        break;
+
+
+
+                    case "(###) ###-####":
+                        <text>
+                            }, {
+                                xtype: '@(cmd == "view" || BoolFieldReadOnly ? "displayfield" : "textfield")',
+                                fieldLabel: @Html.Raw(fldlblTxt),
+                                id: '@fldid',
+                                name: '@fldname',
+                                value: @Html.Json(fldvalue),
+                                allowBlank: @allowBlank,
+                                //vtype: 'phone',
+                                listeners :
+                                {
+                                    blur : function(field)
+                                    {
+                                        checkPhoneFormat(field.getValue(),field);
+                                    },
+                                    change : function (field)
+                                    {
+                                        var delay = 5000; // 5 seconds delay after last input
+                                        clearTimeout($('#'+field.id).data('timer'));
+                                        $('#'+field.id).data('timer', setTimeout(function(){
+                                            $('#'+field.id).removeData('timer');
+                                            checkPhoneFormat(field.getValue(),field);
+                                        }, delay));
+                                    }
+                                },
+                                plugins: new Ext.ux.plugin.FormatPhoneNumber()
+                        </text>
+                            break;
+
+                    case "###-##-####":
+                    string SSMemo2 = Settings.Instance.GetMasterInfo2().SocialSecurityMemo;
+                    <text>
+                            }, {
+                                xtype: '@(cmd == "view" || BoolFieldReadOnly ? "displayfield" : "textfield")',
+                                fieldLabel: @Html.Raw(fldlblTxt),
+                                id: '@fldid',
+                                name: '@fldname',
+                                allowBlank: @allowBlank,
+                                inputAttrTpl: " data-qtip='@SSMemo2 ' ",
+                                value: @Html.Json(fldvalue),
+                                vtype: 'SS1',
+                                plugins: new Ext.ux.plugin.FormatSS1()
+                        </text>
+                                break;
+                    case "####":
+                    string SSMemo = Settings.Instance.GetMasterInfo2().SocialSecurityMemo;
+                        <text>
+                            }, {
+                                xtype: '@(cmd == "view" || BoolFieldReadOnly ? "displayfield" : "textfield")',
+                                fieldLabel: @Html.Raw(fldlblTxt),
+                                id: '@fldid',
+                                name: '@fldname',
+                                inputAttrTpl: " data-qtip='@SSMemo ' ",
+                                value: @Html.Json(fldvalue),
+                                vtype: 'SS2',
+                                plugins: new Ext.ux.plugin.FormatSS2()
+                        </text>
+                                break;
+
+                    case "notifySP":
+                        <text>
+                        }, {
+                            xtype      : 'fieldcontainer',
+                            fieldLabel : @Html.Raw(fldlblTxt),
+                            defaultType: 'radiofield',
+                            value:'0',
+                            defaults: {
+                                flex: 1
+                            },
+                            layout: 'hbox',
+                                items: [
+                                    {
+                                        boxLabel  : 'Enrolls',
+                                        name      : '@fldname',
+                                        inputValue: '1'
+                                    }, {
+                                        boxLabel  : 'Cancels',
+                                        name      : '@fldname',
+                                        inputValue: '2'
+                                    }, {
+                                        boxLabel  : 'Both',
+                                        name      : '@fldname',
+                                        inputValue: '3',
+                                        checked : true
+                                    }, {
+                                        boxLabel  : 'Neither',
+                                        name      : '@fldname',
+                                        inputValue: '0'
+                                    }
+                                ]
+
+
+                            </text>
+                            break;
+
+                    case "advanceoptions":
+                        <text>
+                            }, {
+                            xtype:'checkboxfield',
+                            fieldLabel: @Html.Raw(fldlblTxt),
+                            checked:  true,
+                            id: '@fldid',
+                            readOnly:@FieldReadOnly,
+                            value:1,
+                            name: '@fldname'
+                            </text>
+                            break;
+
+                    case "readonly":
+                        <text>
+                            }, {
+                                fieldLabel: @Html.Raw(fldlblTxt),
+                                id: '@fldid',
+                                name: '@fldname',
+                                value: @Html.Json(fldvalue),
+                                xtype: (UsrAdmin ? 'textfield' : 'displayfield')
+                        </text>
+                            break;
+
+                    case "hidden":
+                        <text>
+                            }, {
+                                fieldLabel: @Html.Raw(fldlblTxt),
+                                id: '@fldid',
+                                name: '@fldname',
+                                hidden:  (UsrAdmin ? false : true),
+                                value: @Html.Json(fldvalue),
+                                xtype: 'textfield'
+                        </text>
+                            break;
+
+
+
+                    case "profileimage":
+                        break;
+
+
+                    default:
+                        <text>
+                            }, {
+                                xtype: '@(cmd == "view" || BoolFieldReadOnly ? "displayfield" : "textfield")',
+                                fieldLabel: @Html.Raw(fldlblTxt),
+                                id: '@fldid',
+                                name: '@fldname',
+                                allowBlank: @allowBlank,
+                                value: @Html.Json(fldvalue)
+                            </text>
+                            break;
+
+
+                }
+
+            }
+
+             }]
+        });
+
+
+
+    var @EditToolbarVar = Ext.create('Ext.toolbar.Toolbar', {
+        dock: 'top',
+        hidden: @hideEditToolbar,
+            height: 25,
+            border: false,
+            items: [
+                    { xtype: 'tbfill' },
+                    {
+                        xtype: 'button',
+                        iconCls: 'save-customicons',
+                        tooltip: 'Save',
+                        margin: '0 0 0 15',
+                        hidden:@ishidden,
+                        listeners: {
+                            click: function () {
+                                SumbitUserFormWidget('@formId', eval(@Html.Raw(Json.Encode(widgetmodel))),'@usergroup');
+                            }
+                        }
+                    },
+                    {
+                        xtype: 'button',
+                        iconCls: 'close-cross',
+                        tooltip: 'Cancel',
+                        margin: '0 5 0 5',
+                        hidden:@ishidden,
+                        listeners: {
+                            click: function () {
+                                loadWidgetFields(eval(@Html.Raw(Json.Encode(widgetmodel))),'view','@usergroup');
+                            }
+                        }
+                    }
+            ]
+        });
+
+
+    Ext.onReady(function () {
+        @if((widgetmodel.Url=="")||(widgetmodel.Url==null)){
+            <text>
+        Ext.create('Ext.Panel', {
+            id:'@ContformId',
+            renderTo: Ext.get('@renderDom'),
+            frame: true,
+            tools: [
+                {
+                    hidden: @(adminmode ? "false" : "true"),
+                    type: 'panelht',
+                    tooltip: 'Change title/header height',
+                    handler: function (e, toolEl, panel, tc) {
+                        InputHeaderHT(@widgetID+0);
+                    }
+                },
+                {
+                    hidden: @(adminmode ? "false" : "true"),
+                    type: 'edit',
+                    tooltip: 'Change title, re-arrange field order, add and delete fields',
+                    handler: function (e, toolEl, panel, tc) {
+                        ShowUserWidgetEditPanel(@widgetID+0 , eval(@Html.Raw(Json.Encode(widgetmodel))));
+                    }
+                },
+                {
+                    hidden: @(adminmode ? "false" : "true"),
+                    type: 'cross',
+                    tooltip: 'Delete this widget ',
+                    handler: function (e, toolEl, panel, tc) {
+                        DeleteUserWidget(@widgetColID+0 , @widgetID+0);
+                    }
+                },
+                {
+                    hidden: @hideEditButton,
+                    type: '@iconedit',
+                    tooltip: '@iconedittooltip',
+                    handler: function (e, toolEl, panel, tc) {
+                        loadWidgetFields(eval(@Html.Raw(Json.Encode(widgetmodel))),'edit','@usergroup');
+                    }
+                },
+                 {
+                     xtype: 'button',
+                     iconCls: 'save-customicons',
+                     tooltip: 'Save',
+                     margin: '0 0 0 15',
+                     hidden: @supSave,
+                     listeners: {
+                         click: function () {
+                             SumbitUserFormWidget('@formId', eval(@Html.Raw(Json.Encode(widgetmodel))),'@usergroup');
+                         }
+                     }
+                 }
+
+
+            ],
+            dockedItems: [
+                     @EditToolbarVar
+            ],
+            autoScroll: false,
+            title: '<div style="white-space: normal !important; top: 36px !important;">@widgetmodel.Title</div>',
+            headerWrap: true,
+            listeners : {
+                afterrender : function(panel) {
+                @{
+                    var HeaderHT = widgetmodel.HeaderHT;
+                    if(HeaderHT <= 28){ HeaderHT = 28;}
+                }
+                    var header = panel.header;
+                    header.setHeight(@HeaderHT);
+                }
+            },
+            items: [
+            @if (WithProfileImage)
+            {
+                <text>
+                UserIdentityUploadPhotoForm,
+                </text>
+            }
+
+            @formVar
+        ]
+        });
+
+        @if (WithProfileImage)
+        {
+            <text>
+            reloadUserIdentityProfileImage('@cmd','ST');
+            </text>
+        }
+
+        </text>
+    }
+
+    else
+    {
+        <text>
+               Ext.Ajax.request({
+                   url: config.getUrl('public/user/'+'@widgetmodel.Url'),
+                   params: {
+                       cmd: "view",
+                       userid: "@usr.userid",
+                       usergroup: "ST"
+                   },
+                   success: function (data) {
+                       $("#"+"@renderDom").html(data.responseText);
+                   }
+               })
+        </text>
+    }
+    });
+
+
+</script>
+
+
+<div id="@renderDom" style="position:relative;min-height:100px; padding-bottom:20px; ">
+    
+</div>
+

@@ -1,0 +1,477 @@
+﻿#layout-welcomeuser, 
+#page-title ,
+#grad_stud_title
+{
+    text-shadow: 2px 2px 3px #ccc !important;
+}
+
+
+::-ms-clear {
+    display: none;
+}
+
+.x-form-save-trigger {
+  background-image: url(../../../Images/extjs-trigger-save.gif);
+}
+
+
+.x-tipcustom, .x-tipcustom.div.div{
+    background-color:lightgray !important;
+    opacity: 1 !important;
+    color: black  !important;
+}
+
+.x-tip.x-tip-default
+{
+    border: none;
+    background-color: #000;
+    z-index: 100001 !important;
+    padding: 10px;
+
+    opacity: 0.8;
+    /* IE 8 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+    /* IE 5-7 */
+    filter: alpha(opacity=80);
+    /* Netscape */
+    -moz-opacity: 0.8;
+    /* Safari 1.x */
+    -khtml-opacity: 0.8;
+}
+        
+.x-tip-body-default.x-tip-body 
+{
+    color: #fff !important;
+    background-color: #000;
+    z-index: 100001 !important;
+}
+        
+.x-header-text.x-tip-header-text , .x-tip .x-title-text
+{
+    color: #fff;
+    background-color: #000;
+    font-weight: bold;
+}
+        
+.x-tip-default.x-tip-anchor 
+{
+    border-color: #000000 !important;
+}
+
+.x-tip-default.x-tip-anchor-bottom {
+    border-bottom-color: transparent !important;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+}     
+
+.x-tip-default.x-tip-anchor-top {
+    border-top-color: transparent !important;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+}     
+
+.x-tip-default.x-tip-anchor-left {
+    border-bottom-color: transparent !important;
+    border-top-color: transparent !important;
+    border-left-color: transparent !important;
+}     
+
+.x-tip-default.x-tip-anchor-right {
+    border-bottom-color: transparent !important;
+    border-top-color: transparent !important;
+    border-right-color: transparent !important;
+}
+
+div.jGrowl, div.jGrowl div.jGrowl-notification div.jGrowl-close {
+    z-index: 100000 !important;
+}
+
+.x-form-invalid-field {
+    background-image: none !important;
+}
+
+.x-tool-edit:hover,
+.x-tool-save:hover,
+.x-tool-lockedit:hover,
+.x-tool-del:hover,
+.x-tool-panelht:hover,
+.x-tool-cross:hover
+{
+    background-position: 0px 1px !important;
+    background-repeat: no-repeat;
+    height: 17px !important;
+    opacity: 1.0;
+}
+
+.x-tool-edit,
+.x-tool-save,
+.x-tool-lockedit,
+.x-tool-del,
+.x-tool-panelht:hover,
+.x-tool-cross
+{
+    opacity: 0.5;
+    width: 16px !important;
+    height: 16px !important;
+    background-position: 0px 0px !important;
+}
+
+.x-tool-edit {
+	background-image:url(/Images/Icons/FamFamFam/pencil.png) !important;  
+} 
+
+.x-tool-save {
+	background-image:url(/Images/Icons/FamFamFam/save.png) !important;  
+} 
+
+.x-tool-lockedit {
+	background-image:url(/Images/Icons/FamFamFam/lock_edit.png) !important;  
+} 
+
+.x-tool-del {
+	background-image:url(/Images/Icons/FamFamFam/delete.png) !important;  
+} 
+
+.x-tool-cross {
+	background-image:url(/Images/Icons/FamFamFam/cross.png) !important;  
+} 
+
+.x-tool-panelht {
+	background-image:url(/Images/Icons/FamFamFam/layout_header.png) !important;  
+} 
+
+
+div.paytabs
+{
+    margin-bottom: 10px;
+    width: 100%;
+    cursor:pointer;
+}
+
+
+div.paytabs div
+{
+    /*font-size: 1.4em;*/
+    font-size: 1.1em;
+	border-bottom: 3px solid #d3d3d3;   
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;  
+    width: 117px;
+    /*height: 65px;*/
+    height: 40px;
+    float: left;
+    text-align: center;
+    padding-top: 10px;
+    text-decoration: none;
+    color: #666666;
+    display: block;
+    font-weight: normal;
+    max-width: 119px;
+    min-width: 86px;
+    width: auto !important;
+    padding: 10px 5px 0;
+}
+
+div.paytabs div {
+    float:left;
+    text-decoration: none;
+	background-color: #eeeeee;
+	border-left: 1px solid #d3d3d3;
+	border-right: 1px solid #d3d3d3;
+	border-top: 1px solid #d3d3d3;    
+    -moz-border-radius-topleft: 5px/*{cornerRadius}*/;
+	-webkit-border-top-left-radius: 5px/*{cornerRadius}*/;
+	-khtml-border-top-left-radius: 5px/*{cornerRadius}*/;
+	border-top-left-radius: 5px/*{cornerRadius}*/;
+	-moz-border-radius-topright: 5px/*{cornerRadius}*/;
+	-webkit-border-top-right-radius: 5px/*{cornerRadius}*/;
+	-khtml-border-top-right-radius: 5px/*{cornerRadius}*/;
+	border-top-right-radius: 5px/*{cornerRadius}*/;	
+    -moz-box-shadow: 6px 1px 5px -5px #6C7280;
+    -webkit-box-shadow: 6px 1px 5px -5px #6C7280;
+    box-shadow: 6px 1px 5px -5px #6C7280;    
+}
+
+div.paytabs div:hover
+{
+    background-color: #ccc
+}
+
+
+div.paytabs div span
+{
+    font-size:10px;
+    margin-top: 7px;
+    display:block;
+}
+div.paytabs div.here
+{
+    color:#2574bb;
+    background:#FFF;
+    font-weight: bold;
+}
+div.paytabs div.here a
+{
+    color: #f00;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+div.paytabs div a
+{
+    display: block;
+    color: #999;
+    text-align: center;
+    font-size: 1.2em;
+}
+
+.x-column-header-inner {
+    line-height: normal;
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+    text-align: center;
+    top: 20%;
+}
+
+.x-panel-header-title {
+    top: 0px !important;
+}
+
+.extrprtCSS .x-grid-cell {
+    font-size:14px !important;
+    height: 30px !important;
+    padding-top: 4px !important;
+}
+
+/*custom header*/
+.header-panel-section .x-title-text{
+    padding-left: 10px;
+}
+.header-panel-icon {
+    left: 0px!important;
+    height: 16px!important;
+    width: 16px!important;
+}
+
+.list-group-item {
+    color: #2574bb!important;
+}
+
+
+/* Attendance Page*/
+
+       .attended-radio:after, .head-attended-radio:after {
+        width: 15px;
+        height: 15px;
+        border-radius: 15px;
+        top: -2px;
+        left: -1px;
+        position: relative;
+        background-color: #d1d3d1;
+        content: '';
+        display: inline-block;
+        visibility: visible;
+        border: 2px solid white;
+    }
+
+    .attended-radio:checked:after, .head-attended-radio:checked:after {
+        width: 15px;
+        height: 15px;
+        border-radius: 15px;
+        top: -2px;
+        left: -1px;
+        position: relative;
+        background-color: green;
+        content: '';
+        display: inline-block;
+        visibility: visible;
+        border: 2px solid green;
+        box-shadow: inset 0px 0px 0px 2px #fff;
+
+    }
+
+           .notattended-radio:after,  .head-notattended-radio:after {
+        width: 15px;
+        height: 15px;
+        border-radius: 15px;
+        top: -2px;
+        left: -1px;
+        position: relative;
+        background-color: #d1d3d1;
+        content: '';
+        display: inline-block;
+        visibility: visible;
+        border: 2px solid white;
+    }
+
+    .notattended-radio:checked:after, .head-notattended-radio:checked:after {
+        width: 15px;
+        height: 15px;
+        border-radius: 15px;
+        top: -2px;
+        left: -1px;
+        position: relative;
+        background-color: red;
+        content: '';
+        display: inline-block;
+        visibility: visible;
+        border: 2px solid red;
+        box-shadow: inset 0px 0px 0px 2px #fff;
+    }
+    .Grid-Header th{
+        background-color:green !important;
+        color: white;
+    }
+    .attendance-header-title {
+         color: 	#2F4F4F; font-weight:bolder;font-size:20px ;
+         z-index:9999999;
+         background-color:whitesmoke;
+         position:fixed;
+         top:0;
+         width:100%;
+    }
+        .attendance-header-2 {
+         color: 	#2F4F4F; font-weight:normal;font-size:14px ;
+         z-index:9999999;
+         background-color:whitesmoke;
+         position:fixed;
+         top:28px;
+         width:100%;
+
+    }
+    .spacing-radio {
+         margin-left:12% !important;
+    }
+    .attendnace-button-area {
+        text-align:left;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+         z-index:9999999;
+         background-color:whitesmoke;
+         padding-top:12px;
+         padding-bottom:5px;
+    }
+    .attendance-submit {
+        background-color: #4CAF50; /* Green */
+        border: none;
+        color: white;
+        padding: 5px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin-right:10px;
+        float:right;
+        border-radius: 5px;
+        margin-top:-25px;
+    }
+    .attendance-header-dropdown {
+          color:black !important;
+          font-size:11px;
+    }
+    .custom-dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 3px 1.5rem;
+    clear: both;
+    font-weight: 400;
+    color: #292b2c;
+    text-align: inherit;
+    white-space: nowrap;
+    background: 0 0;
+    border: 0;
+    font-size:12px;
+    }
+.dropdown-divider {
+    height: 1px;
+    margin: .5rem 0;
+    overflow: hidden;
+    background-color: #eceeef;
+}
+.custom-dropdown-item-group{
+    margin-left:10px;
+    font-size:12px;
+    font-weight:normal;
+    margin-bottom:10px;
+    text-align:left !important;
+}
+.dropdown-selected-item {
+        border-top: .3em solid;
+    border-right: .3em solid transparent;
+    border-left: .3em solid transparent;
+    width:1px;
+    height:1px;
+    overflow:hidden;
+    position:absolute;
+    padding: 0;
+    margin: 6px;
+
+}
+.dropdown-selected-label {
+    font-size:11px !important;
+}
+
+.btn-custom-attendance {
+    padding: 0px 18px 0px 12px !important;
+}
+
+    .attendance-custom-button-red {
+        background-color: red; 
+        border: none;
+        color: white;
+        padding: 2px 12px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 10px;
+        margin-right:5px;
+        float:left;
+        border-radius: 5px;
+    }
+        .attendance-custom-button-green {
+        background-color: #4CAF50; /* Green */
+        border: none;
+        color: white;
+        padding: 2px 12px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 10px;
+        margin-right:10px;
+        float:left;
+        border-radius: 5px;
+    }
+
+.Transcribe-checkbox {
+    background-color: #2196F3;
+        width: 20px;
+    height: 20px;
+}
+
+#attendance-grid_wrapper input[type="text"] { 
+    border-radius:5px;
+    border: 1px solid #d1d3d1;
+     }
+.attendance-custom-dropdown-menu {
+    min-width:80px !important;
+    color:black !important;
+    text-align:center !important;
+    padding-right:5px !important;
+}
+.div-dropdown-menu-value {
+    cursor:pointer;
+}
+.div-dropdown-menu-value:hover{
+   background-color:lightgray;
+}
+.div-dropdown-menu-marginated-left {
+    margin-left:15px;
+    font-weight:bold;
+}
+.div-dropdown-menu-marginated-left-head {
+    font-weight:bold;
+    text-align:left !important;
+    margin-left:5px;
+}

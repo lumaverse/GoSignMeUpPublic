@@ -1,0 +1,68 @@
+﻿@using canvas = Gsmu.Api.Integration.Canvas;
+@using Gsmu.Api.Data;
+@using Gsmu.Api.Language;
+@using Gsmu.Api.Integration.Haiku.Responses;
+@using System.Xml.Serialization;
+@using System.Web.Script.Serialization;
+@{
+    ViewBag.Title = "Canvas Settings";
+    canvas.Entities.Account[] accounts = null;
+    canvas.Entities.AuthenticationProvider[] AuthenticationProviders = null;
+    var config = canvas.Configuration.Instance;
+    if (!string.IsNullOrWhiteSpace(config.AccessToken))
+    {
+        try
+        {
+            var response = canvas.Clients.AccountClient.GetListMainAccounts;
+            if (response.Error == null)
+            {
+                accounts = response.Accounts;
+            }
+            response = canvas.Clients.AccountClient.GetAccountAuthProvider(Convert.ToInt32(config.CanvasAccountId));
+            if (response.Error == null)
+            {
+                AuthenticationProviders = response.AuthenticationProviders;
+            }
+        }
+        catch (Exception e)
+        {
+            Gsmu.Api.Web.ObjectHelper.AddRequestMessage(ViewContext.Controller, e.Message);
+            string tempAuthenticationProviders = "[{\"APId\": 1, \"APauth_type\": \"saml\"},{\"APId\": 2,\"APauth_type\": \"canvas\"}]";
+            JavaScriptSerializer j = new JavaScriptSerializer();
+            AuthenticationProviders = j.Deserialize<canvas.Entities.AuthenticationProvider[]>(tempAuthenticationProviders);
+
+
+        }
+    }
+}
+
+
+@section Head {
+
+@Scripts.Render("~/Areas/Adm/Scripts/Canvas/CanvasSettings.js")    
+    
+    <script type="text/javascript">
+        Ext.onReady(function() {
+            var component = new CanvasSettings({
+                containerId: 'canvas-settings-panel',
+                settings: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(config, Newtonsoft.Json.Formatting.Indented)),
+                accounts: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(accounts, Newtonsoft.Json.Formatting.Indented)),
+                AuthenticationProviders: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(AuthenticationProviders, Newtonsoft.Json.Formatting.Indented))
+            });
+        });
+    </script>
+
+}
+
+@*
+@section TopMiddle {
+}
+*@
+
+@*
+@section sidebar {
+
+}
+*@
+
+<div id="canvas-settings-panel"></div>

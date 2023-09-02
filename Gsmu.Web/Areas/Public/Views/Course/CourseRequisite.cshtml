@@ -1,0 +1,40 @@
+﻿@using Gsmu.Api.Commerce.ShoppingCart;
+@model Gsmu.Api.Data.School.Course.CourseModel
+@{
+    var courseModel = Model;
+    var course = courseModel.Course;
+    var times = courseModel.CourseTimes;
+    var materials = courseModel.Materials;
+    var maincat = courseModel.MainCategory;
+    var subcat = courseModel.SubCategory;
+    var csetting = courseModel.CourseSettings;
+
+    var wgname = "Requisite";
+    var wgcontainer = "Course" + wgname + "Container";
+    var wgcontainerDet = "Course" + wgname + "ContainerDet";
+	var courseId = Model.Course.COURSEID;
+	var inShoppingCart = CourseShoppingCart.Instance.ContainsCourse(courseId);
+
+}
+
+<div id="@wgcontainer" class="course-widgetbox" style="position:inherit; min-height:20px;">
+    <div class="course-widgetbox-smheader">
+        Prerequisite
+    </div>
+    <div id="@wgcontainerDet" style="padding:5px;margin:5px; ">
+        @if (course.PrereqiusiteRequired)
+        {
+            <div>
+                @course.PrerequisiteInfo <br />
+       <input type="checkbox" id="chkRequisite"
+		@if(inShoppingCart){
+		<text>checked="checked" onclick="return false;"</text>
+		}
+       onclick="window.CourseSearchInstance.CheckRequisite()" > I have completed the prerequisite(s) above.<br>
+            </div>
+        }
+    </div>
+</div>
+
+
+

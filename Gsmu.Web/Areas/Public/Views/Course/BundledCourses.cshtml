@@ -1,0 +1,67 @@
+﻿@using Gsmu.Api.Data;
+@model Gsmu.Api.Data.School.Course.CourseModel
+@{
+    var courseModel = Model;
+    var course = courseModel.Course;
+    var csetting = courseModel.CourseSettings;
+    var bundledcourses = courseModel.BundledCourses;
+    var courseStartEndTimeDisplay = string.Empty;
+    var TempBundleNum = "";
+
+    //var modifier = "CourseDetails";
+    var wgname = "BundledCourses";
+    var wgcontainer = "Course" + wgname + "Container";
+    var wgcontainerDet = "Course" + wgname + "ContainerDet";
+}
+
+<div id="@wgcontainer" class="course-widgetbox" style="position:inherit; min-height:80px;">
+    <div class="course-widgetbox-smheader">
+        @Settings.Instance.GetMasterInfo3().FastTrackLabel Courses
+    </div>
+    <div id="@wgcontainerDet" style="padding:5px;margin:5px; ">
+        <div style="padding: 5px;">
+            @foreach (var c in bundledcourses)
+            {
+				courseStartEndTimeDisplay = (c.StartEndTimeDisplay != null ? c.StartEndTimeDisplay.Trim() : string.Empty);
+                if (bundledcourses.IndexOf(c) > 0)
+                {
+                    <hr />
+                }
+                if (Settings.Instance.GetMasterInfo2().HideCourseNumber == 0)
+                {
+                	TempBundleNum = c.COURSENUM;
+                }
+                else
+                {
+                	TempBundleNum = "";
+                }
+                <table style="width:100%">
+                    <tr>
+                        <td colspan="2" style="vertical-align:text-top;">
+                            @Html.Raw("<a href=\"javascript:window.CourseSearchInstance.CloseCourseDetailsWindow(); window.CourseSearchInstance.ShowCourseDetails(" + c.COURSEID + ");\">" + TempBundleNum + " " + c.COURSENAME + "</a>")
+                        </td>
+                    </tr>
+                @if (courseStartEndTimeDisplay.Length > 0)
+                {
+                    <tr>
+                        <td style="text-align:right">&nbsp;</td>
+                        <td style="text-align:right">
+                            @Html.Raw(courseStartEndTimeDisplay)
+                        </td>
+                    </tr>
+                }else{
+                    foreach (var t in c.CourseTimes)
+                    {
+                        <tr>
+                            <td style="text-align:right">&nbsp;</td>
+                            <td style="text-align:right">
+                                @t.COURSEDATE.Value.ToShortDateString() - @t.STARTTIME.Value.ToShortTimeString()
+                            </td>
+                        </tr>
+                    }
+				}
+                </table>
+            }
+       </div>
+    </div>
+</div>

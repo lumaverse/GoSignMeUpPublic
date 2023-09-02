@@ -1,0 +1,37 @@
+﻿@using Gsmu.Api.Data.School.Terminology;
+@model Gsmu.Api.Data.School.Course.CourseModel
+@{
+    var courseModel = Model;
+    var course = courseModel.Course;
+    var times = courseModel.CourseTimes;
+    var csetting = courseModel.CourseSettings;
+    var relatedcourseids = courseModel.Courses;
+    var instructorlist = courseModel.Instructors;
+
+    var wgname = "Similar_Offerings";
+    var wgcontainer = "Course" + wgname + "Container";
+    var wgcontainerDet = "Course" + wgname + "ContainerDet";
+    var panHeight = "230px;";
+    var panmaxweight = "500px;";
+
+      
+}
+
+<div id="@wgcontainer" class="course-widgetbox" style="min-height:120px; ">
+
+    <div class="course-widgetbox-smheader">
+        Additional Offering(s)
+    </div>
+    <div id="@wgcontainerDet" style="padding:5px;margin:5px; ">
+        <div style="padding: 5px;">
+                @if (relatedcourseids!=null){
+                    foreach (var cor in relatedcourseids)
+                    {
+                        Html.RenderAction("CourseDateTimeStart", "Course", new { intCourseId = cor });
+                        <hr />
+                    }
+                }
+        </div>
+    </div>
+</div>
+

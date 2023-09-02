@@ -1,0 +1,21 @@
+﻿@using Gsmu.Api.Data
+@using Gsmu.Api.Integration.Blackboard
+@using Gsmu.Api.Web
+@{
+    ViewBag.Title = "Blackboard Settings";
+}
+@section Head {
+@Scripts.Render("~/Areas/Adm/Scripts/Blackboard/BlackboardSettings.js")
+    <script type="text/javascript">
+        Ext.onReady(function() {
+            var component = new BlackboardSettings({
+                containerId: 'blackboard-dsk-panel',
+                settings: @Html.Json(Configuration.Instance)
+            });
+        });
+    </script>
+}
+<div style="text-align: right; margin-bottom: 1.0em;">
+    <a href="@Url.Content("~/application/AdminFunction?call=go-admin&redirect=blackboard/index.asp")">Blackboard V3 Admin</a>
+</div>
+<div id="blackboard-dsk-panel"></div>

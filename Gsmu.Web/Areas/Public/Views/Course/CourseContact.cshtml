@@ -1,0 +1,20 @@
+﻿@model Gsmu.Api.Data.School.Course.CourseModel
+@{
+    var courseModel = Model;
+    var course = courseModel.Course;
+    var csetting = courseModel.CourseSettings;
+
+    var wgname = "Contact";
+    var wgcontainer = "Course" + wgname + "Container";
+    var wgcontainerDet = "Course" + wgname + "ContainerDet";
+}
+
+<div id="@wgcontainer" class="course-widgetbox" style="min-height:80px;">
+    <div class="course-widgetbox-smheader">
+    @wgname
+    </div>
+   <div id="@wgcontainerDet" style="padding:5px;margin:5px; ">
+       <div>@Html.Raw(course.ContactName)</div>
+       <div>@Html.Raw(course.ContactPhone)</div>
+    </div>
+</div>

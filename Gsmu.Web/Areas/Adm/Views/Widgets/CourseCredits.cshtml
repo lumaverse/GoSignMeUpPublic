@@ -1,0 +1,41 @@
+﻿<div id="widget-course-credits">
+    <div class="col-lg-12">
+        <div class="row pad-bot-10">
+            <div class="col-lg-5">CEU : </div>
+            <div class="col-lg-7">
+                <input type="number" class="form-control input-sm" id="course-credits-ceu" name="CEUCredit" value="0" />
+            </div>
+        </div>
+        <div class="row pad-bot-10">
+            <div class="col-lg-5">Inservice : </div>
+            <div class="col-lg-7">
+                <input type="number" class="form-control input-sm" id="course-credits-inservice" name="InServiceHours" value="0" />
+            </div>
+        </div>
+        <div class="row pad-bot-10">
+            <div class="col-lg-5">Clock Hours : </div>
+            <div class="col-lg-7">
+                <input type="number" class="form-control input-sm" id="course-credits-custom-credit" name="CustomCreditHours" value="0" />
+            </div>
+        </div>
+        <div class="row pad-bot-10">
+            <div class="col-lg-5">Grading System : </div>
+            <div class="col-lg-7">
+                <input type="checkbox" id="course-credits-grading-system" data-size="mini" class="bootstrap-toggle" />
+            </div>
+        </div>
+        <div class="row pad-bot-10">
+            <div class="col-lg-5">Hide Credits from Public : </div>
+            <div class="col-lg-7">
+                <input type="checkbox" id="course-credits-hide-public" data-size="mini" class="bootstrap-toggle" />
+            </div>
+        </div>
+        <div class="row pad-bot-10">
+            <div class="col-lg-5">Allow credits to rollover: </div>
+            <div class="col-lg-7">
+                <input type="checkbox" id="course-credits-allow-rollover" data-size="mini" class="bootstrap-toggle" />
+            </div>
+        </div>
+     </div>
+</div>
+@Scripts.Render("~/Areas/Adm/Scripts/Widgets/CourseCredits.js")

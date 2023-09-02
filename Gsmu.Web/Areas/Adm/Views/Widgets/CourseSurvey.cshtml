@@ -1,0 +1,43 @@
+﻿<div id="widget-course-surveys">
+    <div class="panel panel-default">
+        <div class="panel-heading gsmu-sub-panel-heading">
+            <div class="panel-title">
+                Surveys
+            </div>
+        </div>
+        <div class="panel-body gsmu-sub-panel-body panel-collapse collapse in" style="height: 250px;">
+            <div class="row form-group form-group-sm">
+                <div class="col-lg-12">
+                    <div class="row pad-x-10 pad-bot-5">
+                        <select id="course-survey-entity" class="form-control">
+                            <option value="0">Student</option>
+                            <option value="1">Teacher</option>
+                        </select>
+                    </div>
+                    <div class="row pad-x-10 pad-bot-5">
+                        <div class="form-group-sm">
+                            <span>Send after Course Survey Show : </span><br /><br />
+                            <input type="radio" id="send-after-course-survey-yes" name="AllowSendSurveyRadio" value="1" /> Yes
+                            <input type="radio" id="send-after-course-survey-no" name="AllowSendSurveyRadio" value="0" /> No
+                        </div>
+                    </div>
+                    <div class="row pad-x-10 pad-bot-5">
+                        <ul class="nav nav-tabs">
+                            <li role="presentation" class="active"><a href="#course-survey-pre-course" data-toggle="tab">Pre-Course</a></li>
+                            <li role="presentation"><a href="#course-survey-post-course" data-toggle="tab">Post-Course</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="course-survey-pre-course" class="tab-pane fade in active">
+                                <select id="course-survey-pre-course-surveys" class="form-control"></select>
+                            </div>
+                            <div id="course-survey-post-course" class="tab-pane fade in">
+                                <select id="course-survey-post-course-surveys" class="form-control"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/Areas/Adm/Scripts/Widgets/CourseSurvey.js")

@@ -1,0 +1,29 @@
+﻿@using Gsmu.Api.Data.School.Terminology
+@{
+    var terms = TerminologyHelper.Instance.Terms;
+    var keys = terms.Keys;
+    var count = keys.Count;
+    Layout = null; 
+}
+/* This script requires Ext Js to be loaded. */ 
+var Terminology = {};
+
+Terminology.Terms = {
+@foreach(string label in keys) {
+    count--;
+    <text>@Html.Raw(Json.Encode(label)):@Html.Raw(Json.Encode(terms[label])) @(count > 0 ? "," : "")</text>
+}
+};
+
+Terminology.lower = function(term) { return Terminology.Terms[term.toLowerCase()].toLowerCase(); };
+
+Terminology.upper = function(term) { return Terminology.Terms[term.toLowerCase()].toUpperCase(); };
+
+//Terminology.capital = function(term) { return Ext.String.capitalize(Terminology.lower(term.toLowerCase())); };
+
+//It will only capitalized the first letter and will not format the succeeding letters or words
+Terminology.capital = function(term) { 
+            var word = Terminology.Terms[term.toLowerCase()];
+            var cptlzd = word.substring(0, 1).toUpperCase() + word.substring(1); 
+        return cptlzd; 
+};

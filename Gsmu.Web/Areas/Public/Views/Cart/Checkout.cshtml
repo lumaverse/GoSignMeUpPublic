@@ -1,0 +1,1247 @@
+﻿@using Gsmu.Api.Data
+@using Gsmu.Api.Authorization;
+@using Gsmu.Api.Data.School.Course
+@using Gsmu.Api.Data.School.Terminology;
+@model Gsmu.Api.Commerce.ShoppingCart.CourseShoppingCart
+@{
+    ViewBag.Title = "Cart";
+    var showCourseNum = ((Settings.Instance.GetMasterInfo2().HideCourseNumber == 0) ? true : false);
+    var showSeatStatus = Settings.Instance.GetMasterInfo2().HideSeatsAvailable;
+    var AllowPartialPayment = ((Settings.Instance.GetMasterInfo3().AllowPartialPayment == 1) ? true : false);
+    var ForceFillExtraParticipantform = ((Settings.Instance.GetMasterInfo3().ForceFillExtraParticipantform == 1) ? true : false);
+    string ExtraParticipantReqrd = ForceFillExtraParticipantform ? "required" : "notrequired";
+    string ExtraParticipantLabel = (string.IsNullOrEmpty(Settings.Instance.GetMasterInfo4().ExtraParticipantLabel) ? "Extra Participant Name" :Settings.Instance.GetMasterInfo4().ExtraParticipantLabel);
+    var hide_payment_info = Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().HidePaymentInfo;
+    var membership = ViewBag.Membership;
+    var cntList = 0;
+    var hasRegCourseInCheckout = 0;
+    var currentLoggedInUser = AuthorizationHelper.CurrentUser.IsLoggedIn && AuthorizationHelper.CurrentStudentUser != null ? AuthorizationHelper.CurrentStudentUser : null;
+    var isAdmin = (AuthorizationHelper.CurrentAdminUser == null ? false : true);
+    var roomatealert=0;
+}
+
+<script>
+
+    $(document).ready(function() {
+        var text_max = 100;
+        $('#CheckoutCharRem').html(text_max + ' characters remaining');
+
+        $('#CheckoutComments').keyup(function() {
+            var text_length = $('#CheckoutComments').val().length;
+            var text_remaining = text_max - text_length;
+            $('#CheckoutCharRem').html(text_remaining + ' characters remaining');
+        });
+    });
+
+</script>
+<input type="hidden" name="ExtraParticipantLabel" id="ExtraParticipantLabel" value="@ExtraParticipantLabel" />
+
+<div class="cart-steps-wrap">
+    <div class="cart-steps cart-step2"></div>
+    <ul class="cart-steps-text" style="list-style-type: none;">
+        <li class="cart-step-1 current-step">Log in/ Create Account</li>
+        <li class="cart-step-2">Review</li>
+         @if (hide_payment_info == 0)
+         {
+            <li class="cart-step-3">Payments</li>
+         }
+         else 
+         {
+            <li class="cart-step-3">Processing</li>
+         }
+        <li class="cart-step-4">Receipt & Confirmation</li>
+    </ul>
+</div>
+<div style="float:right">
+      <a class="button-waitspace primary button-component hudbtn" style=" margin-top:10px; float:left; width:160px; text-align:center; color:white;  cursor:pointer; line-height:20px; height:20px;" href="javascript:cart.backToBrowse(true);">Add more @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course)s</a>
+</div>
+
+<table border="0" style="width: 942px; margin-left: 10px;">
+    <tr>
+        <td colspan="4" style="font-size: 16px; margin-left: 10px;">Review your current order <br />
+        </td>
+        <td style="color: #CDCDCD; width: 22%; text-align: center">
+    @if ((Gsmu.Api.Authorization.AuthorizationHelper.CurrentUser.IsLoggedIn) && ((Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser != null)))
+    {
+        if (ViewBag.Sortby == "1")
+        {  <a class="button-waitspace primary button-component hudbtn" style=" margin-top:10px; float:left; width:160px; text-align:center; color:white;  cursor:pointer; line-height:20px; height:20px;" href="javascript:cart.checkout('1');">Sort By Student</a>
+        }
+        else
+        { <a class="button-waitspace button-component hudbtn" style=" margin-top:10px; float:left; width:160px; text-align:center; color:white;  cursor:pointer; line-height:20px; height:20px;" href="javascript:cart.checkout('1');">Sort By Student</a>
+        }
+        if (ViewBag.Sortby == "2")
+        {  <a class="button-waitspace primary button-component hudbtn" style=" margin-top:10px; float:left; width:160px; text-align:center; color:white;  cursor:pointer; line-height:20px; height:20px;" href="javascript:cart.checkout('2');">Sort By Course</a>
+        }
+        else
+        { <a class="button-waitspace button-component hudbtn" style=" margin-top:10px; float:left; width:160px; text-align:center; color:white;  cursor:pointer; line-height:20px; height:20px;" href="javascript:cart.checkout('2');">Sort By Course</a>
+        }
+    }      
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4">&nbsp;</td>
+    </tr>
+</table>
+<div id="checkoutreservationtimer" style="border-bottom:3px solid red;border-top:3px solid red; text-align:center; color:black; visibility:hidden; "></div>
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "checkoutform" }))
+{
+    //please observe total TD;
+    var totalTD = 8;
+    int? eventId =0;
+    var multplestudentcount= 0;
+    if (showSeatStatus != 2){totalTD +=1;}
+    if(Model.MultipleStudentCourses!=null)
+    {
+        multplestudentcount = Model.MultipleStudentCourses.Count;
+    }
+     
+
+        if((multplestudentcount== 0)){
+
+            if(ViewBag.CountMembership > 0){
+                        <table id="check_out_grid" border="0" style="width: 942px; margin-left: 10px; font-size: 12px">
+                        <tr align="center" style="background-color: #E7E7E7; height: 30px; text-align:center; font-weight: bold;">
+                                <td colspan="3" style="text-align:left; padding-left:15px" >Membership</td>
+                                <td style="width: 100px;" >Price</td>
+                                <td>&nbsp;</td>
+                        </tr>
+                        @foreach (var item in Model.Items.Where(c => c.Course.COURSENUM == "~ZZZZZZ~"))
+                        {
+                            var tr1ID = "tr1" + item.Course.COURSEID;
+                       <tr class="@tr1ID">
+                                <td colspan="3" style="text-align:left; padding-left:15px" >@item.Course.COURSENAME</td>
+                                <td style="width: 100px; text-align:right;" >@string.Format("{0:c}", item.LineTotal)</td>
+                                <td style="width: 40px; text-align:center;">
+                                    <a title="Remove membership from cart" id="remove-@(item.Course.COURSEID)" href="javascript:cart.remove(@(item.Course.COURSEID));" data-message="" class="closebtn">x</a>
+                                </td>
+                        </tr>
+                        }
+                        <tr>
+                                <td colspan="3" style="text-align:left; padding-left:15px" >&nbsp;</td>
+                                <td style="width: 100px;" >&nbsp;</td>
+                                <td>&nbsp;</td>
+                        </tr>
+                    </table>
+                }
+
+
+             <table id="check_out_grid" border="0" style="width: 942px; margin-left: 10px; font-size: 12px">
+                <tr align="center" style="background-color: #E7E7E7; height: 30px; text-align:center; font-weight: bold;" id="CourseHeaderTR">
+                        <td colspan="3" style="text-align:left; padding-left:15px" > @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course) Name</td>
+                        <td style="width: 98px;" >Date(s)</td>
+                        <td style="width: 130px;" >Time(s)</td>
+                    @if (showSeatStatus != 0)
+                    {
+                        <td>Status</td>
+                    }
+                    @if (hide_payment_info == 0)
+                    {
+                    <td style="width: 100px;" >Price</td>
+                    <td>&nbsp;</td>
+                    }
+                </tr>
+                <tr></tr>
+                @foreach (var item in Model.Items.OrderBy(u=>u.CheckoutEventId).ThenBy(u=>u.SessionDate).ThenBy(u=>u.SessionTime).ThenBy(u=>u.SessionName))
+                {
+                    cntList +=1;
+                    var tr1ID = "tr1" + item.Course.COURSEID;
+                    var statusID = "status" + item.Course.COURSEID;
+                    var shwpreqID = "shwPrerequisite" + item.Course.COURSEID;
+                    var preqID = "Prerequisite" + item.Course.COURSEID;
+                    var roommatenameId="roommatename"+item.Course.COURSEID;
+                    var roommategenderId="roommategender"+item.Course.COURSEID;
+                    var roommatecommuteId="roommatecommute"+item.Course.COURSEID;
+                    var ppID = "PartlPaymnt" + item.Course.COURSEID;
+                    var ppChkd = item.IsPartialPayment ? "checked" : "";
+                    var txtcoupon = "txtcoupon" + item.Course.COURSEID;
+                    var txtcoupon_cprice = "txtcoupon_cprice" + item.Course.COURSEID;
+                    var txtcoupon_material_name = "txtcoupon_material_name" + item.Course.COURSEID;
+                    var txtdiscountvalue = "txtdiscountvalue" + item.Course.COURSEID;
+                    HttpContext.Current.Items["currentCartItem"] = item;
+                    var message = Uri.EscapeDataString(Model.GetRemoveCourseAlertText(item.Course.COURSEID));
+                    var dsplayrow = "table-row;";
+                    var PricingModelLabel = "";
+                    if(item.PricingModel != null){
+                        PricingModelLabel = item.PricingModel.Label;
+                    }
+                    if(item.HasMembership){
+                        PricingModelLabel = Settings.Instance.GetMasterInfo2().membertypememberlabel;
+                    }
+                    if(item.Course.COURSENUM == "~ZZZZZZ~"){
+                        dsplayrow = "none;";
+                    }
+                    var eventStyle = "";
+                    var isEvent=0;
+                    var timeDateAddStyle = "";
+                    var sessionid = item.Course.sessionid;
+                    var coursetype = item.Course.coursetype;
+                    var indentvalue="";
+                    if(coursetype == 1){
+                        eventStyle = "font-size: 19px; color: #5fa44a; font-weight: bold;";
+                        timeDateAddStyle = "display:none;";
+                        isEvent = 1;
+                    }
+                    if (@item.CheckoutEventId == 0) {
+                        hasRegCourseInCheckout = 1;
+                    }
+
+                    <tr style="display:@dsplayrow" class="@tr1ID">
+                        <td colspan="@totalTD">
+                        @if(sessionid==0 ){
+                            <div class="thinline"></div>
+                        }
+
+                        </td>
+                    </tr>
+
+                    if(eventId!=item.CheckoutEventId){
+                    <tr align="center" style="background-color: #E7E7E7; height: 30px; text-align:center; font-weight: bold;">
+                            <td colspan="3" style="text-align:left; padding-left:15px" > Event Name</td>
+                            <td style="width: 98px;" >Date(s)</td>
+                            <td style="width: 130px;" >Time(s)</td>
+                        @if (showSeatStatus != 0)
+                        {
+                            <td>Status</td>
+                        }
+                        @if (hide_payment_info == 0)
+                        {
+                        <td style="width: 100px;" >Price</td>
+                        <td>&nbsp;</td>
+                        }
+                    </tr>
+                    }
+                    <tr style="display:@dsplayrow" class="@tr1ID">
+                    <td colspan="@totalTD" style="height: 7px">&nbsp;</td>
+                    </tr>
+                    <tr style="display:@dsplayrow" class="@tr1ID">
+                            <td>&nbsp;</td>
+                            <td colspan="2" style="vertical-align: top; text-align:left">
+                                @if(eventId!=item.CheckoutEventId){
+                                    if(item.EventName!=""){
+
+                                         <div style="font-size: 19px; color: #5fa44a; font-weight: bold;">@Html.Raw(item.EventName)</div>
+                                            indentvalue = "padding-left:20px;";
+                                    
+                                   }
+                                  eventId = item.CheckoutEventId;
+                                }
+                                   
+                                @if(item.SessionName!=""){
+                                    <div style="padding-left:10px; font-weight:bolder;font-size:14px;">@Html.Raw(item.SessionName)</div>
+                                     indentvalue = "padding-left:20px;";
+                                    
+                                }
+                                @if(isEvent==0){
+                                    if (showCourseNum)
+                                    {
+                                     <div style="font-weight: bold; @eventStyle @indentvalue" title="Course Number">@item.Course.COURSENUM</div>
+                                    }
+                                    <div style="@eventStyle @indentvalue">@item.Course.COURSENAME - @item.Course.COURSEID</div>
+                                }
+                                @if (item.PricingModel != null)
+                                {
+                                    <div style="font-style:italic; font-size:11px; @indentvalue"> &nbsp&nbsp&nbsp @PricingModelLabel</div>
+                                }
+
+                                @if (item.HasExtraParticipants)
+                                {
+                                    Html.RenderPartial("_PartialViewExtraParticipants", item.ExtraParticipants);
+                                }
+                            </td>
+                            <td colspan="2" style="text-align:left;@timeDateAddStyle" class="checkout_date_and_time">@{Html.RenderAction("PartialViewCourseTimes", "Cart", new { intCourseId = item.Course.COURSEID });}</td>
+
+                            @if (showSeatStatus != 0 && coursetype != 1)
+                            {
+                             <td id="@statusID" width="80" style="text-align:left; font-size:10px; width:100px">
+                                @{
+                                    var stats = item.Course.EnrollmentStatistics;
+                                 }
+                                 @if (showSeatStatus == 1) {
+                                 //show class size & seat avail
+                                <div>
+                                    Open Seats: @stats.SpaceAvailable of @stats.MaxEnrolledRosterCount
+                                </div>
+                                <div>
+                                    Wait List: @stats.WaitSpaceAvailable of @stats.MaxWaitingRosterCount
+                                </div>
+                                }
+                                @if (showSeatStatus == 2) {
+                                //hide class size & show seat avail
+                                <div>
+                                    Open: @stats.SpaceAvailable Open Seats Left
+                                </div>
+                                <div>
+                                    Wait List: @stats.WaitSpaceAvailable Wait Spaces Available
+                                </div>
+                                }
+                                @if (showSeatStatus == 3) {
+                                //show class size & hide seat avail
+                                <div>
+                                    Class Size: @stats.MaxEnrolledRosterCount 
+                                </div>
+                                <div>
+                                    Waiting: @stats.MaxWaitingRosterCount
+                                </div>
+                                }                    
+                            </td>
+                            }
+                             <td align="center">
+                                 @if (hide_payment_info == 0 && coursetype != 1)
+                                 {
+                                     <div style="text-align:right; padding-right:10px;">
+                                         @string.Format("{0:c}", item.CourseTotal)
+                                     </div>
+                                 }
+                                 <input type="hidden" id="@txtcoupon_cprice" value="@item.CourseTotal" />
+
+                                 
+
+                                 <br />
+                                 @if (ViewBag.AllowCouponPerOrder == "True" && coursetype != 1)
+                                 {
+                                     if (ViewBag.HideCoupons == "False" || AuthorizationHelper.CurrentAdminUser != null)
+                                     {
+
+                                         <span id="@(txtcoupon)-container">
+                                             <input name="@txtcoupon" class="ignore" type="text" placeholder="Coupon Code" id="@txtcoupon" style="width: 80px; font-size: 12px" value="@ViewBag.CouponCode" />
+                                         </span>
+                                         <input name="@txtdiscountvalue" class="ignore" type="hidden" placeholder="Coupon Code" id="@txtdiscountvalue" style="width: 80px; font-size: 12px;" />
+                                         <a id="@(txtcoupon)-href" href="javascript:cart.ApplyCouponDiscountPerOrder('',@item.Course.COURSEID,@item.CourseTotal,@item.MateriaTotal, '@txtcoupon');" style="  font-size: 10px;">Apply coupon</a>
+                                     }
+                                 }
+                             </td>
+
+                            @if(coursetype == 1){
+                              <td></td>
+                              <td></td>
+                              <td></td>
+
+                            }
+                            
+                            <td style="text-align: center; width: 40px;">
+                                @if(coursetype == 1){
+                                <a title="Remove course from cart" id="remove-@(item.Course.COURSEID)" href="javascript:cart.RemoveEvent(@(item.Course.COURSEID),'checkout');" data-message="@message" class="closebtn">x</a>
+                                }else if(sessionid>0){
+
+                                }else{
+                                    if(!item.IsBundledCourse){
+                                        <a title="Remove course from cart" id="remove-@(item.Course.COURSEID)" href="javascript:cart.remove(@(item.Course.COURSEID));" data-message="@message" class="closebtn">x</a>
+                                    }                                
+                                }
+                            </td>
+                    </tr>
+                    if(item.Course.CollectExtraParticipant == 1 && coursetype != 1){
+                    <text> 
+                    <tr class="@tr1ID">
+                            <td colspan="@totalTD">
+                            @if(ForceFillExtraParticipantform){
+                            <text>
+                                <input name="CRExtraParticipant" type="text" placeholder="@ExtraParticipantLabel" class="CRExtraParticipant-@ExtraParticipantReqrd"
+                                 value="@item.CRExtraParticipant" id="CRExtraParticipant@(item.Course.COURSEID)" onblur="cart.updateCRExtraParticipant(@item.Course.COURSEID)" style="width: 320px; text-align:left;font-size: 11px;margin-left: 60px;height: 12px;border: rgba(39, 16, 16, 0.3) solid 1px;margin-top: 3px;padding-left: 5px;color: rgba(18, 19, 19, 0.74);" />
+                                <font style="color:red;font-size: 23px;font-family: Arial;">*</font>
+                                </text>
+                            } else {
+                            <text>
+                                <input name="CRExtraParticipant" type="text" placeholder="@ExtraParticipantLabel"
+                                 value="@item.CRExtraParticipant" id="CRExtraParticipant@(item.Course.COURSEID)" onblur="cart.updateCRExtraParticipant(@item.Course.COURSEID)" style="width: 320px; text-align:left;font-size: 11px;margin-left: 60px;height: 12px;border: rgba(39, 16, 16, 0.3) solid 1px;margin-top: 3px;padding-left: 5px;color: rgba(18, 19, 19, 0.74);" />
+                                </text>                            
+                            }
+                            </td>
+                    </tr>
+                    </text> 
+                    }
+                    <tr style="display:@dsplayrow" class="@tr1ID">
+                        <td colspan="@totalTD"><div style="margin-left:20px;">
+                            @if(item.SelectedCredits!=null){
+                                if(item.SelectedCredits.Count>0)
+                                {
+                                    <div>Selected Credit(s)</div>
+                                     foreach( var credit in item.SelectedCredits){
+                                            <div style="margin-left:20px; font-style:italic;">
+
+                                               @credit.Label &nbsp; @credit.Credit
+                                            </div>
+                                        }
+                                  
+                                }
+                            }
+                        </div>
+                        </td>
+                    </tr>
+                    <tr style="display:@dsplayrow" class="@tr1ID">
+                            <td colspan="@totalTD">   <div>&nbsp;</div>
+                                @{Html.RenderAction("PartialViewMaterials", "Cart", new { intCourseId = item.Course.COURSEID, listMaterials = item.Materials });}
+                            </td>
+                    </tr>
+
+                    if (item.Course.ShowPrerequisite != 0)
+                        {
+                     <text>  
+                     <tr style="display:@dsplayrow" class="@tr1ID">
+                            <td colspan="@totalTD" style="height: 10px">&nbsp;</td>
+                    </tr>
+                    <tr style="display:@dsplayrow" class="@tr1ID">
+                        <td colspan="@totalTD" style="height: 10px">
+                            <div style="width: 500px; left: 10px; position: relative; color: #888888; font-size: 11px">
+                                Course Prerequisite(s)<font style="color: red; font-size: 23px; font-family: Arial;">*</font>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="@tr1ID">
+                            <td colspan="@totalTD">
+                                <div style="width: 500px; left: 30px; position: relative; color: #888888; font-size: 11px">
+                                    @item.Course.PrerequisiteInfo
+                                    <input id="@preqID" name="Prerequisite" type="checkbox" value="true" checked="checked" onclick="return false;">
+                                 </div>
+                             </td>
+                   </tr>
+                    </text>
+                    }
+                    if(item.Course.useRoommateMatch ==-1){
+                            roomatealert=1;
+                        <tr>
+                            <td colspan="5">
+                                <div style="margin:10px; "><b>Roommate Request:</b><br />
+                                       <input type="hidden" id="@("saved" + roommatenameId)" name="@("saved" + roommatenameId)" class="roomatesavedyet"/>
+                                       <input type="text" placeholder="Name of roommate" id="@roommatenameId" name="@roommatenameId"  class="roomatechecker"/>
+                                       <input type="text" placeholder="Gender" id="@roommategenderId" name="@roommategenderId"/>
+                                        <select name="commuting" id="@roommatecommuteId">
+				                                <option value="">Will you be commuting daily?</option>
+				                                <option value="Yes">Yes</option>
+				                                <option value="No">No</option>
+				                        </select>&nbsp;
+                                         <a type="button" value="Save" href="javascript:cart.ApplyRoomRequest('@item.Course.COURSEID')">Save</a>&nbsp;
+                                         <a type="button" value="Save" href="javascript:cart.CancelRoomRequest('@item.Course.COURSEID')">Reset</a>
+                                        <br />
+                                            @Settings.Instance.GetMasterInfo3().RMStatement
+
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    if(AllowPartialPayment && item.PartialPayment>0){
+                    <tr style="display:@dsplayrow" class="@tr1ID">
+                        <td colspan="@totalTD" style="height: 7px">
+                        <input id="@ppID" type="checkbox" value="true" onclick="cart.updatePartialPayment(@item.Course.COURSEID)" @ppChkd>
+                        I would like to make a partial payment of $@item.PartialPayment for this course to reserve my spot.
+                        </td>
+                    </tr>
+                    }
+
+                }
+                    <tr class="@totalTD">
+                        <td colspan="@totalTD">
+                            <div class="thinline"></div>
+                        </td>
+                    </tr>
+
+                <tr>
+                    <td colspan="@totalTD">&nbsp;</td>
+                </tr>
+                @if (ViewBag.HidePaymentInfo == "False")
+                    
+                    {
+                    var subTcolspn = totalTD-3;
+                    <tr>
+                        <td colspan="@subTcolspn" style="height: 20px;">&nbsp;</td>
+                        <td style="text-align: right; font-weight: bold;">Sub-total:</td>
+                        <td id="CheckoutSubtotal" style="text-align: right; font-weight: bold; padding-right:10px;">@string.Format("{0:c}", Model.SubTotal)</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    }
+          </table>
+            <input type="hidden" id="varRegCheckoutCourse" value="@hasRegCourseInCheckout" />
+            <script>
+                //hide course header when only event is exist in checkout.
+                if ($('#varRegCheckoutCourse').val() == 0) {
+                        $('#CourseHeaderTR').hide();
+                    }
+            </script>
+
+        }
+    
+    else{
+        string aa = "0";
+        var query_students = (from an in Model.MultipleStudentCourses
+                              group an by
+                                  new
+                                  {
+                                      FirstName = an.FirstName,
+                                      LastName = an.LastName,
+                                  }
+                                  into newGroup
+                                  select newGroup);
+
+        var query_course_group = (from an in Model.MultipleStudentCourses
+                              group an by
+                                  new
+                                  {
+                                    CourseId = an.CourseId
+                                  }
+                                  into newGroup
+                                  select newGroup);
+        if(ViewBag.Sortby=="1")
+        {
+             aa = ViewBag.Sortby;
+             query_students = (from an in Model.MultipleStudentCourses
+                                  orderby an.LastName
+                                  group an by
+                                      new
+                                      {
+                                          FirstName = an.FirstName,
+                                          LastName = an.LastName,
+
+                                      }
+                                      into newGroup
+                                      select newGroup);
+        }
+
+        if (ViewBag.Sortby == "2")
+        {
+            aa = ViewBag.Sortby;
+            query_course_group = (from an in Model.MultipleStudentCourses
+                              orderby an.CourseName
+                              group an by
+                                  new
+                                  {
+                                     CourseId = an.CourseId,                  
+                                  }
+                                  into newGroup
+                                  select newGroup);
+        }
+            if (ViewBag.Sortby == "2")
+                {
+                    foreach (var course in query_course_group)
+                    {
+                <table id="check_out_grid" border="0" style="width: 942px; margin-left: 10px; font-size: 12px">
+                <tr align="center" style="background-color: #E7E7E7; height: 20px;">
+                 <td style="width: 10px" rowspan="2">&nbsp;</td>
+                 <td style="text-align:left" rowspan="2" colspan="2">@TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course) Name </td>
+                 <td style="width: 98px; text-align:left" rowspan="2">Date(s)</td>
+                 <td style="width: 130px; text-align:left" rowspan="2">Time(s)</td>
+                <!--<td width="71" rowspan="2" colspan="2">Credit hours</td>-->
+                <td style="width: 100px; text-align:left" rowspan="2">Price</td>
+                @if (showSeatStatus != 0)
+                {
+                    <td colspan="2" rowspan="2" style="text-align:left">Status</td>
+                } else {
+                <td rowspan="2" style="text-align:left">&nbsp;</td>
+                }
+                </tr>
+                <tr></tr>
+                @foreach (var item in Model.Items)
+                {
+                 if(course.Key.CourseId == item.Course.COURSEID)
+                  {
+                    var counter =0;
+                    var tr1ID = "tr1" + item.Course.COURSEID;
+                    var statusID = "status" + item.Course.COURSEID;
+                    var shwpreqID = "shwPrerequisite" + item.Course.COURSEID;
+                    var ppID = "PartlPaymnt" + item.Course.COURSEID;
+                    var ppChkd = item.IsPartialPayment ? "checked" : "";
+                    var preqID = "Prerequisite" + item.Course.COURSEID;
+                    var roommatenameId="roommatename"+item.Course.COURSEID;
+                    var roommategenderId="roommategender"+item.Course.COURSEID;
+                    var roommatecommuteId="roommatecommute"+item.Course.COURSEID;
+                    var txtcoupon = "txtcoupon" + item.Course.COURSEID;
+                    var txtdiscountvalue = "txtdiscountvalue" + item.Course.COURSEID;
+                    HttpContext.Current.Items["currentCartItem"] = item;
+                    var message = Uri.EscapeDataString(Model.GetRemoveCourseAlertText(item.Course.COURSEID));
+                    var PricingModelLabel = item.PricingModel.Label;
+                    if(item.HasMembership){
+                         PricingModelLabel = Settings.Instance.GetMasterInfo2().membertypememberlabel;
+                    }
+
+                    <tr class="@tr1ID">
+                    <td colspan="@totalTD" style="height: 7px">&nbsp;</td>
+                    </tr>
+                    <tr class="@tr1ID">
+                        <td>&nbsp;</td>
+                        <td colspan="2" style="vertical-align: top; text-align:left">
+                            @if (showCourseNum)
+                            {
+                                <div style="font-weight: bold;" title="Course Number">@item.Course.COURSENUM </div>
+                            }
+                            <div>@item.Course.COURSENAME - @item.Course.COURSEID
+
+                            <div  style="font-weight:bold;">Order For:
+                                @foreach(var st1 in course)
+                                    {
+                                        <div style="font-weight:bold;">@st1.FirstName @st1.LastName</div>
+                                    }
+                            </div>
+                            </div>
+                            @if (item.PricingModel != null)
+                            {
+                                <div style="font-style:italic; font-size:11px;"> &nbsp&nbsp&nbsp @PricingModelLabel</div>
+                            }
+
+                            @if (item.HasExtraParticipants)
+                            {
+                                Html.RenderPartial("_PartialViewExtraParticipants", item.ExtraParticipants);
+                            }
+
+                        </td>
+                        <td colspan="2" style="text-align:left" class="checkout_date_and_time">@{Html.RenderAction("PartialViewCourseTimes", "Cart", new { intCourseId = item.Course.COURSEID });}</td>
+                        <!--<td align="center" colspan="2">@item.Course.CREDITHOURS</td>-->
+                         <td align="left">
+                                @if(hide_payment_info == 0)
+                                {
+                                    string.Format("{0:c}", item.CourseTotal);
+                                
+                                }
+                             <br />
+                            @if (ViewBag.AllowCouponPerOrder == "True")
+                                {
+                                    if (ViewBag.HideCoupons == "False" || AuthorizationHelper.CurrentAdminUser != null)
+                                        {
+
+                                <span id="@(txtcoupon)-container">
+                                <input name="@txtcoupon" class="ignore" type="text" placeholder="Coupon Code" id="@txtcoupon" style="width: 80px; text-align:left" value="@ViewBag.CouponCode" />
+                                </span>
+                                <input name="@txtdiscountvalue" class="ignore" type="hidden" placeholder="Coupon Code" id="@txtdiscountvalue" style="width: 80px; text-align:left" />
+                                        <a id="@(txtcoupon)-href" href="javascript:cart.ApplyCouponDiscountPerOrder('',@item.Course.COURSEID,@item.CourseTotal,@item.MateriaTotal, '@txtcoupon',);" style="font-size: 10px;">Apply coupon</a>
+                                        }
+                                 }
+                          </td>            
+                          @if (showSeatStatus != 0)
+                            {
+                            <td id="@statusID" width="80" style="text-align:left; font-size:10px; width:100px">
+                            @{
+                                var stats = item.Course.EnrollmentStatistics;
+                             }
+                                 @if (showSeatStatus == 1) {
+                                 //show class size & seat avail
+                                <div>
+                                    Open Seats: @stats.SpaceAvailable of @stats.MaxEnrolledRosterCount
+                                </div>
+                                <div>
+                                    Wait List: @stats.WaitSpaceAvailable of @stats.MaxWaitingRosterCount
+                                </div>
+                                }
+                                @if (showSeatStatus == 2) {
+                                //hide class size & show seat avail
+                                <div>
+                                    Open: @stats.SpaceAvailable Open Seats Left
+                                </div>
+                                <div>
+                                    Wait List: @stats.WaitSpaceAvailable Wait Spaces Available
+                                </div>
+                                }
+                                @if (showSeatStatus == 3) {
+                                //show class size & hide seat avail
+                                <div>
+                                    Class Size: @stats.MaxEnrolledRosterCount 
+                                </div>
+                                <div>
+                                    Waiting: @stats.MaxWaitingRosterCount
+                                </div>
+                                }
+                        </td>
+                            }
+
+                        <td style="text-align: right; width: 40px;">
+                            <a title="Remove course from cart" id="remove-@(item.Course.COURSEID)" href="javascript:cart.remove(@(item.Course.COURSEID));" data-message="@message" class="closebtn">x</a>
+
+
+                        </td>
+                    </tr>
+                    <tr class="@tr1ID">
+                        <td colspan="@totalTD">
+                            @{Html.RenderAction("PartialViewMaterials", "Cart", new { intCourseId = item.Course.COURSEID, listMaterials = item.Materials });}
+                        </td>
+                    </tr>
+
+                            if (item.Course.ShowPrerequisite != 0)
+                                {
+
+                     <tr class="@tr1ID">
+                            <td colspan="@totalTD" style="height: 10px">&nbsp;</td>
+                    </tr>
+                    <tr class="@tr1ID">
+                        <td colspan="@totalTD" style="height: 10px">
+                            <div style="width: 500px; left: 10px; position: relative; color: #888888; font-size: 11px">
+                                Course Prerequisite(s)<font style="color: red; font-size: 23px; font-family: Arial;">*</font>
+                            </div>
+                        </td>
+                    </tr>
+                    if(item.Course.useRoommateMatch ==-1){
+                            roomatealert=1;
+                        <tr>
+                            <td colspan="5">
+                                <div style="margin:10px; "><b>Roommate Request:</b><br />
+                                       <input type="hidden" id="@("saved" + roommatenameId)" name="@("saved" + roommatenameId)" class="roomatesavedyet"/>
+                                       <input type="text" placeholder="Name of roommate" id="@roommatenameId" name="@roommatenameId" class="roomatechecker"/>
+                                       <input type="text" placeholder="Gender" id="@roommategenderId" name="@roommategenderId"/>
+                                        <select name="commuting" id="@roommatecommuteId">
+				                                <option value="">Will you be commuting daily?</option>
+				                                <option value="Yes">Yes</option>
+				                                <option value="No">No</option>
+				                        </select>
+                                         <a type="button" value="Save" href="javascript:cart.ApplyRoomRequest('@item.Course.COURSEID')">Save</a>
+                                         <a type="button" value="Save" href="javascript:cart.CancelRoomRequest('@item.Course.COURSEID')">Reset</a>
+                                        <br />
+                                            @Settings.Instance.GetMasterInfo3().RMStatement
+
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    if(AllowPartialPayment && item.PartialPayment>0){
+                    <tr class="@tr1ID">
+                      <td colspan="@totalTD" style="height: 7px">
+                        <input id="@ppID" type="checkbox" value="true" onclick="cart.updatePartialPayment(@item.Course.COURSEID)" @ppChkd>
+                        I would like to make a partial payment of $@item.PartialPayment for this course to reserve my spot.
+                        </td>
+                    </tr>
+                    }
+                    <tr class="@tr1ID">
+                            <td colspan="@totalTD">
+                                <div style="width: 500px; left: 30px; position: relative; color: #888888; font-size: 11px">
+                                    @item.Course.PrerequisiteInfo
+                                    <input id="@preqID" name="Prerequisite" type="checkbox" value="true">
+                                 </div>
+                             </td>
+                   </tr>
+
+                                }
+                    <tr class="@tr1ID">
+                        <td colspan="@totalTD">&nbsp;</td>
+
+                    </tr>
+
+                    <tr class="@tr1ID">
+                        <td colspan="@totalTD">
+                            <div class="thinline"></div>
+                        </td>
+                    </tr>
+                        }
+                    }
+                
+                <tr>
+                    <td colspan="@totalTD">&nbsp;</td>
+                </tr>
+          </table>
+                    }
+                }
+            else
+                { 
+                 foreach (var student in query_students)
+                 {
+                     <table id="check_out_grid" border="0" style="width: 942px; margin-left: 10px; font-size: 12px">
+                <tr><td colspan="3" style="font-size:14px; font-weight:bold;">Order for @student.Key.FirstName  @student.Key.LastName </td></tr>
+                <tr align="center" style="background-color: #E7E7E7; height: 20px;">
+                 <td style="width: 10px" rowspan="2">&nbsp;</td>
+                 <td style="text-align:left" rowspan="2" colspan="2"> @TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course) Name </td>
+                 <td style="width: 98px; text-align:left" rowspan="2">Date(s)</td>
+                 <td style="width: 130px; text-align:left" rowspan="2">Time(s)</td>
+                <!--<td width="71" rowspan="2" colspan="2">Credit hours</td>-->
+                <td style="width: 100px; text-align:left" rowspan="2">Price</td>
+                @if (showSeatStatus != 0)
+                {
+                    <td colspan="2" rowspan="2" style="text-align:left">Status</td>
+                } else {
+                <td rowspan="2" style="text-align:left">&nbsp;</td>
+                }
+                </tr>
+                <tr></tr>
+               @foreach (var st in student)
+                    {
+                foreach (var item in Model.Items)
+                {
+                 if(st.CourseId == item.Course.COURSEID)
+                  {
+                    var sid = st.StudentId;
+                    var tr1ID = "tr1" + item.Course.COURSEID;
+                    var statusID = "status" + item.Course.COURSEID;
+                    var ppID = "PartlPaymnt" + item.Course.COURSEID;
+                    var ppChkd = item.IsPartialPayment ? "checked" : "";
+                    var shwpreqID = "shwPrerequisite" + item.Course.COURSEID;
+                    var roommatenameId="roommatename"+item.Course.COURSEID;
+                    var roommategenderId="roommategender"+item.Course.COURSEID;
+                    var roommatecommuteId="roommatecommute"+item.Course.COURSEID;
+                    var preqID = "Prerequisite" + item.Course.COURSEID;
+                    var txtcoupon = "txtcoupon" + item.Course.COURSEID +st.StudentId;
+                    var txtdiscountvalue = "txtdiscountvalue" + item.Course.COURSEID +st.StudentId;
+                    var txtadminpriceedit = "txtadminpriceedit" + item.Course.COURSEID +st.StudentId;
+                    var coursetype = item.Course.coursetype;
+                    HttpContext.Current.Items["currentCartItem"] = item;
+                    var message = Uri.EscapeDataString(Model.GetRemoveCourseAlertText(item.Course.COURSEID));
+                    var  PricingModelLabel =   Gsmu.Api.Data.School.Student.MembershipHelper.GetMembershipTypeLabelByStudent(st.StudentId);
+                    if(item.HasMembership){
+                         PricingModelLabel = Settings.Instance.GetMasterInfo2().membertypememberlabel;
+                    }
+                    <tr class="@tr1ID">
+                    <td colspan="@totalTD" style="height: 7px">&nbsp;</td>
+                    </tr>
+                    <tr class="@tr1ID">
+                        <td>&nbsp;</td>
+                        <td colspan="2" style="vertical-align: top; text-align:left">
+                            @if (showCourseNum)
+                            {
+                                <div style="font-weight: bold;" title="Course Number">@item.Course.COURSENUM</div>
+                            }
+                            <div>@item.Course.COURSENAME - @item.Course.COURSEID</div>
+                            @if (item.PricingModel != null)
+                            {
+                                   var _pricemodel =  (from an in Model.MultipleStudentCourses where an.CourseId == st.CourseId && an.StudentId == st.StudentId  select an.PricingModel).FirstOrDefault();
+                                    if(_pricemodel!=null && !item.HasMembership){ 
+                                          <div> @_pricemodel.Label </div>
+                                    }
+                                    else
+                                     {
+                                          <div style="font-style:italic; font-size:11px;"> &nbsp&nbsp&nbsp @PricingModelLabel</div>
+                                     }
+                            }
+                            else
+                            {
+                                    <div style="font-style:italic; font-size:11px;">vvv &nbsp&nbsp&nbsp @PricingModelLabel</div>
+                            }
+
+                            @if (item.HasExtraParticipants)
+                            {
+                                Html.RenderPartial("_PartialViewExtraParticipants", item.ExtraParticipants);
+                            }
+
+                        </td>
+                        <td colspan="2" style="text-align:left" class="checkout_date_and_time">@{Html.RenderAction("PartialViewCourseTimes", "Cart", new { intCourseId = item.Course.COURSEID });}</td>
+                        <!--<td align="center" colspan="2">@item.Course.CREDITHOURS</td>-->
+                         <td align="left">
+                                @if(hide_payment_info == 0)
+                                {
+                                    string.Format("{0:c}", item.CourseTotal);
+                                   var price =  (from an in Model.MultipleStudentCourses where an.CourseId == st.CourseId && an.StudentId == st.StudentId  select an.CourseTotal).FirstOrDefault();
+                                    if(price!=null){ 
+                                        string.Format("{0:c}", price);
+                                        
+                                        if(AuthorizationHelper.CurrentAdminUser != null && !item.IsBundledCourse){
+                                               <div>$ <input type="number" id="@txtadminpriceedit" value="@(Math.Round(price,2))" style="width: 70px; text-align:left"  /> </div>
+                                                  <a id="@(txtcoupon)-href" href="javascript:cart.UpdateCoursePrice(@item.Course.COURSEID,'@st.StudentId');" style="font-size: 10px;">Update</a>
+
+                                        }
+                                    }
+                                    else
+                                     {
+                                        <div> @string.Format("{0:c}", 0); </div>
+                                     }
+                                }
+
+                             <br />
+                            @if (ViewBag.AllowCouponPerOrder == "True")
+                                {
+                                    if (ViewBag.HideCoupons == "False" || AuthorizationHelper.CurrentAdminUser != null)
+                                        {
+
+                                <span id="@(txtcoupon)-container">
+                                <input name="@txtcoupon" class="ignore" type="text" placeholder="Coupon Code" id="@txtcoupon" style="width: 80px; text-align:left" value="@ViewBag.CouponCode"/>
+                                </span>
+                                <input name="@txtdiscountvalue" class="ignore" type="hidden" placeholder="Coupon Code" id="@txtdiscountvalue" style="width: 80px; text-align:left" />
+                                        <a id="@(txtcoupon)-href" href="javascript:cart.ApplyCouponDiscountPerOrder('',@item.Course.COURSEID,@item.CourseTotal,@item.MateriaTotal, '@txtcoupon','@st.StudentId');" style="font-size: 10px;">Apply coupon</a>
+                                        }
+                                 }
+                            </td>            
+                          @if (showSeatStatus != 0)
+                            {
+                            <td id="@statusID" width="80" style="text-align:left; font-size:10px; width:100px">
+                                @{
+                                 var stats = item.Course.EnrollmentStatistics;
+                                 }
+                                 @if (showSeatStatus == 1) {
+                                 //show class size & seat avail
+                                <div>
+                                    Open Seats: @stats.SpaceAvailable of @stats.MaxEnrolledRosterCount
+                                </div>
+                                <div>
+                                    Wait List: @stats.WaitSpaceAvailable of @stats.MaxWaitingRosterCount
+                                </div>
+                                }
+                                @if (showSeatStatus == 2) {
+                                //hide class size & show seat avail
+                                <div>
+                                    Open: @stats.SpaceAvailable Open Seats Left
+                                </div>
+                                <div>
+                                    Wait List: @stats.WaitSpaceAvailable Wait Spaces Available
+                                </div>
+                                }
+                                @if (showSeatStatus == 3) {
+                                //show class size & hide seat avail
+                                <div>
+                                    Class Size: @stats.MaxEnrolledRosterCount 
+                                </div>
+                                <div>
+                                    Waiting: @stats.MaxWaitingRosterCount
+                                </div>
+                                }
+                        </td>
+                            }
+                        <td style="text-align: right; width: 40px;">
+                            <a title="Remove course from cart" id="remove-@(item.Course.COURSEID)" href="javascript:cart.remove(@(item.Course.COURSEID),@sid);" data-message="@message" class="closebtn">x</a>
+
+
+                        </td>
+                    </tr>
+                    <tr class="@tr1ID">
+                        <td colspan="@totalTD">
+                          
+                            @{Html.RenderAction("PartialViewMaterials", "Cart", new { intCourseId = item.Course.COURSEID, listMaterials = item.Materials, intStudentId = sid });}
+                        </td>
+                    </tr>
+
+                if (item.Course.ShowPrerequisite != 0)
+                    {
+
+                     <tr class="@tr1ID">
+                            <td colspan="@totalTD" style="height: 10px">&nbsp;</td>
+                    </tr>
+                    <tr class="@tr1ID">
+                        <td colspan="@totalTD" style="height: 10px">
+                            <div style="width: 500px; left: 10px; position: relative; color: #888888; font-size: 11px">
+                                Course Prerequisite(s)<font style="color: red; font-size: 23px; font-family: Arial;">*</font>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="@tr1ID">
+                            <td colspan="@totalTD">
+                                <div style="width: 500px; left: 30px; position: relative; color: #888888; font-size: 11px">
+                                    @item.Course.PrerequisiteInfo
+                                    <input id="@preqID" name="Prerequisite" type="checkbox" value="true">
+                                 </div>
+                             </td>
+                   </tr>
+
+                }
+                    if(item.Course.useRoommateMatch ==-1){
+                            roomatealert=1;
+                        <tr>
+                            <td colspan="5">
+                                <div style="margin:10px; "><b>Roommate Request:</b><br />
+                                       <input type="hidden" id="@("saved" + roommatenameId)" name="@("saved" + roommatenameId)" class="roomatesavedyet"/>
+                                       <input type="text" placeholder="Name of roommate" id="@roommatenameId" name="@roommatenameId" class="roomatechecker"/>
+                                       <input type="text" placeholder="Gender" id="@roommategenderId" name="@roommategenderId"/>
+                                        <select name="commuting" id="@roommatecommuteId">
+				                                <option value="">Will you be commuting daily?</option>
+				                                <option value="Yes">Yes</option>
+				                                <option value="No">No</option>
+				                        </select>
+                                       <a type="button" value="Save" href="javascript:cart.ApplyRoomRequest('@item.Course.COURSEID')">Save</a>
+                                       <a type="button" value="Save" href="javascript:cart.CancelRoomRequest('@item.Course.COURSEID')">Reset</a>
+                                        <br />
+                                            @Settings.Instance.GetMasterInfo3().RMStatement
+
+                                </div>
+                            </td>
+                        </tr>
+                    }                    
+                    if(AllowPartialPayment && item.PartialPayment>0){
+                    <tr class="@tr1ID">
+                      <td colspan="@totalTD" style="height: 7px">
+                        <input id="@ppID" type="checkbox" value="true" onclick="cart.updatePartialPayment(@item.Course.COURSEID)" @ppChkd>
+                        I would like to make a partial payment of $@item.PartialPayment for this course to reserve my spot.
+                        </td>
+                    </tr>
+                    }
+                    <tr class="@tr1ID">
+                            <td colspan="@totalTD">&nbsp;</td>
+
+                    </tr>
+
+                    if(item.Course.CollectExtraParticipant == 1 && coursetype != 1){
+                    <text> 
+                    <tr class="@tr1ID">
+                            <td colspan="@totalTD">
+                            @if(ForceFillExtraParticipantform){
+                            <text>
+                                <input name="CRExtraParticipant" type="text" placeholder="@ExtraParticipantLabel" class="CRExtraParticipant-@ExtraParticipantReqrd"
+                                 value="@item.CRExtraParticipant" id="CRExtraParticipant@(item.Course.COURSEID)" onblur="cart.updateCRExtraParticipant(@item.Course.COURSEID)" style="width: 320px; text-align:left;font-size: 11px;margin-left: 60px;height: 12px;border: rgba(39, 16, 16, 0.3) solid 1px;margin-top: 3px;padding-left: 5px;color: rgba(18, 19, 19, 0.74);" />
+                                <font style="color:red;font-size: 23px;font-family: Arial;">*</font>
+                                </text>
+                            } else {
+                            <text>
+                                <input name="CRExtraParticipant" type="text" placeholder="@ExtraParticipantLabel"
+                                 value="@item.CRExtraParticipant" id="CRExtraParticipant@(item.Course.COURSEID)" onblur="cart.updateCRExtraParticipant(@item.Course.COURSEID)" style="width: 320px; text-align:left;font-size: 11px;margin-left: 60px;height: 12px;border: rgba(39, 16, 16, 0.3) solid 1px;margin-top: 3px;padding-left: 5px;color: rgba(18, 19, 19, 0.74);" />
+                                </text>                            
+                            }
+                            </td>
+                    </tr>
+                    </text> 
+                    }
+                    <tr class="@tr1ID">
+                            <td colspan="@totalTD">
+                                <div class="thinline"></div>
+                            </td>
+                    </tr>
+                        }
+                    }
+                }
+
+                <tr>
+                            <td colspan="@totalTD">&nbsp;</td>
+                </tr>
+          </table>
+                 }
+                }
+    }
+
+
+                     <table border="0" style="width: 942px; margin-left: 10px;">
+                         <tr>
+                             <td style="height: 20px">&nbsp;</td>
+                             <td>&nbsp;</td>
+                             <td style="width: 100px">&nbsp;</td>
+                             <td style="width: 40px;">&nbsp;</td>
+                         </tr>
+
+                         <tr>
+                             <td rowspan="5">
+                                 @if (ViewBag.ischeckoutcommentenabled != "False" && ViewBag.ischeckoutcommentenabled != "0")
+                                 {
+                                     @Html.Raw(ViewBag.checkoutcommentlabel)<br>
+                                     <textarea name="CheckoutComments" id="CheckoutComments" style="width: 400px" cols="" class="ignore" rows="3" maxlength="100"></textarea><br>
+                                     <div id="CheckoutCharRem" style="color:grey"></div>
+                                 }
+                             </td>
+                             <td>&nbsp;</td>
+                             <td>&nbsp;</td>
+                             <td>&nbsp;</td>
+                         </tr>
+
+                         @if (ViewBag.HidePaymentInfo == "False")
+                         {
+                             if (ViewBag.UseCCFee == "true")
+                             {
+                                 <tr>
+                                     <td align="right">Convenience Fee: </td>
+                                     <td align="right" style="padding-right:10px;">$0.00</td>
+                                     <td>&nbsp;</td>
+                                 </tr>
+                             }
+                             <tr>
+                                 @if (ViewBag.AllowCouponPerOrder == "False")
+                                 {
+                                     if (ViewBag.HideCoupons == "False" || AuthorizationHelper.CurrentAdminUser != null)
+                                     {
+                                         <td align="right">
+                                             Coupon Code <a href="javascript:cart.AlertDiscountDetails()">[D]</a>:
+                                         </td>
+                                         <td align="center">
+                                             <input type="text" placeholder="Coupon Code" id="txtCoupon" name="txtCoupon" style="width: 80px; text-align:left; font-size: 12px;" value="@ViewBag.CouponCode" />
+                                             <br>
+                                             <a href="javascript:cart.ApplyCouponDiscount('',1);" style="font-size: 10px;">Apply coupon</a>
+                                         </td>
+                                         <td align="left"></td>
+                                     }
+                                 }
+                             </tr>
+
+                             if (!isAdmin)
+                             {
+                                 <text>
+                                     <tr>
+                                         <td align="right">Discount:</td>
+                                         <td align="right" id="CheckoutDiscount" style="padding-right:10px;">$0.00</td>
+                                         <td><input type="text" data-isadmin="false" value="0" id="hiddenOrderDiscountTotal" style="display:none;" onkeyup="cart.ComputePriceCheckout();" /></td>
+                                     </tr>
+                                 </text>
+                             }
+                             else
+                             {
+                                 <text>
+                                     <tr>
+                                         <td align="right">Discount:</td>
+                                         <td align="right" id="CheckoutDiscount" style="padding-right:10px;display:none;">$0.00</td>
+                                         <td>
+                                             $<input type="text" data-isadmin="true" value="0" id="hiddenOrderDiscountTotal" onkeyup="cart.ComputePriceCheckout();" style="width: 70px;text-align: right;
+}" />
+                                         </td>
+                                     </tr>
+                                 </text>
+                             }
+                             <tr>
+                                 <td align="right">Sales Tax:</td>
+                                 <td align="right" id="SalesTaxTotal" style="padding-right:10px;">$0.00</td>
+                                 <td></td>
+                             </tr>
+
+                             <tr>
+                                 <td align="right" style="font-weight: bold; font-size: 14px; height: 25px">
+                                     <input type="text" value="0" id="hiddenRemainingAmount" style="display:none;" />
+                                     <input type="text" value="0" id="hiddenPaymentTotal" style="display:none;" />
+                                     <input type="text" value="@Model.SubTotal" id="hiddenOrderTotal" style="display:none;" />
+
+                                     <input type="text" value="0" id="hiddenSalesTaxTotal" style="display:none;" />
+                                     Total:
+                                 </td>
+                                 <td id="CheckoutTotal" align="right" style="font-weight: bold; font-size: 16px; padding-right:10px;">
+                                     @string.Format("{0:c}", Model.SubTotal)
+                                 </td>
+                                 <td>&nbsp; </td>
+
+
+                             </tr>
+                             if (isAdmin)
+                             {
+                                 <text>
+                                     <tr>
+
+
+                                         <td>&nbsp;</td>
+                                         <td style="float:right; margin-right:8px; margin-top:2px;"> Mark as Paid in Full: </td>
+                                         <td colspan="2"> <input type="checkbox" id="paidinfull" name="paidinfull"> </td>
+                                     </tr>
+                                 </text>
+                             }
+                             <tr id="PartialPaymentTR">
+                                 <td>&nbsp;</td>
+                                 <td align="right" style="font-weight: bold; font-size: 14px; height: 25px; color:red;">
+                                     Partial Payment:
+                                 </td>
+                                 <td id="PartialPaymentTD" align="right" style="font-weight: bold; font-size: 16px; padding-right:10px; color:red; ">
+                                     @string.Format("{0:c}", 0)
+                                 </td>
+                                 <td>&nbsp;</td>
+                             </tr>
+                             <tr id="RemainingAmountTR">
+                                 <td>&nbsp;</td>
+                                 <td align="right" style="font-size: 14px; height: 25px; color:red;">
+                                     Remaining Amount:
+                                 </td>
+                                 <td id="RemainingAmountTD" align="right" style="font-size: 16px; padding-right:10px; color:red; ">
+                                     @string.Format("{0:c}", 0)
+                                 </td>
+                                 <td>&nbsp;</td>
+                             </tr>
+                             <tr>
+                                 <td></td>
+                                 <td></td>
+                                 <td></td>
+                                 <td>&nbsp;</td>
+                             </tr>
+
+                         }
+                         else
+                         {
+                             <tr>
+                                 <td>&nbsp;</td>
+                                 <td>&nbsp;</td>
+                             </tr>
+                             <tr>
+                                 <td></td>
+                                 <td></td>
+                                 <td></td>
+                                 <td>&nbsp;</td>
+                             </tr>
+                             <tr>
+                                 <td>&nbsp;</td>
+                                 <td>
+                                     <input type="text" value="0" id="hiddenOrderTotal" style="display:none;" />
+                                     <input type="text" value="0" id="hiddenOrderDiscountTotal" style="display:none;" />
+                                     <input type="text" value="0" id="hiddenPaymentTotal" style="display:none;" />
+                                 </td>
+                             </tr>
+                             <tr>
+                                 <td></td>
+                                 <td></td>
+                                 <td></td>
+                                 <td>&nbsp;</td>
+                             </tr>
+                         }
+
+
+                         @if (ViewBag.hidecheckoutapproval == "False" || ViewBag.hidecheckoutapproval == "0")
+                         {
+                             <tr>
+                                 <td colspan="4">
+                                     @Html.Raw(ViewBag.alternatecheckoutmessage) <br />
+                                     <input id="chkYes" type="hidden" value="Yes" />
+                                     &nbsp;&nbsp;<label>@Html.RadioButton("alternatecheckoutradio", "Yes") Yes</label>
+                                     <font style="color:red;font-size: 23px;font-family: Arial;">*</font>
+                                     &nbsp;<label>@Html.RadioButton("alternatecheckoutradio", "", new { Checked = "checked" }) No</label>
+                                 </td>
+                             </tr>
+                         }
+                         else
+                         {
+                             <tr>
+                                 <td colspan="4"></td>
+                             </tr>
+                         }
+                         <tr>
+                             <td></td>
+                             <td></td>
+                             <td></td>
+                             <td>&nbsp;</td>
+                         </tr>
+
+                         @if (ViewBag.checkoutquestionenabled != "False")
+                         {
+                             <tr>
+                                 <td colspan="4">@Html.Raw(ViewBag.checkoutquestionlabel) </td>
+                             </tr>
+                             <tr>
+                                 <td colspan="4">
+                                     @Html.DropDownList("CheckOutQuestion", ViewBag.deptList as SelectList, new { id = "CheckOutQuestion" })
+                                     <font style="color:red;font-size: 23px;font-family: Arial;">*</font>
+                                 </td>
+                             </tr>
+                         }
+                         <tr>
+                             <td></td>
+                             <td></td>
+                             <td></td>
+                             <td>&nbsp;</td>
+                         </tr>
+
+                         <tr>
+                             <td></td>
+                             <td align="center" colspan="2">
+
+                                 @if (Gsmu.Api.Authorization.AuthorizationHelper.CurrentUser.IsLoggedIn)
+                                 {
+
+                                     if (currentLoggedInUser != null)
+                                     {
+                                         <a id="ConfirmCheckoutButton" href="javascript:cart.ConfirmCheckout(@currentLoggedInUser.STUDENTID,@roomatealert)"
+                                            class="simpleCart_checkout hudbtn primary right"
+                                            style="height: 25px; width: 180px; font-size: 15px; vertical-align: central;">Proceed to Next Step</a>
+                                     }
+                                     else
+                                     {
+                                         <a id="ConfirmCheckoutButton" href="javascript:cart.ConfirmCheckout('',@roomatealert)"
+                                            class="simpleCart_checkout hudbtn primary right"
+                                            style="height: 25px; width: 180px; font-size: 15px; vertical-align: central;">Proceed to Next Step</a>
+                                     }
+
+                                 }
+                                 else
+                                 {
+
+                                     <a href="javascript:membership.showLoginForm();cart.HideReviewCheckout();"
+                                        class="simpleCart_checkout hudbtn primary right"
+                                        style="height: 25px; width: 180px; font-size: 15px; vertical-align: central;">Log-in to Proceed</a>
+                                 }
+
+                             </td>
+                             <td>&nbsp;</td>
+                         </tr>
+                         <tr>
+                             <td style="height: 25px">&nbsp;</td>
+                             <td>&nbsp;</td>
+                             <td>&nbsp;</td>
+                             <td>&nbsp;</td>
+                         </tr>
+                     </table>
+
+
+}
+
+<script type="text/javascript">
+    $('.checkout_date_and_time table td').css('text-align', 'left');
+
+    var delay = 2500//2.5 seconds
+    setTimeout(function () {
+
+        // cart.ApplyAutomaticCouponDiscount();
+    }, delay)
+
+</script>

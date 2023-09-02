@@ -1,0 +1,51 @@
+﻿@using Gsmu.Api.Data.School.Entities
+@using Gsmu.Api.Data;
+@model Gsmu.Api.Data.School.Course.CourseModel
+@{
+    string PubDateFormat = Settings.Instance.GetPubDateFormat();
+    string PubDateFormatTDwidth =  (Settings.Instance.GetMasterInfo2().usePubDateFormat==1 ? "150px" : "70px");
+}
+<table border="0">
+    @{
+        var courseModel = Model;
+        List<Course_Time> courseTimes = ViewBag.CourseTimeList;
+        var courseStartEndTimeDisplay = ( ViewBag.DateDisplay != null ?  ViewBag.DateDisplay.Trim() : string.Empty);
+
+        if (courseStartEndTimeDisplay.Length > 0)
+        {
+            <tr style="font-size:11px">
+                <td style="width:210px; text-align:center" colspan="4">
+                    @Html.Raw(courseStartEndTimeDisplay)
+                </td>
+            </tr>
+        }
+        else
+        {
+            foreach (var time in courseTimes)
+            {
+                <tr style="font-size:11px">
+                    <td style="width:130px; text-align:right">
+                        @time.COURSEDATE.Value.ToString(PubDateFormat)
+                    </td>
+                    <td style="width:70px; text-align:right">
+                        @if(time.STARTTIME != null){
+                        <text>
+                            @time.STARTTIME.Value.ToShortTimeString()
+                        </text>
+                        }
+                    </td>
+                    <td style="width:10px; text-align:right">
+                        -
+                    </td>
+                    <td style="width:60px; text-align:right">
+                        @if(time.FINISHTIME != null){
+                        <text>
+                            @time.FINISHTIME.Value.ToShortTimeString()
+                        </text>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    }
+</table>

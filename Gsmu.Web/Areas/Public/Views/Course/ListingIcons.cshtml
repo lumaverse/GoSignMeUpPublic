@@ -1,0 +1,23 @@
+﻿@using Gsmu.Api.Data
+@model Gsmu.Api.Data.School.Course.CourseModel
+@{
+    var course = Model.Course;
+    var iconlist = course.Icons == null ? string.Empty : course.Icons.Replace("~", "");
+
+}
+
+@foreach (string icon in iconlist.Split('|'))
+{
+                      
+    if (icon.Trim() != "" & icon.Trim()!="0")
+    {
+        foreach (var icons in ViewBag.Icons)
+        {
+            if (icons.IconsID.ToString() == icon.Trim())
+            {
+                        <img alt="@Html.Raw(icons.IconTitle)" title="@Html.Raw(icons.IconTitle)" style="width:20px; height:20px;" src="@(Url.Content(WebConfiguration.CourseIconsVirtualDirectoryVirtual))/@(Html.Raw(icons.IconImage))"  />
+            }
+        }
+                           
+    }
+}

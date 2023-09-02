@@ -1,0 +1,330 @@
+﻿@using Gsmu.Api.Data;
+@model Gsmu.Api.Data.School.Course.CourseModel
+@{
+    var courseModel = Model;
+    var course = courseModel.Course;
+    var csetting = courseModel.CourseSettings;
+    string cmd = ViewBag.cmd;
+    string urllnk = ViewBag.urllnk;
+    if (!Uri.IsWellFormedUriString(urllnk, UriKind.RelativeOrAbsolute)) {
+        urllnk = "invalidurl.com";
+    }
+
+    var wgname = "LinkAction";
+    var wgcontainer = "Course" + wgname + "Container";
+    var wgcontainerDet = "Course" + wgname + "ContainerDet";
+
+    var pointrleft = 130;
+    //&#9660; down
+    //&#9650; up
+    if(cmd=="in"){
+        pointrleft = pointrleft - (27 * 4);
+    }
+    else if (cmd == "tw")
+    {
+        pointrleft = pointrleft - (27 * 3);
+    }
+    else if (cmd == "fb")
+    {
+        pointrleft = pointrleft - (27 * 2);
+    }
+    else if (cmd == "ml")
+    {
+        pointrleft = pointrleft - (27 * 1);
+    }else{ //lk
+        pointrleft = pointrleft - (27 * 0);
+    }
+    var pointrlefttxt = pointrleft.ToString() + "px";
+
+
+    var CourseTitle = "";
+    if (Settings.Instance.GetMasterInfo2().HideCourseNumber == 0)
+    {
+        CourseTitle = CourseTitle + "[" + course.COURSENUM + "]";
+    }
+
+    CourseTitle = CourseTitle +"  " + course.COURSENAME ;
+
+    var CourseDesc = course.DESCRIPTION;
+    if (course.DESCRIPTION.Length >= 300)
+    {
+        CourseDesc = course.DESCRIPTION.Substring(0, 300) + "...";
+    }
+
+
+}
+
+
+<input id="CourseLinkActioncmd" type="hidden" value="@cmd" />
+<div id="@wgcontainer" style="min-height:80px; overflow:auto; padding-bottom:20px; border:solid 2px #CCCCCC; background-color:ghostwhite">
+    <div id="@wgcontainerDet" style="padding:5px;margin:5px; ">
+        <div style="position:absolute; position: absolute; top: 29px; color: ghostwhite; left: @pointrlefttxt; font-size: 18px;">&#9650;</div>
+
+        @if (cmd == "ml")
+        {
+            //display for  email
+            string emailmsg = "";
+            string bodymsg = course.DESCRIPTION;
+            if (Settings.Instance.GetMasterInfo2().HideCourseNumber == 0)
+            {
+                emailmsg = emailmsg + "[" + course.COURSENUM + "]";
+            }
+
+            emailmsg = "<a href='" + urllnk + "'><strong> " + emailmsg + "  " + course.COURSENAME + "</strong></a>";
+            if (courseModel.CourseStart != null)
+            {
+                emailmsg = emailmsg + "<br> Start Date: " + courseModel.CourseStart.COURSEDATE.Value.ToShortDateString();
+            }
+
+            if (course.DESCRIPTION.Length >= 300)
+            {
+                emailmsg = emailmsg + "<p>" + course.DESCRIPTION.Substring(0, 300) + "..." + "</p>";
+            }
+            else
+            {
+                emailmsg = emailmsg + "<p>" + course.DESCRIPTION + "</p>";
+            }
+
+            string formemailmsg = emailmsg.Replace("<", "@@@");
+            formemailmsg = formemailmsg.Replace(">", "~~~");
+            <text>
+
+                <script type="text/javascript">
+
+                    function ValidateInfo() {
+
+                        if ($("#CourseEmailTo").val().length < 1) {
+                            Ext.Msg.alert("Email", "Error. Emptpy recipient.", function () { $("#CourseEmailTo").focus(); })
+                            return;
+                        }
+
+                        if ($("#CourseEmailSubject").val().length < 1) {
+                            Ext.Msg.alert("Email", "Error. Emptpy subject.", function () { $("#CourseEmailSubject").focus(); })
+                            return;
+                        }
+
+
+                        SendCourseAction();
+                    };
+
+                    function SendCourseAction() {
+
+                        var mask = new Ext.LoadMask(Ext.getCmp('CourseDetailsWindow'), { msg: "Please wait... Sending..." });
+                        mask.show();
+                        $("#CourseSendEmalBtnVrfy").html("");
+                        $("#CourseSendEmalBtn").val("Sending...");
+                        $("#CourseSendEmalBtn").attr("disabled", "disabled");
+                        Ext.Ajax.request({
+                            url: config.getUrl('public/Course/EmailCourse'),
+                            params: {
+                                emailTo: $("#CourseEmailTo").val(),
+                                emailCC: $("#CourseEmailCC").val(),
+                                emailSubject: $("#CourseEmailSubject").val(),
+                                firstBody: $("#CourseFirstBody").val(),
+                                courseBody: $("#CourseCourseBody").val(),
+                            },
+                            success: function (response) {
+                                mask.hide();
+                                $("#CourseSendEmalBtnVrfy").html("DONE SENDING.");
+                                $("#CourseSendEmalBtn").val("Send Another");
+                                $("#CourseSendEmalBtn").removeAttr("disabled");
+                                Recaptcha.reload();
+                            },
+                            failure: function () {
+                                mask.hide();
+                            }
+                        });
+                    }
+                </script>
+
+                <div style="float:left; width:20px">
+                    &nbsp;
+                </div>
+                <div style="float:left; width:350px">
+                    <div style="width:100%; overflow:auto; padding-right:40px;">
+                        Email To: <div style="float:right" ;><input id="CourseEmailTo" type="text" style="width:200px" /></div>
+                    </div>
+                    <div style="font-size:9px; text-align:center">
+                        Note: Comma separated email addresses
+                    </div>
+
+                    <div style="width:100%; overflow:auto; padding-right:40px;">
+                        CC: <div style="float:right" ;><input id="CourseEmailCC" type="text" style="width:200px" /></div>
+                    </div>
+                    <div style="font-size:9px; text-align:center">
+                        Note: Comma separated email addresses
+                    </div>
+
+                    @*       </div>
+                    <div style="float:left;  width:350px">*@
+                    <div style="width:100%; overflow:auto; padding-right:40px;">
+                        Subject: &nbsp;&nbsp;<input id="CourseEmailSubject" type="text" style="width:310px" />
+                    </div>
+                    <div style="width:100%; overflow:auto; padding-right:40px;">
+                        Additional note:<textarea name="firstBody" id="CourseFirstBody" style="width:310px; height:60px"></textarea>
+                    </div>
+                </div>
+                <div style="float:left">
+                    <div style="height:20px">Message preview:</div>
+                    <div style="width:400px">@Html.Raw(emailmsg)</div>
+                    <input id="CourseCourseBody" type="hidden" value="@formemailmsg" />
+                </div>
+                <div style="float:right; width:20px">
+
+                </div>
+
+                <div style="float:right; padding-right:55px; padding-top:10px">
+                    <div id="captchadiv" style="height:150px"></div>
+                    <div id="CourseSendEmalBtnVrfy" style="padding-left: 26px;"></div>
+                    <div><input type="button" id="CourseSendEmalBtn" value="Send" class="btn btn-prim sd-sgnBtn" style="height:35px" onclick="ValidateInfo()"></div>
+
+                </div>
+
+            </text>
+        }
+
+        @if (cmd == "fb")
+        {
+            //display for  facebook
+            <text>
+                <div id="fb-root"></div>
+
+                <script type="text/javascript">
+                    var fbAppId = '@Settings.Instance.GetMasterInfo3().facebookAPInum';
+                    window.fbAsyncInit = function () {
+                        FB.init({
+                            appId: fbAppId,
+                            autoLogAppEvents: true,
+                            xfbml: true,
+                            version: 'v3.2'
+                        });
+                    };
+                    (function (d, s, id) {
+                        var js, fjs = d.getElementsByTagName(s)[0];
+                        if (d.getElementById(id)) return;
+                        js = d.createElement(s); js.id = id;
+                        js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+                        fjs.parentNode.insertBefore(js, fjs);
+                    }(document, 'script', 'facebook-jssdk'));
+                </script>
+                <script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+                <script type="text/javascript">
+
+                    function FbShare() {
+                        var CourseUrl = location.href;
+                        var image_url = "@course.TileImageUrl";
+                        var CourseDesc = "@CourseDesc";
+                        var CourseTitle = "@CourseTitle";
+                        document.location = "https://www.facebook.com/sharer/sharer.php?u=" + location.href + '&quote=' + encodeURIComponent(CourseTitle) + encodeURIComponent(CourseDesc);
+                        //FB.ui({
+                        //    method: 'share_open_graph',
+                        //    action_type: 'og.shares',
+                        //    action_properties: JSON.stringify({
+                        //        object: {
+                        //            'og:url': CourseUrl,
+                        //            'og:title': CourseTitle,
+                        //            'og:description': CourseDesc,
+                        //            'og:image': image_url
+                        //        }
+                        //    })
+                        //}, function (response) { });
+                        //var CourseTitle = "@CourseTitle";
+                        //var CourseDesc = "@CourseDesc";
+                        //var fbAppId = "@Settings.Instance.GetMasterInfo3().facebookAPInum";
+                        //var CourseUrl = location.href;
+                        //var redirectUrl = location.href;
+                        //var image_url = "@course.TileImageUrl";
+                        //var name = "@CourseTitle";
+                        ////--FB DOCUMENTATION --
+                        ////fbAppId = '145634995501895';
+                        ////CourseUrl = 'https://developers.facebook.com/docs';
+                        ////redirectUrl = 'https://developers.facebook.com/tools/explorer';
+                        ////--END FB DOCUMENTATION
+                        ////CourseUrl = CourseUrl.replace(/#/g, "%23");
+                        //var facebook_root = 'https://www.facebook.com/dialog/feed?app_id=' + fbAppId;
+                        //var facebook_share_root = 'https://www.facebook.com/dialog/share?app_id=' + fbAppId;
+                        //var feed_url = '&display=popup&caption=' + encodeURIComponent(CourseDesc) + '&name=' + encodeURIComponent(CourseTitle) + '&link=' + encodeURIComponent(CourseUrl) + '&redirect_uri=' + redirectUrl + '&source=' + image_url;
+                        //var share_url = '&display=popup&href=' + encodeURIComponent(CourseUrl) + '&redirect_uri=' + encodeURIComponent(redirectUrl);
+                        //window.open(facebook_root + feed_url);
+
+                        //  return false;
+
+                    }
+                </script>
+                <div style="float:left; padding-top:20px; overflow:visible">
+                    <input type="button" value="Share" class="btn btn-prim sd-sgnBtn" style="height:35px;" onclick="FbShare()">
+                </div>
+                @* <div style="float:left; padding-top:25px; padding-left:20px; height:200px">
+                    <div class="fb-like" data-href="@urllnk" data-send="true" data-width="450" data-show-faces="true" data-font="arial" data-action="like" data-share="false"></div>
+                </div>*@
+
+            </text>
+        }
+
+        @if (cmd == "in")
+        {
+            //display for  linkin
+            <text>
+                <script type="text/javascript">
+
+                    function InShare() {
+
+                        var CourseTitle = "@CourseTitle";
+                        var CourseUrl = encodeURIComponent(location.href).replace(/[!'()]/g, escape).replace(/\*/g, "%2A");
+                        var CourseDesc = "@CourseDesc";
+
+                        window.open("http://www.linkedin.com/shareArticle?mini=true&url=" + CourseUrl + "&title=" + CourseTitle + "&summary=" + CourseDesc + "&source=GoSignMeUp")
+                    }
+                </script>
+                <div style="padding-top:20px">
+                    <input type="button" value="Share" class="btn btn-prim sd-sgnBtn" style="height:35px;" onclick="InShare()">
+                </div>
+
+            </text>
+        }
+
+        @if (cmd == "tw")
+        {
+            //display for  twitter
+            <text>
+                <script type="text/javascript">
+
+                    function TwShare() {
+                        var CourseUrl = encodeURIComponent(location.href).replace(/[!'()]/g, escape).replace(/\*/g, "%2A");
+                        window.open("http://twitter.com/home?status=Currently reading " + CourseUrl)
+                    }
+                </script>
+                <div style="padding-top:20px">
+                    <input type="button" value="Share" class="btn btn-prim sd-sgnBtn" style="height:35px;" onclick="TwShare()">
+                </div>
+
+            </text>
+        }
+
+        @if (cmd == "lk")
+        {
+            //display for  link
+            <text>
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        $("#lnkinputbox").val(location.href + '&AllowDirectLoad=1');
+                    });
+                    function highlightonfocus() {
+                        $("#lnkinputbox").focus();
+                        $("#lnkinputbox").focus(function () { $(this).select(); });
+                        $("#lnkinputbox").focus();
+                    }
+                </script>
+
+                <div style="float:left; padding-right:20px; padding-top:20px; width:100%; padding:2px 10px 3px 10px">
+                    <div><textarea id="lnkinputbox" style="width:100%; height:50px; font-size:12px" onclick="highlightonfocus()"></textarea></div>
+                    <div style="color:grey; font-size:10px">Right-click on the highlighted text then select copy</div>
+                </div>
+            </text>
+        }
+
+    </div>
+</div>
+    
+

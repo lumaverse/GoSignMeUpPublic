@@ -1,0 +1,28 @@
+﻿@{
+    var area = ViewContext.RouteData.DataTokens["area"] as string;
+    if (!string.IsNullOrWhiteSpace(area))
+    {
+        area = area.ToLower();
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    
+    @{Html.RenderPartial("_PartialScriptsAndStyles");}
+
+
+    @if (area != null && area == "adm")
+    {
+        @Scripts.Render("~/bundles/gsmu-admin");
+        @Styles.Render("~/Areas/Adm/Styles/css");
+    }
+
+    @RenderSection("head")
+</head>
+<body>
+    @RenderBody()
+</body>
+</html>

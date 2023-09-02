@@ -1,0 +1,25 @@
+﻿@model List<Gsmu.Api.Data.School.Entities.CourseExtraParticipant>
+
+@{
+    Layout = null;
+}
+
+<span style="font-size: smaller;">
+    @{
+        var extraParticipantCounter = 0;
+    }
+    <span style="font-weight: bold;">Extra participant(s):</span>
+    @foreach (var participant in Model)
+    {
+        extraParticipantCounter++;
+        if (extraParticipantCounter > 1)
+        {
+            <span>,</span>
+        }
+        <span>
+            @participant.StudentFirst @participant.StudentLast - <a href="@participant.StudentEmail">@participant.StudentEmail</a>
+        </span>
+    }
+</span>
+
+

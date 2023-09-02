@@ -1,0 +1,91 @@
+﻿@model Gsmu.Api.Data.School.User.UserModel
+@{
+    var userModel = Model;
+    string cmd = ViewBag.cmd;
+    
+    var usr = userModel.CommonUserInfo;
+    
+ 
+   
+    //Profile Image
+    string ProfileImageFolder = "/Images/Profiles/";
+    string OldProfileImageFolder = ViewBag.V3InstructorImage;
+    string NoProfileImagePath = Url.Content(Gsmu.Api.Data.WebConfiguration.NoProfileImageVirtualPath);
+    string ProfileImagePath = NoProfileImagePath;
+    string OldProfileImagePath = "";
+    string ProfileMsg = "Add image in edit mode";
+    
+    if(cmd == "view"){
+        ProfileMsg = "Can be change in edit mode"; 
+        if (!string.IsNullOrWhiteSpace(usr.ProfileImage))
+        {
+            ProfileImagePath = ProfileImageFolder + usr.ProfileImage;
+            OldProfileImagePath = OldProfileImageFolder + usr.ProfileImage;
+
+            if (System.IO.File.Exists(HttpContext.Current.Request.MapPath(ProfileImagePath))){
+                ProfileImagePath = ProfileImagePath;
+            }else if (System.IO.File.Exists(HttpContext.Current.Request.MapPath(OldProfileImagePath))){
+                ProfileImagePath = OldProfileImagePath;
+            }else{
+                ProfileImagePath = NoProfileImagePath;
+            }
+
+        }
+    }else if (cmd == "edit"){
+        ProfileMsg = "select & save to change";
+        if (!string.IsNullOrWhiteSpace(usr.TempProfileImage))
+        {
+            ProfileImagePath = ProfileImageFolder + usr.TempProfileImage;
+        }
+        else if (!string.IsNullOrWhiteSpace(usr.ProfileImage))
+        {
+            ProfileImagePath = ProfileImageFolder + usr.ProfileImage;
+            OldProfileImagePath = OldProfileImageFolder + usr.ProfileImage;
+
+            if (System.IO.File.Exists(HttpContext.Current.Request.MapPath(ProfileImagePath))){
+                ProfileImagePath = ProfileImagePath;
+            }else if (System.IO.File.Exists(HttpContext.Current.Request.MapPath(OldProfileImagePath))){
+                ProfileImagePath = OldProfileImagePath;
+            }else{
+                ProfileImagePath = NoProfileImagePath;
+            }
+        }
+    }
+    
+}
+
+<script type="text/javascript">
+ 
+
+</script>
+<style type="text/css"> 
+    a.aProfileImage:hover:after,
+    a.aProfileImage:focus:after
+    {
+        background: rgb(255,255,255);
+        font-size: 10px;
+        bottom: 2px;
+        content: "@Html.Raw(ProfileMsg)";
+        color: #000;
+        display: block;
+        font-weight: bold;
+        height: 30px;
+        line-height: 15px;
+        position: absolute;
+        text-align: center;
+        margin-left:10%;
+        width: 80%;
+        top: 50%; 
+        margin-top: -15px;
+        opacity:0.8;
+        cursor:pointer;
+    }
+
+</style>
+<div style="height:120px; " >
+
+    <a class="aProfileImage">
+    <img style="max-height:120px;max-width:150px; display: block; text-align: center; margin: 0 auto; border:solid; border-color:lightgrey"
+        src="@ProfileImagePath" >
+        </a>
+</div>

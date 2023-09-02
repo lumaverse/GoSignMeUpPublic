@@ -1,0 +1,48 @@
+﻿@using Gsmu.Api.Data.School.Terminology;
+
+@{
+    Layout = null;
+    int qnum = 0;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>ShowSurvey</title>
+</head>
+
+
+<body>
+@if(ViewBag.validrequest ==1){
+    <div>
+        <center>
+        <b>
+            TextArea/TextBox & Comment Report for: @ViewBag.Title <br />
+            Course: @ViewBag.Course
+        </b>
+        </center>
+     </div>
+            foreach(var items in ViewBag.Questions)
+                {
+                   qnum = qnum+1;
+                   var name ="Answer" + items.QuestionID;
+                   var labelname= "label"+items.QuestionID;
+                   var commentName = "Comment" + items.QuestionID;
+                                    <div id="@labelname" style="padding: 6px; border: thin solid #999999; background: #e0e0e0; margin-right:10%;  margin-left:10%; font-weight:bold;">
+                                        @Html.Raw(qnum)
+                                        @Html.Raw(items.Question1)
+                                    </div>
+                                     <div><center>@{Html.RenderAction("CommentsResult", "Survey", new { intSurveyId = items.SurveyID, questionid = items.QuestionID, withComment = items.Comments, cid=ViewBag.Cid  });}</center></div>
+                 }
+
+}
+else{
+<div>Invalid Request</div>
+<script>
+    document.location = "/"
+</script>
+}
+</body>
+</html>

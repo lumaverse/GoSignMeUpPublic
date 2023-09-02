@@ -1,0 +1,1361 @@
+@using Gsmu.Api.Data;
+@using Gsmu.Api.Data.School.User;
+@using Gsmu.Api.Data.School.Terminology;
+@model UserModel
+
+@{
+    string cmd = ViewBag.cmd;
+
+    string formTitle = TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course)+"s";
+    var userModel = Model;
+    var usr = new UserInfo();
+    usr = userModel.CommonUserInfo;
+
+    var comma = string.Empty;
+    decimal rtotal = 0;
+    var prevOrdNum = string.Empty;
+    var today = DateTime.Today;
+    var startdays = ViewBag.DaysBeforeCourseStart == null ? 0.00 : Convert.ToDouble(ViewBag.DaysBeforeCourseStart);
+    var allowcancel =  ViewBag.AllowCourseCancellation;
+    var nocancelmessage = Html.Raw(Json.Encode(ViewBag.NoCancelMessage));
+    var showcancelmessage = true;
+    var withprintreciept = "true";
+    var withmovetoenroll = "false";
+    string studentSessionId ="";
+    if (Gsmu.Api.Authorization.AuthorizationHelper.CurrentUser.LoggedInUserType.ToString().ToUpper() == "STUDENT") 
+    {
+    	studentSessionId = userModel.Student.UserSessionId.Value.ToString();
+    } else if (Gsmu.Api.Authorization.AuthorizationHelper.CurrentUser.LoggedInUserType.ToString().ToUpper() == "SUPERVISOR") {
+    	studentSessionId = Gsmu.Api.Authorization.AuthorizationHelper.CurrentSupervisorUser.UserSessionId.ToString();
+    }
+    if(String.IsNullOrEmpty(ViewBag.NoCancelMessage)){showcancelmessage = false;}
+    int allowcancelOnlyNotPaid = ViewBag.AllowCourseCancelOnPaymentStatus == null ? 0 : ViewBag.AllowCourseCancelOnPaymentStatus;
+    string transcriptnetUrl = Settings.Instance.GetMasterInfo4().AspSiteRootUrl +"/students_transcriptnet.asp?sid=" + (usr != null ? usr.userid : 0); 
+    string WidgtHeight = (Settings.Instance.GetMasterInfo3().AllowPartialPayment == 1) ? "270" : "180";
+    var hide_payment_info = Settings.Instance.GetMasterInfo2().HidePaymentInfo;
+    string PubDateFormatWidth =  (Settings.Instance.GetMasterInfo2().usePubDateFormat==1 ? "110" : "75");
+    string jsPubDateFormat = Settings.Instance.GetJsPubDateFormat();
+    string TranscriptTitleText = "Unofficial "+ TerminologyHelper.Instance.GetTermCapital(TermsEnum.Transcript);
+    int? userid =  (usr != null ? usr.userid : 0);
+    if(Settings.Instance.GetMasterInfo3().HideUnofficialFromStudentTranscript != 0)
+    {
+        TranscriptTitleText = TerminologyHelper.Instance.GetTermCapital(TermsEnum.Transcripted);
+    }
+
+
+
+}
+<script src="~/Scripts/moment.min.js"></script>
+<script src="~/Scripts/plugins/underscore-min.js"></script>
+<script type="text/javascript">
+    //destroy first main panel if exist for the edit mode
+    var courseCmp = Ext.getCmp('UserDashboardCourses');
+    if (courseCmp != null) {courseCmp.destroy();}
+    var calendar ='calendar';
+    var nocancelmessage = '@Html.Raw(Json.Encode(ViewBag.NoCancelMessage))';
+    var allowcancel = '@(ViewBag.AllowCourseCancellation)';
+    var coursecategory = "enrolled";
+    var hide_payment_info = '@Html.Raw(Json.Encode(hide_payment_info))';
+    var totalPaidGeneral = 0;
+    nocancelmessage = nocancelmessage.replace(/"/g, "");
+    var storeCourses = Ext.create('Ext.data.Store', {
+        fields: ['rosterid', 'courseid', 'coursenumber', { name: 'coursename', sortType: 'asUCText' }, { name: 'rawcoursename', sortType: 'asUCText' }, 'maxcoursedate','mincoursedate', 'totalpaid', 'coursetype','ordernumber','paidremainderamount','dueamount',
+            'paybalanceoption','cancelcourseoption','viewcourseworkoption','enrolledby', 'createdname', 'courseclose','cancel', 'withcancelcourse','withmovetoenroll' ,'withpaybalance', 'withviewcoursework', 'orderheader', 'registereddate' ],
+        remoteFilter: false,
+        groupOnSort: false,
+        groupField: 'orderheader',
+        data: [
+        @if (usr!=null && usr.courses != null)
+        {
+            var AllowPayTranscribedCourses = "0";
+            var AllowPublicPaylater = "0";
+            if (Settings.Instance.GetMasterInfo4().GlobalConfiguration != "" && Settings.Instance.GetMasterInfo4().GlobalConfiguration != null){
+                try{
+                    AllowPublicPaylater =  (Json.Decode(Settings.Instance.GetMasterInfo4().GlobalConfiguration)).AllowPublictoPaylater;
+                    AllowPayTranscribedCourses = (Json.Decode(Settings.Instance.GetMasterInfo4().GlobalConfiguration)).AllowPayTranscribedCourse;
+                }
+                catch{}
+            }
+        foreach (var item in usr.courses)
+        {
+        Decimal totpaid = 0;
+        String addlheadrinfo = "' ";
+        String withpaybalance = "false";
+        String cname = item.COURSENAME.Replace("'", " ");
+        Decimal paidremainderamount = 0;
+        var DueAmount = item.TotalCourseCostDecimalbyOrder - item.TotalPaid;
+        if (item.Cancel == 0 && AllowPublicPaylater=="1" && item.PaidInFullBool == false && item.CourseType != "cancelled" && (item.CourseType != "transcripted" || AllowPayTranscribedCourses == "1"))
+        {
+            withpaybalance = "true";
+            paidremainderamount = DueAmount;
+            addlheadrinfo = "'<font style=\"color:red\"> Due Amount: ' + Ext.util.Format.usMoney("+ DueAmount +") +'</font></br> ";
+            addlheadrinfo += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            addlheadrinfo += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            addlheadrinfo += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            //    addlheadrinfo += "'";
+        }
+        if (item.paidremainderamount != 0 && AllowPublicPaylater=="1" && item.CourseType != "cancelled" && (item.CourseType != "transcripted" || AllowPayTranscribedCourses == "1"))
+        {
+
+            withpaybalance = "true";
+            paidremainderamount = DueAmount;
+            addlheadrinfo = "'<font style=\"color:red\"> Due Amount: ' + Ext.util.Format.usMoney("+ DueAmount +") +'</font></br> ";
+            addlheadrinfo += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            addlheadrinfo += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            addlheadrinfo += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            // addlheadrinfo += "'";
+        }
+
+        if(DueAmount<0){
+            DueAmount=0;
+        }
+        var withviewcoursework= "false";
+        if (item.CourseType != "cancelled" && item.CourseType != "waiting")
+        {
+            withviewcoursework= "true";
+        }
+
+        if (ViewBag.SupervisorRequest == "true" && item.CourseType == "waiting" && ViewBag.AllowStudentMoveWaittoEnroll == 1)
+        {
+            withmovetoenroll= "true";
+        }else{
+            withmovetoenroll= "false";
+        }
+
+
+        var withcancelcourse = "true";
+        var allowsupcancelpastcourse=0;
+        if(startdays == 999)
+        {
+            if(ViewBag.SupervisorRequest != "true"){
+                startdays = 0;
+            }
+            allowsupcancelpastcourse = 1;
+
+        }
+        if (allowcancel == 0  //-1 TRUE 0 FALSE
+        || item.CourseType == "past"
+        || item.CourseType == "transcripted"
+        || item.CourseType == "cancelled")
+        {
+            if(item.CourseType == "past" && allowsupcancelpastcourse==1 && ViewBag.SupervisorRequest == "true"){
+                withcancelcourse = "true";
+            }
+            else{
+                withcancelcourse = "false";
+            }
+        }
+        else
+        {
+            if(item.CourseStartDateTime == null || today.AddDays(startdays) <= item.CourseStartDateTime.Value || today.AddDays(startdays) <= item.MinDate.Value) // STILL CAN BE CANCELLED -- CURRENT DATE + Number of days SET from MASTERINFO is EARLIER THAN START DATE
+            {
+                switch(allowcancelOnlyNotPaid)
+                {
+                    case 0 : //N/A
+                        withcancelcourse = "true";
+                        break;
+                    case -1 : //NOT PAID IN FULL
+                        if (item.PaidInFullBool == true)
+                        {
+                            withcancelcourse = "false";
+                        }
+                        else
+                        {
+                            withcancelcourse = "true";
+                        }
+                        break;
+                    case 2 : //NO COST
+                        if(Convert.ToDouble(item.CourseCostDecimal) > 0.00 || Convert.ToDouble(item.RosterMaterialTotalDecimal) > 0.00)
+                        {
+                            withcancelcourse = "false";
+                        }
+                        else
+                        {
+                            withcancelcourse = "true";
+                        }
+                        break;
+                    case 3 : //Allow cancel : BOTH
+                        if (item.PaidInFullBool == true // FULLY PAID
+                        || (Convert.ToDouble(item.CourseCostDecimal) > 0.00) // HAS COURSE COST
+                        || (Convert.ToDouble(item.RosterMaterialTotalDecimal) > 0.00) // HAS COURSE MATERIAL
+                        )
+                        {
+                            withcancelcourse = "false"; // IF ONE CONDITION IS TRUE CANCEL COURSE IS NOT ALLOWED
+                        }
+                        else
+                        {
+                            withcancelcourse = "true"; //Course Not Paid in full
+                        }
+                        break;
+                }
+            }
+            else
+            {
+                if(allowsupcancelpastcourse == 1){withcancelcourse = "true";}
+                else{
+                    withcancelcourse = "false"; //Date Validation : Course Date Can Not be Cancelled
+                }
+            }
+        }
+        //override the above implementation
+        //if master setting no days cancel is negative one, check the time and hour and it can still be cancelled
+        //zero implementation is already above
+        if(allowcancel != 0 && startdays <= 0)
+        {
+            if(item.MinDate.HasValue && item.CourseStartDateTime.HasValue)
+            {
+                if(startdays < 0)
+                {
+                    DateTime courseStartDateTime = Convert.ToDateTime(item.MinDate.Value.ToString("yyyy-MM-dd") +" "+ item.CourseStartDateTime.Value.ToString("HH:mm:ss"));
+                    if(courseStartDateTime > DateTime.Now)
+                    {
+                        switch(allowcancelOnlyNotPaid)
+                        {
+                            case 0 : //N/A
+                                withcancelcourse = "true";
+                                break;
+                            case -1 : //NOT PAID IN FULL
+                                if (item.PaidInFullBool == true)
+                                {
+                                    withcancelcourse = "false";
+                                }
+                                else
+                                {
+                                    withcancelcourse = "true";
+                                }
+                                break;
+                            case 2 : //NO COST
+                                if(Convert.ToDouble(item.CourseCostDecimal) > 0.00 || Convert.ToDouble(item.RosterMaterialTotalDecimal) > 0.00)
+                                {
+                                    withcancelcourse = "false";
+                                }
+                                else
+                                {
+                                    withcancelcourse = "true";
+                                }
+                                break;
+                            case 3 : //Allow cancel : BOTH
+                                if (item.PaidInFullBool == true // FULLY PAID
+                                || (Convert.ToDouble(item.CourseCostDecimal) > 0.00) // HAS COURSE COST
+                                || (Convert.ToDouble(item.RosterMaterialTotalDecimal) > 0.00) // HAS COURSE MATERIAL
+                                )
+                                {
+                                    withcancelcourse = "false"; // IF ONE CONDITION IS TRUE CANCEL COURSE IS NOT ALLOWED
+                                }
+                                else
+                                {
+                                    withcancelcourse = "true"; //Course Not Paid in full
+                                }
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        withcancelcourse = "false";
+                    }
+                }
+                else if(startdays == 0)
+                {
+                    if(item.MinDate.Value >= today)
+                    {
+                        switch(allowcancelOnlyNotPaid)
+                        {
+                            case 0 : //N/A
+                                withcancelcourse = "true";
+                                break;
+                            case -1 : //NOT PAID IN FULL
+                                if (item.PaidInFullBool == true)
+                                {
+                                    withcancelcourse = "false";
+                                }
+                                else
+                                {
+                                    withcancelcourse = "true";
+                                }
+                                break;
+                            case 2 : //NO COST
+                                if(Convert.ToDouble(item.CourseCostDecimal) > 0.00 || Convert.ToDouble(item.RosterMaterialTotalDecimal) > 0.00)
+                                {
+                                    withcancelcourse = "false";
+                                }
+                                else
+                                {
+                                    withcancelcourse = "true";
+                                }
+                                break;
+                            case 3 : //Allow cancel : BOTH
+                                if (item.PaidInFullBool == true // FULLY PAID
+                                || (Convert.ToDouble(item.CourseCostDecimal) > 0.00) // HAS COURSE COST
+                                || (Convert.ToDouble(item.RosterMaterialTotalDecimal) > 0.00) // HAS COURSE MATERIAL
+                                )
+                                {
+                                    withcancelcourse = "false"; // IF ONE CONDITION IS TRUE CANCEL COURSE IS NOT ALLOWED
+                                }
+                                else
+                                {
+                                    withcancelcourse = "true"; //Course Not Paid in full
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // FINAL OVERRIDING SETTING - REGARDLESS OF THE SETTINGS OVERRIDE
+        // IF PAST, TRANSCRIPTED OR CANCELLED COURSE
+        // THERE SHOULD BE NO CANCEL OPTION
+        if (allowcancel == 0  //-1 TRUE 0 FALSE
+        || item.CourseType == "past"
+        || item.CourseType == "transcripted"
+        || item.CourseType == "cancelled")
+        {
+            if(item.CourseType == "past" && allowsupcancelpastcourse ==1 && ViewBag.SupervisorRequest == "true")
+            {
+                withcancelcourse="true";
+            }
+            else{
+                withcancelcourse = "false";
+            }
+        }
+        else {
+            //IF SUPERVISOR AND ALLOW CANCEL IS ON AND DATESTART IS LATER THAN CURRENTDATE + NUMBER OF DAYS BEFORE STARTING
+            if (ViewBag.SupervisorRequest == "true" && allowcancel != 0 && item.MinDate.Value.AddDays(-1 * startdays) >= today)
+            {
+                withcancelcourse = "true";
+            }
+        }
+
+        string created_names ="<ul style='list-style-type:decimal;padding:0px 0px 0px 15px'>";
+        if(usr.createdname != null){
+            foreach(var names in usr.createdname)
+            {
+                created_names += "<li style='text-align:left;'><span style='text-transform:capitalize;'>"+ names.first+' '+names.last + "</span></li>";
+            }
+        }
+        created_names+="</ul>";
+
+        if(hide_payment_info ==0)
+        {
+            addlheadrinfo = addlheadrinfo+ String.Format(" Paid Amount: {0:C}",  item.TotalPaid);
+            addlheadrinfo += "'";
+        }
+        else{ addlheadrinfo += "'";}
+
+        var EventIcon = "";
+        if(item.CourseEvent != "0"){
+            EventIcon = "<img src='/Images/eventE16.png' />";
+
+        }
+
+        <text>
+            @comma
+        {
+            "rosterid": "@item.Rosterid",
+            "courseid": "@item.COURSEID",
+            "coursenumber": "@item.COURSENUM",
+            "rawcoursename": "@cname",
+            "selectedcredit" :"@Html.Raw(item.SelectedCredit)",
+            "coursename": "<a href='javascript:CourseSearch.prototype.ShowCourseDetails(@item.COURSEID, calendar);'>@Html.Raw(EventIcon) @cname</a>  " + "<br /><div style='font-size:10px; font-style:italic;'> @Html.Raw(item.SelectedCredit) </div>",
+            "maxcoursedate": "@Html.Raw(item.MaxDate)",
+            "mincoursedate": "@Html.Raw(item.MinDate)",
+            "totalpaid": @item.TotalPaid,
+            "coursetype": "@item.CourseType",
+            "ordernumber":"@item.OrderNumber",
+            "masterordernumber":"@item.MasterOrderNumber",
+            "testtotalpaid": "@item.TotalPaid",
+            "paidremainderamount":"@paidremainderamount",
+            "dueamount":"@DueAmount",
+            "enrolledby":"@usr.createdbyname",
+            "createdname" : "@Html.Raw(created_names)",
+            "courseclose" : "",
+            "cancel": @item.Cancel,
+            "withcancelcourse":@withcancelcourse,
+            "withpaybalance":@withpaybalance,
+            "withprintreciept":@withprintreciept,
+            "withviewcoursework":@withviewcoursework,
+            "withmovetoenroll":@withmovetoenroll,
+            "orderheader": "@item.OrderNumber" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + @Html.Raw(addlheadrinfo),
+            "registereddate" : "@item.RegisteredDate"
+
+        }
+
+        </text>
+        comma = ",";
+    }
+    }
+    ]});
+
+    var coursedashmenudta = [];
+    coursedashmenudta.push({vlu: 'cancelcourse', labl: 'Cancel '+'@TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course)'});
+    coursedashmenudta.push({vlu: 'paybalance', labl: 'Pay Now'});
+    coursedashmenudta.push({vlu: 'printreciept', labl: 'Print Receipt'});
+    coursedashmenudta.push({vlu: 'viewcoursework', labl: 'View '+'@TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course)' + ' Work'});
+    coursedashmenudta.push({vlu: 'movetoenroll', labl: 'Move to Enroll'});
+
+    var coursedashmenu = Ext.create('Ext.data.Store', {
+        fields: ['vlu','labl'],
+        data: coursedashmenudta
+    });
+
+
+    storeCourses.on('load', function () {
+        var sumtotalpaid = 0;
+        var sumtotaldueamount = 0;
+        var prevOrdNum = '';
+        storeCourses.each(function (item) {
+
+            if(prevOrdNum != item.get('ordernumber')){
+                sumtotalpaid += item.get('totalpaid');
+                sumtotaldueamount += parseFloat(item.get('dueamount'));
+            }
+            prevOrdNum = item.get('ordernumber');
+        }, this);
+
+        if(sumtotalpaid<0){
+            Ext.getCmp('UserCoursesTotalPaid').setText('('+Ext.util.Format.usMoney(sumtotalpaid*-1)+')');
+        }
+        else{
+            Ext.getCmp('UserCoursesTotalPaid').setText(Ext.util.Format.usMoney(sumtotalpaid));
+        }
+
+        if(sumtotaldueamount>0 && coursecategory != 'cancelled'){
+            Ext.getCmp('UserCoursesTotalOutstandingAmount').show();
+            Ext.getCmp('UserCoursesTotalOutstandingAmountLabel').show();
+            Ext.getCmp('UserCoursesTotalOutstandingAmount').setText(Ext.util.Format.usMoney(sumtotaldueamount));
+        }else{
+            Ext.getCmp('UserCoursesTotalOutstandingAmount').hide();
+            Ext.getCmp('UserCoursesTotalOutstandingAmountLabel').hide();
+        }
+        totalPaidGeneral = sumtotalpaid
+    });
+
+    var combotpl = new Ext.XTemplate(
+        '<div style="width:90px; border: 1px solid grey; height: 20px; padding: 0px;"><div style="color:grey;float: left;width: 55px; margin-top:2px;">&nbsp;&nbsp;select...</div><div style="float: left; text-align:right; width: 30px; margin-top:2px;">&#9660;&nbsp;</div></div>'
+    );
+
+    var UserCoursesFormvar = Ext.create('Ext.grid.Panel', {
+        id: 'UserCoursesWidgetGrid',
+        store: storeCourses,
+        border:false,
+        autoScroll: true,
+        layout: 'fit',
+        height: @WidgtHeight,
+        emptyText: 'No courses to show',
+        listeners: {
+            sortchange: function() {
+                var view = Ext.getCmp('UserCoursesWidgetGrid').getView();
+                if ("@WebConfiguration.UserDashCourseGridDefaultView" == "grid") {
+                    view.getFeature('CourseGroup').enable();
+                    Ext.getCmp('UserCoursesGridButton').show()
+                } else {
+                    view.getFeature('CourseGroup').disable();
+                    Ext.getCmp('UserCoursesGroupButton').show()
+                }
+            }
+        },
+        features: [{
+            id: 'CourseGroup',
+            ftype: 'groupingsummary',
+            hideGroupedHeader: false,
+            collapsible: false,
+            enableGroupingMenu: false,
+            groupHeaderTpl: [
+                    'Order Number: {[values.rows[0].data.orderheader]}'
+            ],
+        }
+        ],
+        columns: [
+            {
+                text: '#',
+                id: 'courseid',
+                dataIndex: 'courseid',
+                width: 40,
+                align: 'left'
+            },
+            {
+                text: 'paybalanceoption',
+                dataIndex: 'paybalanceoption',
+                hidden: true,
+                width: 0
+            },
+            {
+                text: 'cancelcourseoption',
+                dataIndex: 'cancelcourseoption',
+                hidden: true,
+                width: 0
+            },
+            {
+                text: 'viewcourseworkoption',
+                dataIndex: 'viewcourseworkoption',
+                hidden: true,
+                width: 0
+            },
+            {
+                text: 'paidremainderamount',
+                dataIndex: 'paidremainderamount',
+                hidden: true,
+                width: 0
+            },
+            {
+                text:'@TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course)',
+                dataIndex: 'rawcoursename',
+                type: 'string',
+                sortType: 'asUCText',
+                flex: 3,
+                align: 'left',
+                renderer: function(value, something, record) {
+                    var statusText = null;
+                    var courseid = record.get('courseid');
+                    var selectedCredit = record.get('selectedcredit');
+                    var template = "";
+                    if ("@WebConfiguration.UserDashCourseShowCourseNum" == "true") { 
+                        template = record.get('coursenumber') + "<br />";
+                    }
+                    template +="<a href='javascript:CourseSearch.prototype.ShowCourseDetails(" + courseid + ", calendar)'>" + value + "</a>";
+                    template += "<br /> <div style='font-size:10px; font-style:italic;'> " + selectedCredit + " </div>"
+                    switch(record.get('cancel')) {
+                        case 2:
+                            statusText = 'Incomplete checkout';
+                            break;
+
+                        case 3:
+                            statusText = 'Failed payment';
+                            break;
+
+                        case 4:
+                            statusText = 'Incomplete registration';
+                            break;
+                    }
+                    if (statusText != null) {
+                        template += '<div style="color: silver;">' + statusText + '</div>';
+                    }
+                    return template;
+                }
+            },
+            {
+                //on grid view Enrolled
+                text: 'Course Name',
+                dataIndex: 'rawcoursename',
+                flex: 3,
+                align: 'left',
+                type: 'string',
+                sortType: 'asUCText',
+                renderer: function (value, something, record) {
+                    var courseid = record.get('courseid');
+                    if(record.get('withpaybalance')){
+                        txt = "<a title='Due Amount: "+ Ext.util.Format.usMoney(record.get('paidremainderamount')) +" \n Paid Amount: "+ Ext.util.Format.usMoney(record.get('totalpaid'));
+                        txt += "' style='color:red; font-weight:bold' href='javascript:CourseSearch.prototype.ShowCourseDetails("+ courseid +", calendar);'>"+ value +"</a>";
+                    } else {
+                        txt = "<a href='javascript:CourseSearch.prototype.ShowCourseDetails(" + courseid + ", calendar);'>" + value + "</a>" ///+ record.get('selectedcredit'); //- not really sure why is this here. But seems like this is not needed.
+                        //Please get it back if it caused issues -- this is causing the Course Name to have extra words on the grid
+                    }
+                    return txt;
+                }
+            },
+            {
+                text: 'Name',
+                dataIndex: 'createdname',
+                //width: 100,
+                flex: 3,
+                hidden : true,
+                align: 'left'
+            },
+            {
+                text: 'Enrolled by',
+                dataIndex: 'enrolledby',
+                //width: 100,
+                flex: 3,
+                hidden : true,
+                align: 'left'
+            },
+            {
+                text: 'Start Date',
+                dataIndex: 'mincoursedate',
+                xtype: 'datecolumn', format: '@jsPubDateFormat',
+                width: @PubDateFormatWidth,
+                //flex: 1.2,
+                align: 'right'
+            },
+            {
+                text: 'Order Paid',
+                dataIndex: 'totalpaid',
+                width: 0,
+                align: 'right',
+                hidden: true,
+                xtype: 'templatecolumn',
+                tpl: '{totalpaid:usMoney}'
+            },
+            {
+                text: 'Order Number',
+                id:'ordernumber',
+                dataIndex: 'ordernumber',
+                hidden: true,
+                width: 0
+            },
+            // This type of controll is not working in safari and IE
+            //{
+            //    text: 'Action',
+            //    dataIndex: 'courseid',
+            //    xtype: 'templatecolumn',
+            //    tpl: actiondiv //using html for option dropdown
+            //},
+            {
+                text: 'Action',
+                xtype: 'templatecolumn',
+                width: 100,
+                tpl: combotpl,
+                editor:
+                    {
+                        xtype: 'combobox',
+                        id: 'coursedashmenucombo',
+                        forceSelection: true,
+                        editable: false,
+                        store: coursedashmenu,
+                        emptyText: 'select...',
+                        displayField: 'labl',
+                        valueField: 'vlu',
+                        listeners: {
+                            'focus': function(fld) { this.onTriggerClick(); } ,
+                            'change': function(field, selectedValue) {
+
+                                var ucwg = Ext.getCmp('UserCoursesWidgetGrid');
+                                var selection = ucwg.getSelectionModel().getSelection()[0];
+                                var paidremainderamount = selection.get('paidremainderamount');
+                                var rosterid = selection.get('rosterid');
+                                var courseid = selection.get('courseid');
+                                var ordernumber = selection.get('ordernumber');
+                                var masterordernumber = selection.get('masterordernumber');
+
+                                if(this.value == 'paybalance'){
+                                    if(paidremainderamount=='0'){
+                                        paidremainderamount = selection.get('paidremainderamount');
+
+                                        membership.UserAction(courseid,ordernumber,this,this.value,rosterid,paidremainderamount,this)
+                                    }
+                                    else{
+                                        membership.UserAction(courseid,ordernumber,this,this.value,rosterid,paidremainderamount,this)
+                                    }
+                                }
+                                else{
+                                    var cmd = this.value;
+                                    if (this.value === 'printreciept')
+                                    {
+                                        @if (ViewBag.SupervisorRequest == "true")
+                                        {
+                                            <text>
+                                                ordernumber = masterordernumber ? masterordernumber : ordernumber;
+                                            </text>
+                                            
+                                        }
+                                       
+                                    };
+                                    membership.UserAction(courseid, ordernumber, this, cmd,rosterid,paidremainderamount,this)
+                                }
+                            }
+                        }
+                    }
+            }
+        ],
+
+        plugins: [
+            Ext.create('Ext.grid.plugin.CellEditing', {
+                clicksToEdit: 1
+            })
+        ],
+
+        listeners: {
+            itemclick: function(dv, record, item, index, e) {
+                var ucwg = Ext.getCmp('UserCoursesWidgetGrid');
+                var selection = ucwg.getSelectionModel().getSelection()[0];
+                var ordernumber = selection.get('ordernumber');
+
+                var withcancelcourse = selection.get('withcancelcourse');
+                var withpaybalance = selection.get('withpaybalance');
+                var withprintreciept = selection.get('withprintreciept');
+                var withviewcoursework= selection.get('withviewcoursework');
+                var withmovetoenroll= selection.get('withmovetoenroll');
+
+
+
+                var cmbostore = Ext.getCmp('coursedashmenucombo').getStore();
+                cmbostore.clearFilter(true);
+
+                cmbostore.filter(function(r) {
+                    var value = r.get('vlu');
+
+                    var retvlu = false;
+                    if(withcancelcourse && value == 'cancelcourse'){
+                        retvlu = true;
+                    }
+                    if(withpaybalance && value == 'paybalance'){
+                        retvlu = true;
+                    }
+                    if(withprintreciept && value == 'printreciept'){
+                        retvlu = true;
+                    }
+                    if(withviewcoursework && value == 'viewcoursework'){
+                        retvlu = true;
+                    }
+                    if(withmovetoenroll && value == 'movetoenroll'){
+                        retvlu = true;
+                    }
+
+                    return retvlu;
+                });
+
+                cmbostore.reload();
+
+
+            }
+        }
+
+    });
+
+    var UserCoursesTab = Ext.create('Ext.tab.Panel', {
+        layout: 'fit',
+        id: 'UserCoursesTab',
+        items: [{
+            title:  @Html.Raw(Json.Encode(TerminologyHelper.Instance.GetTermCapital(TermsEnum.Enrolled))) ,
+            id:'enrolled',
+            listeners: {
+                activate: function () {
+                    hideshowColumn();
+                    coursecategory = 'enrolled';
+                    var store = Ext.getCmp('UserCoursesWidgetGrid').getStore();
+                    store.clearFilter(true);
+                    store.filter([{ id: 'coursetype', property: 'coursetype', value: coursecategory }
+                    ]);
+                    store.reload();
+                }
+            }
+        }, {
+            title: 'Waiting',
+            id:'waiting',
+            listeners: {
+                activate: function () {
+                    hideshowColumn();
+                    coursecategory = 'waiting';
+                    var store = Ext.getCmp('UserCoursesWidgetGrid').getStore();
+                    store.clearFilter(true);
+                    store.filter([{ id: 'coursetype', property: 'coursetype', value: coursecategory }
+                    ]);
+                    store.reload();
+                }
+            }
+        }, {
+            title: 'Past',
+            id:'past',
+            listeners: {
+                activate: function () {
+                    hideshowColumn();
+                    coursecategory = 'past';
+                    var store = Ext.getCmp('UserCoursesWidgetGrid').getStore();
+                    store.clearFilter(true);
+                    store.filter([{ id: 'coursetype', property: 'coursetype', value: coursecategory }
+                    ]);
+                    store.reload();
+                }
+            }
+        }, {
+            title: @Html.Raw(Json.Encode(TranscriptTitleText)),
+            id:'transcripted',
+            listeners: {
+                activate: function () {
+                    hideshowColumn();
+                    coursecategory = 'transcripted';
+                    var store = Ext.getCmp('UserCoursesWidgetGrid').getStore();
+                    store.clearFilter(true);
+                    store.filter([{ id: 'coursetype', property: 'coursetype', value: coursecategory }
+                    ]);
+                    store.reload();
+
+                }
+            }
+        }, {
+            title: 'Cancelled',
+            id:'cancelled',
+            listeners: {
+                activate: function () {
+                    hideshowColumn();
+                    coursecategory = 'cancelled';
+                    var store = Ext.getCmp('UserCoursesWidgetGrid').getStore();
+                    store.clearFilter(true);
+                    store.filter([{ id: 'coursetype', property: 'coursetype', value: coursecategory }
+                    ]);
+                    store.reload();
+                }
+            }
+        }, {
+            title: 'Multiple Enroll',
+            id:'multienroll',
+            listeners: {
+                activate: function () {
+                    hideshowColumn();
+                    coursecategory = 'enrolled';
+                    var store = Ext.getCmp('UserCoursesWidgetGrid').getStore();
+                    store.clearFilter(true);
+                    store.filter([{ id: 'coursetype', property: 'coursetype', value: coursecategory }
+                    ]);
+                    store.reload();
+
+                }
+            }
+        }
+        ]
+    });
+
+    var hideshowColumn = function(){
+
+        var ActiveTabID = Ext.getCmp('UserCoursesTab').getActiveTab().id;
+        Ext.getCmp('UserFilterDateBar').setVisible(false)
+
+        var gridview  = Ext.getCmp('UserCoursesWidgetGrid').getView();
+        gridview.emptyText = '<div class="x-grid-empty">No courses to show</div>';
+
+        if(ActiveTabID == 'enrolled' || ActiveTabID == 'multienroll'){
+            if(Ext.getCmp('UserCoursesGridButton').hidden){
+
+                Ext.getCmp('UserCoursesWidgetGrid').columns[5].setVisible(false)
+                Ext.getCmp('UserCoursesWidgetGrid').columns[6].setVisible(true)
+            }else{
+                Ext.getCmp('UserCoursesWidgetGrid').columns[5].setVisible(true)
+                Ext.getCmp('UserCoursesWidgetGrid').columns[6].setVisible(false)
+            }
+        }
+
+
+        if(ActiveTabID == 'multienroll'){
+            Ext.getCmp('UserCoursesWidgetGrid').columns[8].setVisible(true)
+            Ext.getCmp('UserCoursesWidgetGrid').columns[7].setVisible(false)
+        }
+
+        if(ActiveTabID == 'transcripted'){
+            Ext.getCmp('UserFilterDateBar').setVisible(true)
+            gridview.emptyText = '<div class="x-grid-empty">No courses to show</br>Make sure you have a date range to show transcribed courses</div>';
+        }
+
+
+        gridview.refresh();
+
+
+    }
+
+    var UserCoursesMenuBar = Ext.create('Ext.toolbar.Toolbar', {
+        border: false,
+        height: 30,
+        items: [
+                {
+                    xtype: 'button',
+                    text:'<div style="margin-bottom:2px;"><img style="float:left;" src="/Images/Icons/FamFamFam/printer.png" />&nbsp;&nbsp;Print</div>',
+                    tooltip:'Print',
+                    width:80,
+                    height:28,
+                    handler: function (e, toolEl, panel, tc) {
+                        if (Ext.getCmp('UserCoursesTab').getActiveTab().id == "transcripted") {
+                            printpdf('ST',coursecategory);
+                        } else {
+                            serverLessPrint('ST',coursecategory);
+                        }
+                    }
+                },
+                 {
+                     xtype: 'button',
+                     id: 'UserCoursesGroupButton',
+                     text:'<div style="margin-bottom:2px;"><img style="float:left;" src="/Images/Icons/FamFamFam/application_split.png" />&nbsp;&nbsp;Show Group by Order</div>',
+                     tooltip:'Show Order Number Group and Paid Amount',
+                     hidden: true,
+                     width:150,
+                     height:28,
+                     handler: function (e, toolEl, panel, tc) {
+                         var view = Ext.getCmp('UserCoursesWidgetGrid').getView();
+                         view.getFeature('CourseGroup').enable();
+                         Ext.getCmp('UserCoursesGroupButton').hide();
+                         Ext.getCmp('UserCoursesGridButton').show();
+                         hideshowColumn();
+                     }
+                 },
+                 {
+                     xtype: 'button',
+                     id: 'UserCoursesGridButton',
+                     text:'<div style="margin-bottom:2px;"><img style="float:left;" src="/Images/Icons/FamFamFam/application_view_columns.png" />&nbsp;&nbsp;Show Grid</div>',
+                     tooltip:'Show in grid view',
+                     hidden: false,
+                     width:120,
+                     height:28,
+                     handler: function (e, toolEl, panel, tc) {
+                         var view = Ext.getCmp('UserCoursesWidgetGrid').getView();
+                         view.getFeature('CourseGroup').disable();
+                         Ext.getCmp('UserCoursesGridButton').hide();
+                         Ext.getCmp('UserCoursesGroupButton').show();
+                         hideshowColumn();
+                     }
+
+                 }
+        ]
+    });
+
+    var UserFilterDate = Ext.create('Ext.toolbar.Toolbar', {
+        id: 'UserFilterDateBar',
+        hidden: true,
+        dock: 'top',
+        border: false,
+        height: 30,
+        items: [
+               // {
+               //     xtype: 'label',
+               //     text: 'Filter Date',
+               //     margin: '0 0 0 0'
+               // },
+                {
+                    xtype: 'tbfill',
+                    width: 10
+                },
+                {
+                    xtype: 'label',
+                    text: 'From: ',
+                    margin: '0 3 0 0'
+                },
+                {
+                    id: 'UserFilterDateFrom',
+                    format: 'm/d/Y',
+                    xtype: 'datefield',
+                    width: 90
+                },
+                {
+                    xtype: 'tbfill',
+                    width: 8
+                },
+                {
+                    xtype: 'label',
+                    text: 'To: ',
+                    margin: '0 3 0 0'
+                },
+                {
+                    id: 'UserFilterDateTo',
+                    format: 'm/d/Y',
+                    xtype: 'datefield',
+                    width: 90
+                },
+                {
+                    xtype: 'tbfill',
+                    width: 15
+                },
+                {
+                    xtype: 'button',
+                    text:'<div style="margin-bottom:2px;"><img style="float:left;" src="/Images/Icons/FamFamFam/zoom.png" />&nbsp;Filter</div>',
+                    tooltip:'Filter',
+                    id:'coursetranscriptfilterbutton',
+                    width:70,
+                    height:25,
+                    handler: function (e, toolEl, panel, tc) {
+
+                        var startdateVal = Ext.getCmp('UserFilterDateFrom').getValue();
+                        var enddateVal = Ext.getCmp('UserFilterDateTo').getValue();
+                        var startdate = new Date(startdateVal);
+                        var enddate = new Date(enddateVal);
+                        var store = Ext.getCmp('UserCoursesWidgetGrid').getStore();
+
+                        if(Ext.isEmpty(startdateVal) && Ext.isEmpty(enddateVal)){
+                            alert("Invalid start and end date")
+                            return;
+                        }
+
+                        if(Ext.isEmpty(startdateVal)){
+                            alert("Invalid start date")
+                            return;
+                        }
+
+                        if(Ext.isEmpty(enddateVal)){
+                            alert("Invalid end date")
+                            return;
+                        }
+                        store.clearFilter(true);
+                        store.filter([{filterFn: function(item) {
+                            var mincoursedate = new Date(item.get("mincoursedate"));
+                            var coursetype = item.get("coursetype");
+
+                            if(!Ext.isEmpty(startdateVal) && !Ext.isEmpty(enddateVal) && coursetype == "transcripted"){
+                                if(mincoursedate >= startdate && mincoursedate <= enddate ){
+                                    return true;
+                                }else{
+                                    return false;
+                                }
+                            }
+
+                        }}]);
+
+                        store.reload();
+                    }
+                },
+                {
+                    xtype: 'button',
+                    text:'<div style="margin-bottom:2px;"><img style="float:left;" src="/Images/Icons/FamFamFam/zoom_out.png" />&nbsp;Clear</div>',
+                    tooltip:'Filter',
+                    width:70,
+                    height:25,
+                    handler: function (e, toolEl, panel, tc) {
+
+                        Ext.getCmp('UserFilterDateFrom').setValue('');
+                        Ext.getCmp('UserFilterDateTo').setValue('');
+
+                        coursecategory = 'transcripted';
+                        var store = Ext.getCmp('UserCoursesWidgetGrid').getStore();
+                        store.clearFilter(true);
+                        store.filter([{ id: 'coursetype', property: 'coursetype', value: 'do not show result' }
+                        ]);
+
+                        store.reload();
+
+                    }
+                }
+
+
+        ]
+    });
+
+
+    var UserCoursesbottomBar = Ext.create('Ext.toolbar.Toolbar', {
+        dock: 'bottom',
+        border: false,
+        height: 20,
+        items: [
+
+                {
+                    xtype: 'label',
+                    id:'UserCoursesTotalOutstandingAmountLabel',
+                    text: 'Total Outstanding Amount:',
+                    hidden : hide_payment_info != "0" ? true : false,
+                    style: {
+                        'color': 'red'
+                    },
+                    grow: true,
+                    margin: '0 0 0 0'
+                },
+                {
+                    xtype: 'label',
+                    id: 'UserCoursesTotalOutstandingAmount',
+                    hidden : hide_payment_info != "0" ? true : false,
+                    text: '@string.Format("{0:C}", rtotal)',
+                    style: {
+                        'color': 'red'
+                    },
+                    grow: true,
+                    margin: '0 5 0 5'
+                },
+                { xtype: 'tbfill' },
+                {
+                    xtype: 'label',
+                    text: 'Total Paid:',
+                    hidden : hide_payment_info != "0" ? true : false,
+                    grow: true,
+                    margin: '0 0 0 15'
+                },
+                {
+                    xtype: 'label',
+                    id: 'UserCoursesTotalPaid',
+                    text: '@string.Format("{0:C}", rtotal)',
+                    grow: true,
+                    hidden : hide_payment_info != "0" ? true : false,
+                    margin: '0 5 0 5'
+                }
+        ]
+    });
+
+    var header_message =  Ext.create('Ext.Panel', {
+        id:'header_message',
+        autoScroll: false,
+        border : false,
+        bodyPadding : '2px',
+        items :
+             [
+                 {
+                     html: '<div style="background-color:#EEEEEE;padding:2px;text-align: center;">' +nocancelmessage+ '</div>',
+                     xtype: 'panel'
+                 }
+             ],
+        listeners:
+             {
+                 afterrender: function(me)
+                 {
+                     if(allowcancel==-1)
+                     {
+                         me.setVisible(false);
+                     }
+                 }
+             }
+    });
+    Ext.onReady(function () {
+
+        Ext.create('Ext.Panel', {
+            id:'UserDashboardCourses',
+            renderTo: Ext.get('Coursesrender'),
+            frame: true,
+            autoScroll: false,
+            title: '@TerminologyHelper.Instance.GetTermCapital(TermsEnum.Course)s',
+            items: [
+                @if(showcancelmessage){
+                <text>
+                header_message,
+                </text>
+                }
+                UserCoursesMenuBar,
+            UserCoursesTab,
+            UserFilterDate,
+            UserCoursesFormvar
+            ],
+            tools: [
+                {
+                    hidden: (dasboardadminmode ? false : true),
+                    type: 'cross',
+                    tooltip: 'Delete this widget ',
+                    handler: function (e, toolEl, panel, tc) {
+                        DeleteUserWidget(GetwidgetColIDbyPlID('UserDashboardCourses'), GetwidgetIDbyPlID('UserDashboardCourses'));
+                    }
+                }
+            ],
+            dockedItems: [
+                 UserCoursesbottomBar
+            ]
+        });
+        if ("@WebConfiguration.UserDashCourseGridDefaultView" == "grid") {
+            var view = Ext.getCmp('UserCoursesWidgetGrid').getView();
+            view.getFeature('CourseGroup').disable();
+            Ext.getCmp('UserCoursesGridButton').hide();
+            Ext.getCmp('UserCoursesGroupButton').show();
+        }
+    });
+
+    printpdf = function (usergroup, coursecategory)
+    {
+        var startdateVal = Ext.getCmp('UserFilterDateFrom').getValue();
+        var enddateVal = Ext.getCmp('UserFilterDateTo').getValue();
+
+        if(coursecategory == 'transcripted'){
+            var startdate =  Ext.Date.format(new Date(startdateVal),'m-d-Y');
+            var enddate = Ext.Date.format(new Date(enddateVal),'m-d-Y');
+
+            if(Ext.isEmpty(startdateVal) && Ext.isEmpty(enddateVal)){
+                alert("Invalid start and end date")
+                return;
+            }
+
+            if(Ext.isEmpty(startdateVal)){
+                alert("Invalid start date")
+                return;
+            }
+
+            if(Ext.isEmpty(enddateVal)){
+                alert("Invalid end date")
+                return;
+            }
+            reloadTranscriptGrid();
+
+            Ext.Ajax.request({
+                url: config.getUrl('public/course/GetDefaultTranscript?'),
+                success: function (response) {
+                    //multiple usage of default transcript and custom transcript in classic. There are discripancy in layout when using .net view
+                    //if(response.responseText == 0 || response.responseText=="null" || response.responseText==""){
+                        var newtab = window.open();
+                        if( typeof newtab !== 'undefined' ) {
+                            newtab.location = '@transcriptnetUrl'+ '&startdate='+ startdate +'&enddate='+ enddate +'&rubyrequest='+1 + '&usersessionid=@studentSessionId';
+                        }
+                        else
+                        {
+                            window.location = '@transcriptnetUrl'+ '&startdate='+ startdate +'&enddate='+ enddate +'&rubyrequest='+1 + '&usersessionid=@studentSessionId';
+                        }
+                    //}
+                    //else{
+                    //    Ext.Ajax.request({
+                    //        url: config.getUrl('public/course/GetPDFTranscript?'),
+                    //        params: { startdate: startdate, enddate: enddate,caller:'usercourses',studentid:'@userid' },
+                    //        success: function (response) {
+                    //            window.open(response.responseText, '_blank');
+                    //        }
+                    //    });
+                    //}
+                }
+            });
+            return;
+        }
+
+        Ext.Ajax.request({
+            url: config.getUrl('public/user/UserCoursesinPDF'),
+            params: {
+                usergroup: usergroup,
+                coursecategory:coursecategory,
+                sid:  '@(usr != null ? usr.userid : 0)'
+            },
+            success: function (data) {
+                var newtab = window.open();
+                if( typeof newtab !== 'undefined' ) {
+                    newtab.location = "/Temp/"+data.responseText;
+                }
+                else
+                {
+                    window.location ="/Temp/"+data.responseText;
+                }
+
+            }
+        })
+    }
+    reloadUserCoursesForm = function(cmd,userid,usergroup) {
+
+        Ext.Ajax.request({
+            url: config.getUrl('public/user/UserCourses'),
+            params: {
+                cmd: cmd,
+                userid: userid,
+                usergroup: usergroup
+            },
+            success: function (data) {
+                $("#UserCoursesContainer").html(data.responseText);
+            }
+        })
+    }
+    //break lengthy words
+    var handleLengthyWords = function (str, value, index) {
+        if (str && str.length > index) {
+            repIndex = 0
+            str = str.substr(repIndex, index) + value + str.substr(index);
+            index += index;
+            return handleLengthyWords(str, value, index)
+        }
+        else {
+            return str;
+        }
+    };
+    
+    var reloadTranscriptGrid= function(){
+        var startdateVal = Ext.getCmp('UserFilterDateFrom').getValue();
+        var enddateVal = Ext.getCmp('UserFilterDateTo').getValue();
+        var startdate = new Date(startdateVal);
+        var enddate = new Date(enddateVal);
+        var store = Ext.getCmp('UserCoursesWidgetGrid').getStore();
+
+        if(Ext.isEmpty(startdateVal) && Ext.isEmpty(enddateVal)){
+            alert("Invalid start and end date")
+            return;
+        }
+
+        if(Ext.isEmpty(startdateVal)){
+            alert("Invalid start date")
+            return;
+        }
+
+        if(Ext.isEmpty(enddateVal)){
+            alert("Invalid end date")
+            return;
+        }
+        store.clearFilter(true);
+        store.filter([{filterFn: function(item) {
+            var mincoursedate = new Date(item.get("mincoursedate"));
+            var coursetype = item.get("coursetype");
+
+            if(!Ext.isEmpty(startdateVal) && !Ext.isEmpty(enddateVal) && coursetype == "transcripted"){
+                if(mincoursedate >= startdate && mincoursedate <= enddate ){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+
+        }}]);
+
+        store.reload();
+    }
+
+    var serverLessPrint = function (usergroup, coursecategory) {
+        var jsonData = Ext.encode(Ext.pluck(storeCourses.data.items, 'data'));
+        var parsedData = JSON.parse(jsonData);
+        var dataWithHeader = [];
+
+        var columns = [
+            { title: '          ' +"Course Id", dataKey: "CourseId" },
+            { title: "Course Number", dataKey: "CourseNumber" },
+            { title: "Course Name", dataKey: "CourseName" },
+            { title: "Date", dataKey: "Date" },
+            { title: "Paid", dataKey: "Paid" },
+        ];
+
+        var newParsedData = parsedData.map(function (item) {
+            var courseName = handleLengthyWords(item.rawcoursename, '\n', 35);
+            return {
+                CourseId: '                 ' + item.courseid, //cheat - no solution yet
+                CourseNumber: item.coursenumber,
+                CourseName: courseName,
+                Date: item.mincoursedate.split(' ')[0],
+                Paid: '',
+                OrderNumber: item.ordernumber,
+                OrderHeader: item.orderheader,
+                RegisteredData: item.registereddate,
+                Type: 'datarow'
+            }
+        });
+
+        var orderHeaders = parsedData.map(function (item) {
+            return {
+                CourseId: 'Order #: ' + item.ordernumber,
+                CourseNumber: '',
+                CourseName: '',
+                Date: moment(item.registereddate).format('MM/DD/YYYY'),
+                Paid: '$ ' + item.totalpaid.toFixed(2),
+                OrderNumber: item.ordernumber,
+                OrderHeader: item.orderheader,
+                Type: 'headerrow'
+            }
+        });
+
+        newParsedData.map(function (data) {
+            orderHeaders.map(function (headers) {
+                if (data.OrderNumber === headers.OrderNumber) {
+                    if (_.findWhere(dataWithHeader, { OrderNumber: headers.OrderNumber }) === undefined) {
+                        dataWithHeader.push(headers);
+                    }
+                    dataWithHeader.push(data);
+                }
+            })
+        })
+        //removes duplicates
+        var copyData = dataWithHeader;
+        dataWithHeader = Array.from(new Set(copyData.map(JSON.stringify))).map(JSON.parse);
+
+        var pageTitle = usergroup == 'ST' ? 'STUDENT ' : 'INS' ? 'INSTRUCTOR ' : 'STUDENT';
+        pageTitle += coursecategory.toUpperCase() + ' COURSES';
+        var studentName = 'Student Name : ' + $('#UserWdgt1Formfirst-inputEl').val().trim() + " " + $('#UserWdgt1Formlast-inputEl').val().trim();
+		var totalPaid = 'Total Paid : ' + Ext.util.Format.usMoney(totalPaidGeneral > 0 ? totalPaidGeneral : ( totalPaidGeneral * -1 ));
+            var doc = new jsPDF('p', 'pt');
+            var yPos = 60;
+			var pageWidth = doc.internal.pageSize.width;
+            doc.setFontSize(9);
+            doc.text(studentName, 20, 50);
+			doc.text(totalPaid, (pageWidth - 20), 50, 'right');
+			doc.setFontSize(10);
+            doc.autoTable(columns, dataWithHeader,
+			{
+			    margin: { top: 50, left: 20, right: 20, bottom: 0 },
+			    styles: {cellPadding: 0.5, fontSize: 8},
+				drawHeaderCell: function (cell, data) {
+                   cell.styles.fontSize = 9;
+                },
+                drawCell: function (cell, data) {
+                    if (data.row.raw.Type == 'headerrow') {
+                        doc.setFillColor(195, 195, 195);
+                    }
+                    if (data.row.raw.Type == 'datarow' && data.column.dataKey === 'CourseId') {
+
+                    }
+                },
+                addPageContent: function (data) {
+                    var xOffset = (doc.internal.pageSize.width / 2) - (doc.getStringUnitWidth(pageTitle) * doc.internal.getFontSize() / 2);
+                    doc.text(pageTitle, xOffset, 30);
+                },
+                startY: 60
+            });
+            doc.save(pageTitle + '.pdf');
+
+    }
+
+</script>
+
+<div id="Coursesrender" style="position:relative;min-height:100px; padding-bottom:20px"></div>

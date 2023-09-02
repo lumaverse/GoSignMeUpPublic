@@ -1,0 +1,75 @@
+﻿@using Gsmu.Api.Data;
+@using Gsmu.Api.Data.School;
+@using Gsmu.Api.Data.School.User;
+@model UserModel
+
+
+@{
+    var username = ViewBag.requsername;
+    int usernameMaskNum = Settings.Instance.GetFieldMasks("username", "Students").DefaultMaskNumber;
+
+    //Acknowlegdement for Instructor
+    if (ViewBag.usergroup == "IT")
+    {
+    <text>
+
+    <div  class="sd-cntr">
+        <div class="sd-rcc"  style="margin-top: 50px;">
+            <div class="sd-txtA">Thank you!</div>
+            <br>
+            <br>
+            <div class="sd-rts">Your account has been created and you can now log in by using your username and password. 
+
+            </div>
+            <br>
+            <br>
+            <div>
+                <input type="button" value="Continue" class="btn btn-prim sd-sgnBtn" onclick="location.reload();">
+            </div>
+            <br>
+            <br>
+        </div>
+    </div>
+
+    </text>
+    }
+    else
+    {
+        //Acknowlegdement for Student
+
+    <text>
+
+    <div id="rContainer" class="sd-cntr">
+        <div class="sd-rcc" id="newUserCnt" style="margin-top: 50px;">
+            <div class="sd-txtA">Thank you!</div>
+            <br>
+            <br>
+            <div class="sd-rts">Your account has been created and you can now log in by using your username and password. 
+                <br />
+                If you were in the middle of a checkout, you will be taken back to the checkout screen.
+                @if (usernameMaskNum == 6)
+                {
+                    <text><br /><br />Your new username is: @username
+                    </text>
+                }
+
+            </div>
+            <br>
+            <br>
+            <div>
+                <input type="button" value="Continue" id="register_signin" class="btn btn-prim sd-sgnBtn" onclick="window.initCloseRegisterUserDisclaimer()">
+            </div>
+            <br>
+            <br>
+        </div>
+    </div>
+    </text>
+    }
+
+}
+
+
+
+
+
+

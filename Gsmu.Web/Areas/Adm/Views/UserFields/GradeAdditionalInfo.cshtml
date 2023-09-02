@@ -1,0 +1,79 @@
+﻿@using school = Gsmu.Api.Data.School
+@using Gsmu.Api.Language
+@model school.Entities.GradeExtraInfo
+
+@{
+    bool modelEmptyData = ReflectionHelper.ObjectStringDataIsEmpty(Model);
+}
+
+@if (modelEmptyData)
+{
+    <text>N/A</text>
+}
+else
+{
+    var hadInput = false;
+    var hadPrevious = false;
+    if (!string.IsNullOrWhiteSpace(Model.gradeshortdesc))
+    {
+        @Model.gradeshortdesc        
+        hadInput = true;
+    }
+    
+    if (!string.IsNullOrWhiteSpace(Model.manufacturer))
+    {
+        if (hadInput)
+        {
+            <br/>
+        }
+        <text>
+            <u>Manufacturer:</u> @Model.manufacturer
+        </text>
+        hadInput = true;
+    }
+    
+    if (!string.IsNullOrWhiteSpace(Model.gaddress))
+    {
+        if (hadInput)
+        {
+            <br/>
+        }
+        @Model.gaddress
+        hadInput = true;
+    }
+    
+    hadPrevious = false;
+    if (!string.IsNullOrWhiteSpace(Model.gcity) || !string.IsNullOrWhiteSpace(Model.gstate) || !string.IsNullOrWhiteSpace(Model.gzip))
+    {
+        if (hadInput)
+        {
+            <br/>
+        }
+        if (!string.IsNullOrWhiteSpace(Model.gcity))
+        {
+            @Model.gcity
+            hadPrevious = true;
+        }
+        if (!string.IsNullOrWhiteSpace(Model.gstate))
+        {
+            if (hadPrevious)
+            {
+                <text>, </text>
+            }
+            @Model.gstate
+            hadPrevious = true;
+        }
+        if (!string.IsNullOrWhiteSpace(Model.gzip))
+        {
+            if (hadPrevious)
+            {
+                <text>, </text>
+            }
+            @Model.gzip
+            hadPrevious = true;
+        }
+    }    
+}
+
+
+

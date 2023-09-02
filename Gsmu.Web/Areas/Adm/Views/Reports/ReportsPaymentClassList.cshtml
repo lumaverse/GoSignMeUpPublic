@@ -1,0 +1,32 @@
+﻿
+<div id="reports-payment-classlist">
+    <div class="panel panel-default">
+        <div class="panel-heading gsmu-sub-panel-heading">
+            <div class="panel-title pull-left">
+                Reports Payment Class list
+            </div>
+            <div class="pull-right">
+                <div id="course-enrollment-data-btns">
+                    <div>
+                        <button type="button" class="btn btn-default btn-xs open" onclick="ReportsPaymentClassList.openAsPage(this)" data-value="false">Open Order Details as Page &nbsp;<span class="glyphicon glyphicon-open-file"></span></button>
+                        <button type="button" class="btn btn-success btn-xs save" onclick="ReportsPaymentClassList.save()">Save Changes &nbsp;<span class="fa fa-check"></span></button>
+                        <button type="button" title="Export to Excel" class="btn btn-success btn-xs excel" onclick="ReportsPaymentClassList.exportToExcel()"><span class="fa fa-file-excel-o"></span></button>
+                        <button type="button" title="Export to PDF" class="btn btn-danger btn-xs excel" onclick="ReportsPaymentClassList.exportToPDF()"><span class="fa fa-file-pdf-o"></span></button>
+                    </div>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <div class="panel-body gsmu-sub-panel-body panel-collapse collapse in">
+            <table id="reports-payment-classlist-grid" class="table table-striped table-hover datatable"></table>
+        </div>
+    </div>
+</div>
+
+<div id="reports-payment-classlist-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+<script src="~/Areas/Adm/Scripts/Reports/ReportsPaymentClassList.js"></script>

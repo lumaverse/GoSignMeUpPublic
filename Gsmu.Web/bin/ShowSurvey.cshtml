@@ -1,0 +1,268 @@
+﻿@using Gsmu.Api.Data.School.Terminology;
+
+@{
+    Layout = null;
+    int qnum = 1;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>ShowSurvey</title>
+
+<script src="/Scripts/jquery-2.2.0.js"></script>
+            <script>
+                if(@ViewBag.LoginRequired ==1)
+                {
+                    if(@ViewBag.ShibbolethLogin ==1)
+                    {
+                        window.location = "/Shibboleth.sso/Login";
+                    }
+                    else
+                    {
+                        window.location ="/Public/Survey/SurveyLogin?studid="+@ViewBag.StudentId+"&sid="+@ViewBag.SurveyId+"&cid="+@ViewBag.CourseId;
+                    }
+                }
+                if(@ViewBag.Error == 1)
+                {
+                    window.location ="/Public/Survey/SurveyConfirmation?status=Invalid Session."
+
+                }
+                console.log('Login Req : ', @ViewBag.LoginRequired)
+                function SubmitSurvey() {
+                    var parameter = "";
+                    var comments="";
+                    var answered =0;
+                    var error ="";
+                    $("#btnSubmit").prop('value', 'Saving...');
+                    $('#btnSubmit').attr('disabled', 'disabled');
+                    $.ajax({
+                        url: "getquestions?intSurveyId="+@ViewBag.SurveyId,
+                        context: document.body,
+                        success: function (response) {
+                            response = JSON.parse(response);
+                            for (var k in response) {
+                                answered = 0;
+                                var comments = "";
+                                if ($("#Answer" + response[k].QuestionID).val() != undefined) {
+                                    if($("#Comment" + response[k].QuestionID).val() != undefined)
+                                    {
+                                        comments=$("#Comment" + response[k].QuestionID).val();
+                                    }
+                                    parameter = parameter + "~||~" + response[k].QuestionID + "~|~" + $("#Answer" + response[k].QuestionID).val()+"~|~"+comments;
+                                    if($("#Answer" + response[k].QuestionID).val().trim()!=""){
+                                        answered=1;
+                                    }
+                                }
+                                else {
+                                    if ($('input:radio[name=Answer' + response[k].QuestionID + ']:checked').val() != undefined) {
+                                        if($("#Comment" + response[k].QuestionID).val() != undefined)
+                                        {
+                                            comments=$("#Comment" + response[k].QuestionID).val();
+                                           
+                                        }
+
+                                        parameter = parameter + "~||~" + response[k].QuestionID + "~|~" + $('input:radio[name=Answer' + response[k].QuestionID + ']:checked').val()+ "~|~"+comments ;
+                                        answered=1;
+
+                                    }
+                                    else {
+                                        var values = "";
+                                        $("input:checkbox[name=Answer" + response[k].QuestionID + "]:checked").each(function () {
+                                            var val = $(this).val();
+                                            values = values + "," + val;
+                                        });
+                                        if(response[k].QuestionID!= undefined){
+                                            if($("#Comment" + response[k].QuestionID).val() != undefined)
+                                            {
+                                                comments=$("#Comment" + response[k].QuestionID).val();
+                                                
+                                            }
+                                            parameter = parameter + "~||~" + response[k].QuestionID + "~|~" +values+ "~|~"+comments;
+                                            if(values!=""){
+                                                answered=1;
+                                            }
+                                        }
+
+
+                                    }
+                                }
+                                //alert(response[k].Required +answered )
+                                if((response[k].Required==1) && (answered==0) &&( response[k].Type!="Instruction"))
+                                {
+                                    
+                                    error =error+ "Required"+ response[k].Type +"-"+ response[k].Question1 +"<br />" ;
+                                    $("#label"+response[k].QuestionID).css("border-color", "red");
+                                }
+                            }
+                            if(error==""){
+                               
+                                $.ajax({
+                                    url: "submitanswer?studid="+@ViewBag.StudentId+"&intSurveyId="+@ViewBag.SurveyId+"&cid="+@ViewBag.CourseId,
+                                    context: document.body,
+                                    type:"post",
+                                    data:{answers:parameter },
+                                    success: function (response) {
+                                        window.location ="/Public/Survey/SurveyConfirmation?status="+response+"&finishedsurveyid="+@ViewBag.SurveyId;
+       
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                $("#btnSubmit").prop('value', 'Submit');
+                                $('#btnSubmit').removeAttr('disabled');
+                                $("#result_error").html('Answer all Required Questions.');
+
+                            }
+                        }
+                    });               
+                }
+            </script>
+
+</head>
+<body>
+    <center>
+        <table width="660">
+            <tr>
+                <td colspan ="2">
+                    <center>
+                        @if (ViewBag.SurveyImage != "none")
+                        {
+                            <img src="/admin/Survey/bannerimages/@Html.Raw(ViewBag.SurveyImage)" />
+                        }
+
+                    </center>
+                      <div style="text-align:center; font-weight:bold; font-size:18px;">
+                          @Html.Raw(ViewBag.Title)
+ 
+                     </div>
+<center>
+                     @Html.Raw(ViewBag.Course)
+</center>
+
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @if (!string.IsNullOrEmpty(ViewBag.SurveyDescription)){
+                        <br />
+                        <center>@Html.Raw(ViewBag.SurveyDescription) </center>
+                    }   
+                </td>
+                     
+            </tr>
+            <tr>
+                <td>
+                    @if (ViewBag.countinst > 0) { 
+                       <b>@TerminologyHelper.Instance.GetTermCapital(ViewBag.countinst > 1 ? TermsEnum.Instructors : TermsEnum.Instructor) </b> @Html.Raw(ViewBag.Instructor) 
+                    }   
+                </td>
+                     
+                <td style="text-align:right; font-weight:bold;">@Html.Raw(ViewBag.Date)</td>
+            </tr>
+            <tr>
+                <td colspan ="2">
+                    <hr />
+                </td>
+            </tr>
+            @foreach(var items in ViewBag.Questions)
+                {
+                   var name ="Answer" + items.QuestionID;
+                   var labelname= "label"+items.QuestionID;
+                   var commentName = "Comment" + items.QuestionID;
+                 <tr>
+                         <td colspan ="2">
+                                <br />
+
+                                <br />
+                                @if ((items.Type.ToString().ToLower() == "textbox") || (items.Type.ToString().ToLower() == "textarea"))
+                                {
+                                    <div id="@labelname" style="padding: 6px; border: thin solid #999999; background: #e0e0e0; margin-right:-6px; ">
+                                        @Html.Raw(qnum)
+                                        @Html.Raw(items.Question1)
+                                    </div>
+
+                                    <textarea style="width:100%" cols="65" rows="5" name="@name" id="@name" type="text"></textarea>
+                                    if ((items.Comments.ToString() == "1") || (items.Comments.ToString() == "-1"))
+                                    {
+                                        <textarea style="width:100%" cols="65" rows="5" name="@commentName" id="@commentName" type="text"></textarea>
+
+                                    }
+                                    qnum = qnum + 1;
+                                 }
+                                else if (items.Type.ToString().ToLower() == "signature")
+                                {
+                                    <div  id="@labelname" style="padding: 6px; border: thin solid #999999; background: #e0e0e0; margin-right:-6px; ">
+                                        @Html.Raw(qnum)
+                                        @Html.Raw(items.Question1)
+                                    </div>
+                                    <input type="text" style="width:100%" cols="65" rows="5" name="@name"  id="@name" type="text"  maxlength="100"></input>
+                                    qnum = qnum + 1; 
+                                }
+                                else if (items.Type.ToString().ToLower() == "likertrating")
+                                {
+                                    <div  id="@labelname" style="padding: 6px; border: thin solid #999999; background: #e0e0e0; margin-right:-6px; ">
+                                        @Html.Raw(qnum)
+                                        @Html.Raw(items.Question1)
+                                    </div>
+                                    <div>
+                                        @{Html.RenderAction("LikertRating", "Survey", new { intSurveyId = items.SurveyID, questionid = items.QuestionID, withComment = items.Comments });}
+                                    </div>
+                                    qnum = qnum + 1;
+                                }
+                                else if (items.Type.ToString().ToLower() == "likert")
+                                {
+                                    <div  name="@labelname" style="padding: 6px; border: thin solid #999999; background: #e0e0e0; margin-right:-6px; ">
+                                        @Html.Raw(qnum)
+                                        @Html.Raw(items.Question1)
+                                    </div>
+                                    <div>
+                                        @{Html.RenderAction("Likert", "Survey", new { intSurveyId = items.SurveyID, questionid = items.QuestionID, withComment = items.Comments });}
+                                    </div>
+                                    qnum = qnum + 1;
+                                }
+                                else if (items.Type.ToString().ToLower() == "checkbox")
+                                {
+                                    <div  id="@labelname" style="padding: 6px; border: thin solid #999999; background: #e0e0e0; margin-right:-6px; ">
+                                        @Html.Raw(qnum)
+                                        @Html.Raw(items.Question1)
+                                    </div>
+                                    <div>
+                                        @{Html.RenderAction("SurveyCheckBox", "Survey", new { intSurveyId = items.SurveyID, questionid = items.QuestionID, withComment = items.Comments });}
+                                    </div>
+                                    qnum = qnum + 1;
+                                }
+                                else if (items.Type.ToString().ToLower() == "radio")
+                                {
+                                    <div  id="@labelname" style="padding: 6px; border: thin solid #999999; background: #e0e0e0; margin-right:-6px; ">
+                                        @Html.Raw(qnum)
+                                        @Html.Raw(items.Question1)
+                                    </div>
+                                    <div>
+                                        @{Html.RenderAction("SurveyRadioButton", "Survey", new { intSurveyId = items.SurveyID, questionid = items.QuestionID, withComment = items.Comments });}
+                                    </div>
+                                    qnum = qnum + 1;
+                                }
+                                else
+                                {
+                                    <div style="padding: 6px;  margin-right:-6px; ">
+                                        @Html.Raw(items.Question1)
+                                    </div>
+                                   
+                                }
+</td>
+                  </tr>
+                }
+
+                <tr>
+                    <td></td>
+                    <td style="text-align:right;"><div id="result_error" style="color:red;"></div><input type="button" id="btnSubmit" onclick="SubmitSurvey()" value="Submit" /></td>
+                </tr>
+        </table>
+    </center>
+
+</body>
+</html>

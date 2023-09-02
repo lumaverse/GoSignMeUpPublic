@@ -1,0 +1,76 @@
+﻿@using Gsmu.Api.Data;
+@using Gsmu.Api.Data.School.Attendance;
+@using Gsmu.Api.Data.School.Terminology;
+@using Newtonsoft.Json;
+@model AttendanceModel
+@{
+    var attendanceTitle = TerminologyHelper.Instance.GetTermCapital(TermsEnum.Take) + " attendance"; 
+    ViewBag.Title = attendanceTitle;    
+    if (Model != null)
+    {
+        ViewBag.Title += ": " + Model.CourseModel.Course.COURSENAME;
+    }
+    else { 
+    }
+    string actionName = HttpContext.Current.Request.RequestContext.RouteData.Values["action"].ToString().ToLower();
+    if (actionName == "portalattendance")
+    {
+        Layout = "~/Views/Shared/_ComponentLayout.cshtml";
+    }
+}
+
+@section Head {
+    @Scripts.Render("~/Areas/Adm/Scripts/Attendance/AttendanceComponent.js")
+
+    <style type="text/css">
+        .x-menu-item .column-component {
+            display: none;
+        }
+    </style>
+}
+
+
+<script type="text/javascript">
+    var configuration = @Html.Raw(JsonConvert.SerializeObject(AttendanceConfig.Instance, Formatting.Indented));
+
+    /*
+    model.CourseModel
+    model.CourseModel.CourseId
+    model.CourseModel.CourseTimes[]
+    model.CourseModel.CourseStart
+    model.CourseModel.EffectivePrices
+    */
+    var modelExists = @Html.Json(Model != null);
+
+    var model = null;
+    if (modelExists)  {
+        model = @Html.Raw(JsonConvert.SerializeObject(Model, new JsonSerializerSettings() {
+            DateTimeZoneHandling = DateTimeZoneHandling.Local,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            Formatting = Gsmu.Api.Data.WebConfiguration.DevelopmentMode ? Formatting.Indented : Formatting.None
+        }));
+    }
+
+    Ext.onReady(function() {
+        if (layout == null) {
+            layout = new Layout({
+                noLayout: true
+            });
+        }
+
+        var attendance = new AttendanceCompont({
+            attendanceTitle: @Html.Json(attendanceTitle),
+            renderType: @Html.Json(actionName == "portalattendance" ? "component" : "page"),
+            containerId: 'attendance-component',
+            courseSelectorContainerId: 'attendance-course-selector',
+            model: model,
+            configuration: configuration
+        });
+    });
+</script>
+
+@section Sidebar {
+    <div id="attendance-course-selector"></div>
+}
+<div id="attendance-component" style="clear:both;"></div>
+

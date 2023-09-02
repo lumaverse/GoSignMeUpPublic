@@ -1,0 +1,10 @@
+﻿.price-single {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+tr.grid-row td .price-single {
+}
+

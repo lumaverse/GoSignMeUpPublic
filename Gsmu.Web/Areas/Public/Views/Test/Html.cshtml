@@ -1,0 +1,23 @@
+﻿@using Gsmu.Api.Data.School.Entities
+@using Gsmu.Api.Data.School.Course
+@using Newtonsoft.Json
+@using Gsmu.Api.Data
+
+@{
+    ViewBag.Title = "Html";
+}
+
+@section Head {
+    <script type="text/javascript">
+    </script>
+}
+
+    The level of a update level first one is 0 because first, the seconds is 1 right now.
+    <br />
+    If you want to have a third updater, it would be 2.
+    <br />
+    <br />
+    <span style="font-weight: bold;">
+        As you can see our Ruby Update Level is:
+    </span>
+    @Settings.Instance.GetMasterInfo4().RubyUpdateLevel

@@ -1,0 +1,28 @@
+﻿@{
+    ViewBag.Title = "Login";
+    var hide_payment_info = Gsmu.Api.Data.Settings.Instance.GetMasterInfo2().HidePaymentInfo;
+}
+
+<div style="position:relative; left:940px; top:0px; width:30px;">
+    <img style="cursor: pointer" onclick="cart.HideReviewCheckout(); cart.refreshDisplay(); cart.refreshCourseListing();"
+         src="~/Areas/Public/Images/Layout/btn_close_off.jpg" width="20" height="20" />
+</div>
+
+<div class="cart-steps-wrap" style="position: relative; left: 0px; top: -20px;">
+    <div class="cart-steps cart-step1"></div>
+    <ul class="cart-steps-text" style="list-style-type: none;">
+        <li class="cart-step-1 current-step">Log in/ Create Account</li>
+        <li class="cart-step-2">Review</li>
+         @if (hide_payment_info == 0)
+         {
+            <li class="cart-step-3">Payments</li>
+         }
+         else 
+         {
+            <li class="cart-step-3">Processing</li>
+         }
+        <li class="cart-step-4">Receipt & Confirmation</li>
+    </ul>
+</div>
+
+@{Html.RenderAction("Login", "Membership", new { cmd = "cartcheckoutlogin" });}
