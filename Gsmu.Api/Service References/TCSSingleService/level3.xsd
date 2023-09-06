@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xsd1="http://fms.treas.gov/tcs/schemas" xmlns="http://fms.treas.gov/" elementFormDefault="qualified" targetNamespace="http://fms.treas.gov/tcs/schemas" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="order_level3_data">
+    <xs:annotation>
+      <xs:documentation>Container for the Level III data for the transaction.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence minOccurs="0">
+      <xs:element ref="xsd1:level-2" />
+      <xs:element maxOccurs="1000" name="line-item" type="xsd1:baseLineItemType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="baseLineItemType" abstract="true" />
+  <xs:complexType name="mastercardLevel3Type">
+    <xs:complexContent mixed="false">
+      <xs:extension base="xsd1:baseLineItemType">
+        <xs:sequence>
+          <xs:element ref="xsd1:discount-indicator" />
+          <xs:element minOccurs="0" ref="xsd1:discount-amount" />
+          <xs:element minOccurs="0" ref="xsd1:alternate-tax-identifier" />
+          <xs:element ref="xsd1:product-code" />
+          <xs:element name="item-descriptor" type="xsd1:mastercardItemDescriptorType" />
+          <xs:element default="0" name="item-quantity" type="xsd1:mastercardItemQuantityType" />
+          <xs:element name="unit-of-measure" type="xsd1:mastercardUnitOfMeasureType" />
+          <xs:element default="0" name="unit-cost" type="xsd1:mastercardUnitCostType" />
+          <xs:element ref="xsd1:net-indicator" />
+          <xs:element ref="xsd1:db-cr-indicator" />
+          <xs:element minOccurs="0" ref="xsd1:type-of-supply" />
+          <xs:element minOccurs="0" ref="xsd1:item-commodity-code" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="visaLevel3Type">
+    <xs:complexContent mixed="false">
+      <xs:extension base="xsd1:baseLineItemType">
+        <xs:sequence>
+          <xs:element ref="xsd1:discount-indicator" />
+          <xs:element minOccurs="0" ref="xsd1:discount-amount" />
+          <xs:element minOccurs="0" ref="xsd1:alternate-tax-identifier" />
+          <xs:element ref="xsd1:product-code" />
+          <xs:element name="item-descriptor" type="xsd1:visaItemDescriptorType" />
+          <xs:element default="0" name="item-quantity" type="xsd1:visaItemQuantityType" />
+          <xs:element name="unit-of-measure" type="xsd1:visaUnitOfMeasureType" />
+          <xs:element default="0" name="unit-cost" type="xsd1:visaUnitCostType" />
+          <xs:element minOccurs="0" ref="xsd1:net-indicator" />
+          <xs:element minOccurs="0" ref="xsd1:db-cr-indicator" />
+          <xs:element minOccurs="0" ref="xsd1:type-of-supply" />
+          <xs:element ref="xsd1:item-commodity-code" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="amexLevel3Type">
+    <xs:complexContent mixed="false">
+      <xs:extension base="xsd1:baseLineItemType">
+        <xs:sequence>
+          <xs:element name="item-descriptor" type="xsd1:amexItemDescriptorType" />
+          <xs:element default="0" name="item-quantity" type="xsd1:amexItemQuantityType" />
+          <xs:element default="0" name="unit-cost" type="xsd1:amexUnitCostType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="level-2">
+    <xs:annotation>
+      <xs:documentation>Describes the purchase and pertains to all items in the purchase</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="xsd1:dest-country" />
+        <xs:element minOccurs="0" ref="xsd1:dest-zip" />
+        <xs:element minOccurs="0" ref="xsd1:duty-amount" />
+        <xs:element minOccurs="0" ref="xsd1:from-zip" />
+        <xs:element minOccurs="0" ref="xsd1:order-date" />
+        <xs:element minOccurs="0" ref="xsd1:tax-amount" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="mastercardUnitOfMeasureType">
+    <xs:annotation>
+      <xs:documentation>Unit of measure for the product</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="3" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="mastercardUnitCostType">
+    <xs:annotation>
+      <xs:documentation>Amount per unit</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:decimal">
+      <xs:maxInclusive value="999999.99" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="mastercardItemQuantityType">
+    <xs:annotation>
+      <xs:documentation>Quantity of item purchased</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:long">
+      <xs:maxInclusive value="99999" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="mastercardItemDescriptorType">
+    <xs:annotation>
+      <xs:documentation>Description of item</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="35" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="visaUnitOfMeasureType">
+    <xs:annotation>
+      <xs:documentation>Unit of measure for the product</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="7" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="visaUnitCostType">
+    <xs:annotation>
+      <xs:documentation>Amount per unit</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:decimal">
+      <xs:maxInclusive value="99999999.99" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="visaItemQuantityType">
+    <xs:annotation>
+      <xs:documentation>Quantity of item purchased</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:long">
+      <xs:maxInclusive value="9999999999" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="visaItemDescriptorType">
+    <xs:annotation>
+      <xs:documentation>Description of item</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="24" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="amexUnitCostType">
+    <xs:annotation>
+      <xs:documentation>Amount per unit</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:decimal">
+      <xs:maxInclusive value="99999999.99" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="amexItemQuantityType">
+    <xs:annotation>
+      <xs:documentation>Quantity of item purchased</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:long">
+      <xs:maxInclusive value="999" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="amexItemDescriptorType">
+    <xs:annotation>
+      <xs:documentation>Description of item</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="40" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="type-of-supply">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:maxLength value="2" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element default="0" name="tax-amount">
+    <xs:annotation>
+      <xs:documentation>Tax Amount for the product</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:decimal">
+        <xs:maxInclusive value="999999.99" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="product-code">
+    <xs:annotation>
+      <xs:documentation>Unique ID associated with the product</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:maxLength value="12" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="order-date" type="xs:string">
+    <xs:annotation>
+      <xs:documentation>Date on which the product was ordered</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="net-indicator">
+    <xs:annotation>
+      <xs:documentation>Indicates whether the amount is a net amount or gross amount, Y=tax included, N=tax not included</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="Y" />
+        <xs:enumeration value="N" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="item-commodity-code">
+    <xs:annotation>
+      <xs:documentation>Item Commodity Code</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:maxLength value="12" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="from-zip">
+    <xs:annotation>
+      <xs:documentation>Zip code of originator</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:maxLength value="10" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element default="0" name="duty-amount">
+    <xs:simpleType>
+      <xs:restriction base="xs:decimal">
+        <xs:maxInclusive value="999999.99" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="discount-indicator">
+    <xs:annotation>
+      <xs:documentation>Flag indicating whether a discount was applied to this item, Y=discount applied, N=no discount</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:maxLength value="1" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element default="0" name="discount-amount">
+    <xs:annotation>
+      <xs:documentation>Dollar amount of the discount</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:decimal">
+        <xs:maxInclusive value="999999.99" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="dest-zip">
+    <xs:annotation>
+      <xs:documentation source="Destination zip code for the purchase">Destination zip code for the purchase</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:maxLength value="10" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="dest-country">
+    <xs:annotation>
+      <xs:documentation>Destination country for the purchase</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="840" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="db-cr-indicator">
+    <xs:annotation>
+      <xs:documentation>Indicates whether the item is a debit or credit, D=debit, C=credit</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="C" />
+        <xs:enumeration value="D" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element default="0" name="alternate-tax-identifier" type="xs:byte" />
+</xs:schema>

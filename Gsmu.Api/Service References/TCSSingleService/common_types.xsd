@@ -1,0 +1,1077 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xsd1="http://fms.treas.gov/tcs/schemas" xmlns="http://fms.treas.gov/" elementFormDefault="qualified" targetNamespace="http://fms.treas.gov/tcs/schemas" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="level3.xsd" />
+  <xs:simpleType name="email_address">
+    <xs:annotation>
+      <xs:documentation>Email address that is associated with the payment</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSEmail">
+      <xs:maxLength value="80" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="account_holder_name">
+    <xs:annotation>
+      <xs:documentation>Full name of person holding the account, possibly modified during the Pay.gov session 
+				Required if the agency is sending account data to Pay.gov; otherwise optional.
+			</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSStringPlus">
+      <xs:minLength value="1" />
+      <xs:maxLength value="80" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="account_number">
+    <xs:annotation>
+      <xs:documentation>The account number supplied with the transaction</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSAccountNumber">
+      <xs:minLength value="3" />
+      <xs:maxLength value="17" />
+      <xs:whiteSpace value="preserve" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="account_type">
+    <xs:annotation>
+      <xs:documentation>
+				Applicable if payment_type is ACH. Must be one of allowable enumerations.
+			</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="BusinessChecking" />
+      <xs:enumeration value="BusinessSavings" />
+      <xs:enumeration value="PersonalChecking" />
+      <xs:enumeration value="PersonalSavings" />
+      <xs:enumeration value="GeneralLedger" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="agency_id">
+    <xs:annotation>
+      <xs:documentation>Unique identifer of the agency, as it was assigned by Pay.gov</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSNumericString">
+      <xs:maxLength value="21" />
+      <xs:minLength value="0" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="agency_tracking_id">
+    <xs:annotation>
+      <xs:documentation>
+				Unique identifier controlled by the agency and supplied with the transaction.
+			</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSStringPlus">
+      <xs:maxLength value="21" />
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="app_batch_id">
+    <xs:annotation>
+      <xs:documentation>
+				Unique identifier controlled by the agency and supplied with the batch.
+			</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSStringPlus">
+      <xs:minLength value="1" />
+      <xs:maxLength value="32" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="approval_code">
+    <xs:annotation>
+      <xs:documentation>Approval Code exactly as received from the Plastic Card authorization provider.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="64" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="approvalCodeResponseType">
+    <xs:annotation>
+      <xs:documentation>Approval Code set in response. Please note: this value can be an empty string.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="64" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="auth_response_code">
+    <xs:annotation>
+      <xs:documentation>Authorization Response Code, exactly as received from the authorization service provider.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="2" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="auth_response_text">
+    <xs:annotation>
+      <xs:documentation>Authorization Response Text, exactly as received from the authorization service provider.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="16" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="avs_response_code">
+    <xs:annotation>
+      <xs:documentation>Address Verification Service result exactly as received from the Plastic Card authorization provider.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="20" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="batch_status">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Duplicated" />
+      <xs:enumeration value="Failed" />
+      <xs:enumeration value="Received" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="batch_return_code">
+    <xs:annotation>
+      <xs:documentation>Numeric String</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSNumericString">
+      <xs:maxLength value="4" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="batch_return_detail">
+    <xs:annotation>
+      <xs:documentation>Detailed message elaborating on return_code.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="256" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="billing_address">
+    <xs:annotation>
+      <xs:documentation>Billing address supplied with the transaction</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSStringPlus">
+      <xs:maxLength value="80" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="billing_address_2">
+    <xs:annotation>
+      <xs:documentation>Billing address line 2 supplied with the transaction</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSStringPlus">
+      <xs:maxLength value="80" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="billing_city">
+    <xs:annotation>
+      <xs:documentation>Billing city supplied with the transaction</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSAlphaNumericPlus">
+      <xs:maxLength value="40" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="billing_state">
+    <xs:annotation>
+      <xs:documentation>Billing state or province of address</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSAlphaNumericPlus">
+      <xs:maxLength value="02" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="billing_zip">
+    <xs:annotation>
+      <xs:documentation>Billing zip code of address</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSAlphaNumericPlus">
+      <xs:maxLength value="20" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="billing_country">
+    <xs:annotation>
+      <xs:documentation>3-digit numeric ISO country code supplied with the transaction.  Valid countries are listed in the Country List entry in the Glossary.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="" />
+      <xs:enumeration value="004" />
+      <xs:enumeration value="008" />
+      <xs:enumeration value="012" />
+      <xs:enumeration value="016" />
+      <xs:enumeration value="020" />
+      <xs:enumeration value="024" />
+      <xs:enumeration value="028" />
+      <xs:enumeration value="031" />
+      <xs:enumeration value="032" />
+      <xs:enumeration value="036" />
+      <xs:enumeration value="040" />
+      <xs:enumeration value="044" />
+      <xs:enumeration value="048" />
+      <xs:enumeration value="050" />
+      <xs:enumeration value="051" />
+      <xs:enumeration value="052" />
+      <xs:enumeration value="056" />
+      <xs:enumeration value="060" />
+      <xs:enumeration value="064" />
+      <xs:enumeration value="068" />
+      <xs:enumeration value="070" />
+      <xs:enumeration value="072" />
+      <xs:enumeration value="076" />
+      <xs:enumeration value="084" />
+      <xs:enumeration value="090" />
+      <xs:enumeration value="092" />
+      <xs:enumeration value="096" />
+      <xs:enumeration value="100" />
+      <xs:enumeration value="104" />
+      <xs:enumeration value="108" />
+      <xs:enumeration value="112" />
+      <xs:enumeration value="116" />
+      <xs:enumeration value="120" />
+      <xs:enumeration value="124" />
+      <xs:enumeration value="132" />
+      <xs:enumeration value="136" />
+      <xs:enumeration value="140" />
+      <xs:enumeration value="144" />
+      <xs:enumeration value="148" />
+      <xs:enumeration value="152" />
+      <xs:enumeration value="156" />
+      <xs:enumeration value="170" />
+      <xs:enumeration value="174" />
+      <xs:enumeration value="175" />
+      <xs:enumeration value="178" />
+      <xs:enumeration value="180" />
+      <xs:enumeration value="184" />
+      <xs:enumeration value="188" />
+      <xs:enumeration value="191" />
+      <xs:enumeration value="192" />
+      <xs:enumeration value="196" />
+      <xs:enumeration value="203" />
+      <xs:enumeration value="204" />
+      <xs:enumeration value="208" />
+      <xs:enumeration value="212" />
+      <xs:enumeration value="214" />
+      <xs:enumeration value="218" />
+      <xs:enumeration value="222" />
+      <xs:enumeration value="226" />
+      <xs:enumeration value="231" />
+      <xs:enumeration value="232" />
+      <xs:enumeration value="233" />
+      <xs:enumeration value="234" />
+      <xs:enumeration value="238" />
+      <xs:enumeration value="242" />
+      <xs:enumeration value="246" />
+      <xs:enumeration value="248" />
+      <xs:enumeration value="250" />
+      <xs:enumeration value="254" />
+      <xs:enumeration value="258" />
+      <xs:enumeration value="262" />
+      <xs:enumeration value="266" />
+      <xs:enumeration value="268" />
+      <xs:enumeration value="270" />
+      <xs:enumeration value="275" />
+      <xs:enumeration value="276" />
+      <xs:enumeration value="288" />
+      <xs:enumeration value="292" />
+      <xs:enumeration value="296" />
+      <xs:enumeration value="300" />
+      <xs:enumeration value="304" />
+      <xs:enumeration value="308" />
+      <xs:enumeration value="312" />
+      <xs:enumeration value="316" />
+      <xs:enumeration value="320" />
+      <xs:enumeration value="324" />
+      <xs:enumeration value="328" />
+      <xs:enumeration value="332" />
+      <xs:enumeration value="336" />
+      <xs:enumeration value="340" />
+      <xs:enumeration value="344" />
+      <xs:enumeration value="348" />
+      <xs:enumeration value="352" />
+      <xs:enumeration value="356" />
+      <xs:enumeration value="360" />
+      <xs:enumeration value="364" />
+      <xs:enumeration value="368" />
+      <xs:enumeration value="372" />
+      <xs:enumeration value="376" />
+      <xs:enumeration value="380" />
+      <xs:enumeration value="384" />
+      <xs:enumeration value="388" />
+      <xs:enumeration value="392" />
+      <xs:enumeration value="398" />
+      <xs:enumeration value="400" />
+      <xs:enumeration value="404" />
+      <xs:enumeration value="408" />
+      <xs:enumeration value="410" />
+      <xs:enumeration value="414" />
+      <xs:enumeration value="417" />
+      <xs:enumeration value="418" />
+      <xs:enumeration value="422" />
+      <xs:enumeration value="426" />
+      <xs:enumeration value="428" />
+      <xs:enumeration value="430" />
+      <xs:enumeration value="434" />
+      <xs:enumeration value="438" />
+      <xs:enumeration value="440" />
+      <xs:enumeration value="442" />
+      <xs:enumeration value="446" />
+      <xs:enumeration value="450" />
+      <xs:enumeration value="454" />
+      <xs:enumeration value="458" />
+      <xs:enumeration value="462" />
+      <xs:enumeration value="466" />
+      <xs:enumeration value="470" />
+      <xs:enumeration value="474" />
+      <xs:enumeration value="478" />
+      <xs:enumeration value="480" />
+      <xs:enumeration value="484" />
+      <xs:enumeration value="492" />
+      <xs:enumeration value="496" />
+      <xs:enumeration value="498" />
+      <xs:enumeration value="499" />
+      <xs:enumeration value="500" />
+      <xs:enumeration value="504" />
+      <xs:enumeration value="508" />
+      <xs:enumeration value="512" />
+      <xs:enumeration value="516" />
+      <xs:enumeration value="520" />
+      <xs:enumeration value="524" />
+      <xs:enumeration value="528" />
+      <xs:enumeration value="530" />
+      <xs:enumeration value="533" />
+      <xs:enumeration value="540" />
+      <xs:enumeration value="548" />
+      <xs:enumeration value="554" />
+      <xs:enumeration value="558" />
+      <xs:enumeration value="562" />
+      <xs:enumeration value="566" />
+      <xs:enumeration value="570" />
+      <xs:enumeration value="574" />
+      <xs:enumeration value="578" />
+      <xs:enumeration value="580" />
+      <xs:enumeration value="583" />
+      <xs:enumeration value="584" />
+      <xs:enumeration value="585" />
+      <xs:enumeration value="586" />
+      <xs:enumeration value="591" />
+      <xs:enumeration value="598" />
+      <xs:enumeration value="600" />
+      <xs:enumeration value="604" />
+      <xs:enumeration value="608" />
+      <xs:enumeration value="612" />
+      <xs:enumeration value="616" />
+      <xs:enumeration value="620" />
+      <xs:enumeration value="624" />
+      <xs:enumeration value="626" />
+      <xs:enumeration value="630" />
+      <xs:enumeration value="634" />
+      <xs:enumeration value="638" />
+      <xs:enumeration value="642" />
+      <xs:enumeration value="643" />
+      <xs:enumeration value="646" />
+      <xs:enumeration value="652" />
+      <xs:enumeration value="654" />
+      <xs:enumeration value="659" />
+      <xs:enumeration value="660" />
+      <xs:enumeration value="662" />
+      <xs:enumeration value="663" />
+      <xs:enumeration value="666" />
+      <xs:enumeration value="670" />
+      <xs:enumeration value="674" />
+      <xs:enumeration value="678" />
+      <xs:enumeration value="682" />
+      <xs:enumeration value="686" />
+      <xs:enumeration value="688" />
+      <xs:enumeration value="690" />
+      <xs:enumeration value="694" />
+      <xs:enumeration value="702" />
+      <xs:enumeration value="703" />
+      <xs:enumeration value="704" />
+      <xs:enumeration value="705" />
+      <xs:enumeration value="706" />
+      <xs:enumeration value="710" />
+      <xs:enumeration value="716" />
+      <xs:enumeration value="724" />
+      <xs:enumeration value="732" />
+      <xs:enumeration value="736" />
+      <xs:enumeration value="740" />
+      <xs:enumeration value="744" />
+      <xs:enumeration value="748" />
+      <xs:enumeration value="752" />
+      <xs:enumeration value="756" />
+      <xs:enumeration value="760" />
+      <xs:enumeration value="762" />
+      <xs:enumeration value="764" />
+      <xs:enumeration value="768" />
+      <xs:enumeration value="772" />
+      <xs:enumeration value="776" />
+      <xs:enumeration value="780" />
+      <xs:enumeration value="784" />
+      <xs:enumeration value="788" />
+      <xs:enumeration value="792" />
+      <xs:enumeration value="795" />
+      <xs:enumeration value="796" />
+      <xs:enumeration value="798" />
+      <xs:enumeration value="800" />
+      <xs:enumeration value="804" />
+      <xs:enumeration value="807" />
+      <xs:enumeration value="818" />
+      <xs:enumeration value="826" />
+      <xs:enumeration value="830" />
+      <xs:enumeration value="831" />
+      <xs:enumeration value="832" />
+      <xs:enumeration value="833" />
+      <xs:enumeration value="834" />
+      <xs:enumeration value="840" />
+      <xs:enumeration value="850" />
+      <xs:enumeration value="854" />
+      <xs:enumeration value="858" />
+      <xs:enumeration value="860" />
+      <xs:enumeration value="862" />
+      <xs:enumeration value="876" />
+      <xs:enumeration value="882" />
+      <xs:enumeration value="887" />
+      <xs:enumeration value="894" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="address">
+    <xs:sequence>
+      <xs:element name="billing_address" type="xsd1:billing_address" />
+      <xs:element minOccurs="0" name="billing_address_2" type="xsd1:billing_address_2" />
+      <xs:element name="billing_city" type="xsd1:billing_city" />
+      <xs:element name="billing_state" type="xsd1:billing_state" />
+      <xs:element name="billing_zip" type="xsd1:billing_zip" />
+      <xs:element name="billing_country" type="xsd1:billing_country" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="card_security_code">
+    <xs:annotation>
+      <xs:documentation>The 3 or 4 digit number listed on the back/front of the cardholder card by the signature line.  Applicable 	if payment_type is PlasticCard</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([0-9]{3,4}){0,1}" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="check_number">
+    <xs:annotation>
+      <xs:documentation>The check number that can be assigned to the withdrawal. 
+				Applicable if payment_type is ACH.
+			</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSNumericString">
+      <xs:minLength value="0" />
+      <xs:maxLength value="8" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="credit_card_expiration_date">
+    <xs:annotation>
+      <xs:documentation>Text string representation of the expiration date of the Plastic Card.  The format of this value shall be: YYYY-DD. </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:gYearMonth" />
+  </xs:simpleType>
+  <xs:simpleType name="credit_card_track2">
+    <xs:annotation>
+      <xs:documentation>
+				Track2 data of credit card swipe.  Applicable if payment_type is plastic_card.
+				As per requirements there is no restriction on credit card track 2 data.
+			</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="256" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="custom_fields">
+    <xs:annotation>
+      <xs:documentation>Customized fields that can be passed by the agency to capture agency management data or can be exposed to the user during the transaction.
+			</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="custom_field_1" type="xsd1:customFieldValue" />
+      <xs:element minOccurs="0" name="custom_field_2" type="xsd1:customFieldValue" />
+      <xs:element minOccurs="0" name="custom_field_3" type="xsd1:customFieldValue" />
+      <xs:element minOccurs="0" name="custom_field_4" type="xsd1:customFieldValue" />
+      <xs:element minOccurs="0" name="custom_field_5" type="xsd1:customFieldValue" />
+      <xs:element minOccurs="0" name="custom_field_6" type="xsd1:customFieldValue" />
+      <xs:element minOccurs="0" name="custom_field_7" type="xsd1:customFieldValue" />
+      <xs:element minOccurs="0" name="custom_field_8" type="xsd1:customFieldValue" />
+      <xs:element minOccurs="0" name="custom_field_9" type="xsd1:customFieldValue" />
+      <xs:element minOccurs="0" name="custom_field_10" type="xsd1:customFieldValue" />
+      <xs:element minOccurs="0" name="custom_field_11" type="xsd1:customFieldValue" />
+      <xs:element minOccurs="0" name="custom_field_12" type="xsd1:customFieldValue" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="classification">
+    <xs:annotation>
+      <xs:documentation>Classification that can be passed by the agency to capture TAS/BETC amounts for each transaction.
+			</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="classification_data" type="xsd1:classificationDataType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="query_custom_fields">
+    <xs:annotation>
+      <xs:documentation>Customized fields that can be passed by the agency to capture agency management data or can be exposed to the user during the transaction.
+	</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="custom_field_1" type="xsd1:CustomCollectionLabelAndFieldType" />
+      <xs:element minOccurs="0" name="custom_field_2" type="xsd1:CustomCollectionLabelAndFieldType" />
+      <xs:element minOccurs="0" name="custom_field_3" type="xsd1:CustomCollectionLabelAndFieldType" />
+      <xs:element minOccurs="0" name="custom_field_4" type="xsd1:CustomCollectionLabelAndFieldType" />
+      <xs:element minOccurs="0" name="custom_field_5" type="xsd1:CustomCollectionLabelAndFieldType" />
+      <xs:element minOccurs="0" name="custom_field_6" type="xsd1:CustomCollectionLabelAndFieldType" />
+      <xs:element minOccurs="0" name="custom_field_7" type="xsd1:CustomCollectionLabelAndFieldType" />
+      <xs:element minOccurs="0" name="custom_field_8" type="xsd1:CustomCollectionLabelAndFieldType" />
+      <xs:element minOccurs="0" name="custom_field_9" type="xsd1:CustomCollectionLabelAndFieldType" />
+      <xs:element minOccurs="0" name="custom_field_10" type="xsd1:CustomCollectionLabelAndFieldType" />
+      <xs:element minOccurs="0" name="custom_field_11" type="xsd1:CustomCollectionLabelAndFieldType" />
+      <xs:element minOccurs="0" name="custom_field_12" type="xsd1:CustomCollectionLabelAndFieldType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="csc_result">
+    <xs:annotation>
+      <xs:documentation>Card Verification Value Result Code exactly as received by the authorization provider</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="debit_voucher_number">
+    <xs:annotation>
+      <xs:documentation>Assigned to ACH items that are either returned or retired.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSAlphaNumeric">
+      <xs:maxLength value="10" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="deposit_ticket_number">
+    <xs:annotation>
+      <xs:documentation>Assigned to ACH items that are settled.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSAlphaNumeric">
+      <xs:maxLength value="10" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="effective_date">
+    <xs:annotation>
+      <xs:documentation>Effective date of the ACH collection.  In the majority of cases this will match the payment_date supplied wth the request.  Please see the TCSDate for format.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSDate" />
+  </xs:simpleType>
+  <xs:simpleType name="masked_account_number">
+    <xs:annotation>
+      <xs:documentation>
+				Account Number returned in results.  The system shall show last 4 digits preceded by 12 asterisks.
+				USED FOR OUTPUT ONLY!
+			</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSMaskedAccountNumber" />
+  </xs:simpleType>
+  <xs:simpleType name="order_id">
+    <xs:annotation>
+      <xs:documentation>Level II data field for a credit card transaction.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSStringPlus">
+      <xs:minLength value="0" />
+      <xs:maxLength value="17" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="order_tax_amount">
+    <xs:annotation>
+      <xs:documentation>Level II data field for a credit card transaction.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0" />
+      <xs:maxExclusive value="9999999999999999999" />
+      <xs:fractionDigits value="2" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="paygov_tracking_id">
+    <xs:annotation>
+      <xs:documentation>Pay.gov-generated unique tracking identifier</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSAlphaNumeric">
+      <xs:maxLength value="21" />
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="payment_date">
+    <xs:restriction base="xsd1:TCSDate" />
+  </xs:simpleType>
+  <xs:simpleType name="payment_type">
+    <xs:restriction base="xsd1:TCSString">
+      <xs:enumeration value="ACH" />
+      <xs:enumeration value="PlasticCard" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="recurring_payment_number">
+    <xs:annotation>
+      <xs:documentation>Payment number of a recurring ACH collection</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="9999" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="recurring_payment_number_nozero">
+    <xs:annotation>
+      <xs:documentation>Payment number of a recurring ACH collection</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="1" />
+      <xs:maxInclusive value="9999" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="recurring_payment_frequency">
+    <xs:annotation>
+      <xs:documentation>Frequency of a recurring ACH collection.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="" />
+      <xs:enumeration value="OneTime" />
+      <xs:enumeration value="Weekly" />
+      <xs:enumeration value="Biweekly" />
+      <xs:enumeration value="Monthly" />
+      <xs:enumeration value="Quarterly" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="payment_frequency">
+    <xs:annotation>
+      <xs:documentation>Frequency of an ACH collection.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="OneTime" />
+      <xs:enumeration value="Weekly" />
+      <xs:enumeration value="Biweekly" />
+      <xs:enumeration value="Monthly" />
+      <xs:enumeration value="Quarterly" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="return_code">
+    <xs:annotation>
+      <xs:documentation>Four digit numeric code that specifies the status of this specific request. Can be blank if it is a transaction that was not settled using TCS.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSNumericString">
+      <xs:maxLength value="4" />
+      <xs:minLength value="0" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="return_detail">
+    <xs:annotation>
+      <xs:documentation>Code that, along with return_code, gives the agency system a complete understanding of the error.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSString">
+      <xs:maxLength value="256" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="return_reason_code">
+    <xs:annotation>
+      <xs:documentation>Reason why the ACH transaction was returned.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="100" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="routing_transit_number">
+    <xs:annotation>
+      <xs:documentation>Routing Transit Number associated with the account.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSNumericString">
+      <xs:length value="9" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="sec_code">
+    <xs:annotation>
+      <xs:documentation>Optional parameter that may be sent in request for an ACH collection if the check type is not Business.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="" />
+      <xs:enumeration value="PPD" />
+      <xs:enumeration value="WEB" />
+      <xs:enumeration value="TEL" />
+      <xs:enumeration value="CCD" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="tcs_app_id">
+    <xs:annotation>
+      <xs:documentation>The agency-assigned identifier that Pay.gov can use to look up the applicable collection options.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSAlphaNumericPlus">
+      <xs:minLength value="1" />
+      <xs:maxLength value="21" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="total_recurring_payments">
+    <xs:annotation>
+      <xs:documentation>Number of recurring payments.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="9999" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="total_installments">
+    <xs:annotation>
+      <xs:documentation>Number of installments</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="2" />
+      <xs:maxInclusive value="9999" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="transaction_amount">
+    <xs:annotation>
+      <xs:documentation>The dollar amount of the transaction.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="999999999999999999999" />
+      <xs:fractionDigits value="2" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="transaction_date">
+    <xs:annotation>
+      <xs:documentation>Transaction date the transaction was created/updated in Pay.gov.  This could be either auth_create_date or event_create_date.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSDatetime" />
+  </xs:simpleType>
+  <xs:simpleType name="transaction_status">
+    <xs:annotation>
+      <xs:documentation>status of collection processing</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="" />
+      <xs:enumeration value="Canceled" />
+      <xs:enumeration value="Failed" />
+      <xs:enumeration value="Received" />
+      <xs:enumeration value="Retired" />
+      <xs:enumeration value="Settled" />
+      <xs:enumeration value="Success" />
+      <xs:enumeration value="PartialAuth" />
+      <xs:enumeration value="Scheduled" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="authorized_amount">
+    <xs:annotation>
+      <xs:documentation>Used to support partial authorizations.  This value would represent the actual authorized or approved amount for a authorization request. </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="999999999999999999999" />
+      <xs:fractionDigits value="2" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="remaining_balance">
+    <xs:annotation>
+      <xs:documentation>Used to support partial authorizations.  This value would represent the remaining balance on a card in a partial authorization scenario.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="999999999999999999999" />
+      <xs:fractionDigits value="2" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="business_name">
+    <xs:annotation>
+      <xs:documentation>Business name supplied with the transaction.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSStringPlus">
+      <xs:maxLength value="80" />
+      <xs:minLength value="0" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="first_name">
+    <xs:annotation>
+      <xs:documentation>First name of the account holders name</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSStringPlus">
+      <xs:minLength value="0" />
+      <xs:maxLength value="25" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="middle_initial">
+    <xs:annotation>
+      <xs:documentation>Middle initial of the account holders name</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSStringPlus">
+      <xs:minLength value="0" />
+      <xs:maxLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="last_name">
+    <xs:annotation>
+      <xs:documentation>Last name of the account holders name</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSStringPlus">
+      <xs:minLength value="0" />
+      <xs:maxLength value="52" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="customFieldValue">
+    <xs:restriction base="xsd1:TCSString">
+      <xs:minLength value="0" />
+      <xs:maxLength value="255" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="classificationDataType">
+    <xs:attribute name="classification_id" type="xsd1:classification_id" use="required" />
+    <xs:attribute name="amount" type="xsd1:transaction_amount" use="required" />
+  </xs:complexType>
+  <xs:complexType name="CustomCollectionLabelAndFieldType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="label" nillable="true" type="xsd1:customFieldValue" />
+      <xs:element minOccurs="0" name="value" nillable="true" type="xsd1:customFieldValue" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:group name="nameGroup">
+    <xs:sequence>
+      <xs:element name="first_name" type="xsd1:first_name" />
+      <xs:element minOccurs="0" name="middle_initial" type="xsd1:middle_initial" />
+      <xs:element name="last_name" type="xsd1:last_name" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tcsServiceInfoGroup">
+    <xs:sequence>
+      <xs:element name="agency_id" type="xsd1:agency_id" />
+      <xs:element name="tcs_app_id" type="xsd1:tcs_app_id" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tcsMultipleItemDateQueryInfoGroup">
+    <xs:sequence>
+      <xs:element name="start_date_time" type="xsd1:TCSDatetime" />
+      <xs:element name="duration" type="xsd1:TCSDuration" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tcsMultipleItemBatchQueryInfoGroup">
+    <xs:choice>
+      <xs:element name="app_batch_id" type="xsd1:TCSStringPlus" />
+      <xs:element name="paygov_batch_id" type="xsd1:TCSAlphaNumeric" />
+    </xs:choice>
+  </xs:group>
+  <xs:group name="tcsMultipleItemBatchQueryResponseInfoGroup">
+    <xs:sequence>
+      <xs:element name="app_batch_id" type="xsd1:TCSStringPlus" />
+      <xs:element name="paygov_batch_id" type="xsd1:TCSAlphaNumeric" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tcsBatchResultsInfoGroup">
+    <xs:choice>
+      <xs:element name="app_batch_id" type="xsd1:TCSStringPlus" />
+      <xs:element name="paygov_batch_id" type="xsd1:TCSAlphaNumeric" />
+    </xs:choice>
+  </xs:group>
+  <xs:group name="tcsBatchResultsServiceLevelInfoGroup">
+    <xs:sequence>
+      <xs:element name="app_batch_id" nillable="true" type="xsd1:TCSStringPlus" />
+      <xs:element name="paygov_batch_id" nillable="true" type="xsd1:TCSAlphaNumeric" />
+      <xs:element name="batch_create_date" nillable="true" type="xsd1:TCSStringPlus" />
+      <xs:element name="net_amount" nillable="true" type="xsd1:TCSStringPlus" />
+      <xs:element name="total_amount" nillable="true" type="xsd1:TCSStringPlus" />
+      <xs:element name="transaction_count" nillable="true" type="xsd1:TCSStringPlus" />
+      <xs:element name="batch_status" nillable="true" type="xsd1:TCSStringPlus" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="serviceLevelReturnValuesGroup">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return_code" nillable="true" type="xsd1:return_code" />
+      <xs:element minOccurs="0" name="return_detail" nillable="true" type="xsd1:return_detail" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tcsQueryCommonValuesGroup">
+    <xs:sequence>
+      <xs:element name="agency_tracking_id" type="xsd1:agency_tracking_id" />
+      <xs:element name="paygov_tracking_id" type="xsd1:optionalPaygovTrackingIdType" />
+      <xs:element name="transaction_status" type="xsd1:transaction_status" />
+      <xs:element name="transaction_amount" type="xsd1:transaction_amount" />
+      <xs:element name="masked_account_number" type="xsd1:masked_account_number" />
+      <xs:element minOccurs="0" name="custom_fields" type="xsd1:query_custom_fields" />
+      <xs:group ref="xsd1:serviceLevelReturnValuesGroup" />
+      <xs:element name="account_holder_name" type="xsd1:account_holder_name" />
+      <xs:element minOccurs="0" name="account_holder_email_address" type="xsd1:email_address" />
+      <xs:element name="transaction_date" nillable="true" type="xsd1:TCSDatetime" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tcsBatchResultsCommonValuesGroup">
+    <xs:sequence>
+      <xs:element name="agency_tracking_id" type="xsd1:agency_tracking_id" />
+      <xs:element name="paygov_tracking_id" type="xsd1:optionalPaygovTrackingIdType" />
+      <xs:element name="transaction_status" type="xsd1:transaction_status" />
+      <xs:element name="transaction_amount" type="xsd1:transaction_amount" />
+      <xs:element name="masked_account_number" type="xsd1:masked_account_number" />
+      <xs:group ref="xsd1:serviceLevelReturnValuesGroup" />
+      <xs:element name="transaction_date" nillable="true" type="xsd1:TCSDatetime" />
+      <xs:element name="account_holder_name" type="xsd1:account_holder_name" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tcsBatchResultsFailedTransValuesGroup">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="agency_tracking_id" type="xsd1:optionalAgencyTrackingIdType" />
+      <xs:element minOccurs="0" name="paygov_tracking_id" type="xsd1:optionalPaygovTrackingIdType" />
+      <xs:group ref="xsd1:serviceLevelReturnValuesGroup" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tcsACHBatchResultsCommonValuesGroup">
+    <xs:sequence>
+      <xs:element name="effective_date" nillable="true" type="xsd1:effective_date" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tcsACHCommonValuesGroup">
+    <xs:sequence>
+      <xs:element name="account_type" type="xsd1:account_type" />
+      <xs:element minOccurs="0" name="effective_date" nillable="true" type="xsd1:effective_date" />
+      <xs:element name="routing_transit_number" type="xsd1:routing_transit_number" />
+      <xs:element name="sec_code" type="xsd1:sec_code" />
+      <xs:element minOccurs="0" name="return_reason_code" nillable="true" type="xsd1:return_reason_code" />
+      <xs:element minOccurs="0" name="deposit_ticket_number" nillable="true" type="xsd1:deposit_ticket_number" />
+      <xs:element minOccurs="0" name="debit_voucher_number" nillable="true" type="xsd1:debit_voucher_number" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tcsPCCommonValuesGroup">
+    <xs:sequence>
+      <xs:element name="billing_info" type="xsd1:address" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tcsPCBatchResultsAuthorizationDataCommonValuesGroup">
+    <xs:sequence>
+      <xs:element name="auth_response_code" type="xsd1:auth_response_code" />
+      <xs:element name="auth_response_text" type="xsd1:auth_response_text" />
+      <xs:element name="avs_response_code" type="xsd1:avs_response_code" />
+      <xs:element name="csc_result" type="xsd1:csc_result" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tcsPCBatchResultsHistoricTransactionDataCommonValuesGroup">
+    <xs:sequence>
+      <xs:element name="orig_paygov_tracking_id" type="xsd1:paygov_tracking_id" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tcsPCBatchResultsApprovalsCommonValuesGroup">
+    <xs:sequence>
+      <xs:element name="approval_code" type="xsd1:TCSString" />
+    </xs:sequence>
+  </xs:group>
+  <xs:simpleType name="CustomCollectionFieldType">
+    <xs:annotation>
+      <xs:documentation>Customized field that can be passed by the agency to capture agency management data.
+			</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSString">
+      <xs:minLength value="1" />
+      <xs:maxLength value="255" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TCSAccountNumber">
+    <xs:annotation>
+      <xs:documentation>
+				This simple type is used by account_number nodes for defining both Ach and Plastic Card account numbers.
+				Due to the fact that the Nacha allowable list include all characters that are currently allowed for Plastic Card numbers, 
+				the regular expression pattern contained herein is defines the Nacha list.
+				The decision to make this data type less restrictive was an attempt to minimize potential future changes causing
+				backward compatibility issues.
+				PLEASE NOTE: 
+							XSD Regular Expression special characters list 
+							[]\^.|?*+(){}-
+							These characters must be escaped by reverse slant ( \ )
+			</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="256" />
+      <xs:pattern value="[a-zA-Z0-9\s\[\]\\\^\.\|\?\*\+\(\)\{\}$`~!@#%_= ;:',/\-]*" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TCSMaskedAccountNumber">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="16" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TCSAlphaNumeric">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-zA-Z0-9\s]*" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TCSAlphaNumericPlus">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-zA-Z0-9\(\)\s\.\-_']*" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="classification_id">
+    <xs:annotation>
+      <xs:documentation>Classification Id can only contain A-Z, a-z, 0-9 (alphanumerics), only one contiguous embedded space (can contain more than one space, just not together, or at the beginning or end), and no leading and/or trailing spaces.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="0" />
+      <xs:maxLength value="24" />
+      <xs:pattern value="[a-zA-Z0-9]+(\s[a-zA-Z0-9]+)*" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TCSDate">
+    <xs:annotation>
+      <xs:documentation>The date is specified in the following form "YYYY-MM-DD" where:
+				* YYYY indicates the year
+				* MM indicates the month
+				* DD indicates the day
+				Note: All components are required!			
+			</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:date" />
+  </xs:simpleType>
+  <xs:simpleType name="TCSDuration">
+    <xs:annotation>
+      <xs:documentation>The date is specified in the following form "HH:MM:SS" where:
+				* HH is hours, max 24
+				* MM is minutes, max 59
+				* SS is seconds, max 59
+				Note: All components are required!
+				The maximum value is 24:00:00
+			</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:time" />
+  </xs:simpleType>
+  <xs:simpleType name="TCSDatetime">
+    <xs:annotation>
+      <xs:documentation>The dateTime is specified in the following form "YYYY-MM-DDThh:mm:ss" where:
+				* YYYY indicates the year
+				* MM indicates the month
+				* DD indicates the day
+				* T indicates the start of the required time section
+				* hh indicates the hour
+				* mm indicates the minute
+				* ss indicates the second
+				Note: All components are required!
+			</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:dateTime" />
+  </xs:simpleType>
+  <xs:simpleType name="TCSEmail">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([a-zA-Z0-9\-_']+(\.[a-zA-Z0-9\-_']+)*@([a-zA-Z0-9\-_]+\.)+[a-zA-Z]{2,7})?" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TCSString">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([a-zA-Z0-9\.\s\-\+\(\),:@_#$'!=/&amp;])*" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TCSStringPlus">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([a-zA-Z0-9\.\s\-\(\),:@_#'/&amp;])*" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TCSNumericString">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0-9]*" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="paygov_date_time">
+    <xs:annotation>
+      <xs:documentation>format is mmddyyyyThhmmss</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSDatetime" />
+  </xs:simpleType>
+  <xs:simpleType name="optionalPaygovTrackingIdType">
+    <xs:annotation>
+      <xs:documentation>Unique identifier generated by the Paygov system. Refined for response to allow for empty value.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSAlphaNumeric">
+      <xs:maxLength value="21" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="optionalAgencyTrackingIdType">
+    <xs:annotation>
+      <xs:documentation>Unique identifier generated by agency system. Refined for response to allow for empty value.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xsd1:TCSString">
+      <xs:maxLength value="21" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

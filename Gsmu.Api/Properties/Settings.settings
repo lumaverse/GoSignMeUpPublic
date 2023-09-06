@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Gsmu.Api.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Gsmu_Api_TPGSecureLink_TPGSecureLink" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://test.secure.touchnet.net:8703/C30002test_tlink/services/TPGSecureLink1234_wrong</Value>
+    </Setting>
+    <Setting Name="Gsmu_Api_TPGSecureLink1_TPGSecureLink" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://test.secure.touchnet.net:8703/C30002test_tlink/services/TPGSecureLink1234_wrong</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

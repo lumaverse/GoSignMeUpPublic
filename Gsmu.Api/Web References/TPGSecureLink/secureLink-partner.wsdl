@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:secureLinkImpl="http://service.secureLink.touchnet.com" xmlns:secureLinkTypes="http://types.secureLink.touchnet.com" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://service.secureLink.touchnet.com" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://types.secureLink.touchnet.com">
+      <xsd:complexType name="SecureLinkException">
+        <xsd:sequence>
+          <xsd:element name="code" type="xsd:int" />
+          <xsd:element name="description" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="nameValuePair">
+        <xsd:sequence>
+          <xsd:element name="name" type="xsd:string" />
+          <xsd:element name="value" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="GenerateSecureLinkTicketRequest">
+        <xsd:sequence>
+          <xsd:element name="ticketName" type="xsd:string" />
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="nameValuePairs" type="secureLinkTypes:nameValuePair" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="GenerateSecureLinkTicketResponse">
+        <xsd:sequence>
+          <xsd:element name="ticket" type="xsd:string" />
+          <xsd:element name="ticketExpire" type="xsd:dateTime" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="ApplicationSpecificLogData">
+        <xsd:sequence>
+          <xsd:element name="name" type="xsd:string" />
+          <xsd:element name="value" nillable="true" type="xsd:string" />
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="children" type="secureLinkTypes:ApplicationSpecificLogData" />
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="attributes" type="secureLinkTypes:ApplicationSpecificLogData" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="AuthorizeAccountRequest">
+        <xsd:sequence>
+          <xsd:element name="session" type="xsd:string" />
+          <xsd:element name="invoiceNumber" nillable="true" type="xsd:string" />
+          <xsd:element name="ancillaryData" nillable="true" type="xsd:string" />
+          <xsd:element name="application" nillable="true" type="xsd:string" />
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="logData" type="secureLinkTypes:ApplicationSpecificLogData" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="CreditCardAuthResponse">
+        <xsd:sequence>
+          <xsd:element name="approvalCode" type="xsd:string" />
+          <xsd:element name="receiptNumber" type="xsd:string" />
+          <xsd:element name="cvv2Available" type="xsd:boolean" />
+          <xsd:element name="cvv2Succeeded" type="xsd:boolean" />
+          <xsd:element name="avsAvailable" type="xsd:boolean" />
+          <xsd:element name="avsSucceeded" type="xsd:boolean" />
+          <xsd:element name="avsZipStatus" type="xsd:boolean" />
+          <xsd:element name="avsAddrStatus" type="xsd:boolean" />
+          <xsd:element name="creditCardInfo" type="secureLinkTypes:StoreCreditCardInfoResponse" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="AchMakePaymentResponse">
+        <xsd:sequence>
+          <xsd:element name="receiptNumber" type="xsd:string" />
+          <xsd:element name="agreementNumber" nillable="true" type="xsd:string" />
+          <xsd:element name="bankName" type="xsd:string" />
+          <xsd:element name="bankAddress" type="xsd:string" />
+          <xsd:element name="bankCityStateZip" type="xsd:string" />
+          <xsd:element name="maskedAccountNumber" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="StoreCreditCardInfoResponse">
+        <xsd:sequence>
+          <xsd:element name="creditCardType" type="xsd:string" />
+          <xsd:element name="maskedAccountNumber" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="AuthorizeAccountResponse">
+        <xsd:sequence>
+          <xsd:element name="ticketName" type="xsd:string" />
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="nameValuePairs" type="secureLinkTypes:nameValuePair" />
+          <xsd:element name="achResponse" nillable="true" type="secureLinkTypes:AchMakePaymentResponse" />
+          <xsd:element name="creditResponse" nillable="true" type="secureLinkTypes:CreditCardAuthResponse" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="AdjustBalanceRequest">
+        <xsd:sequence>
+          <xsd:element name="session" type="xsd:string" />
+          <xsd:element minOccurs="0" name="receiptNumber" type="xsd:string" />
+          <xsd:element name="amount" type="xsd:long" />
+          <xsd:element minOccurs="0" name="ancillaryData" nillable="true" type="xsd:string" />
+          <xsd:element minOccurs="0" name="application" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="AuthorizeRecurringAccountRequest">
+        <xsd:sequence>
+          <xsd:element name="session" type="xsd:string" />
+          <xsd:element name="amount" type="xsd:long" />
+          <xsd:element minOccurs="0" name="ancillaryData" nillable="true" type="xsd:string" />
+          <xsd:element minOccurs="0" name="application" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="AuthorizeRecurringAccountResponse">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="achResponse" nillable="true" type="secureLinkTypes:AchMakePaymentResponse" />
+          <xsd:element minOccurs="0" name="creditResponse" nillable="true" type="secureLinkTypes:CreditCardAuthResponse" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="RemoveRecurringAccountRequest">
+        <xsd:sequence>
+          <xsd:element name="session" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="ValidateRecurringAccountRequest">
+        <xsd:sequence>
+          <xsd:element name="session" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="ValidateRecurringAccountResponse">
+        <xsd:sequence>
+          <xsd:element name="valid" type="xsd:boolean" />
+          <xsd:element minOccurs="0" name="pmtMethodExpDate" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="fault" type="secureLinkTypes:SecureLinkException" />
+      <xsd:element name="generateSecureLinkTicketRequest" type="secureLinkTypes:GenerateSecureLinkTicketRequest" />
+      <xsd:element name="generateSecureLinkTicketResponse" type="secureLinkTypes:GenerateSecureLinkTicketResponse" />
+      <xsd:element name="authorizeAccountRequest" type="secureLinkTypes:AuthorizeAccountRequest" />
+      <xsd:element name="authorizeAccountResponse" type="secureLinkTypes:AuthorizeAccountResponse" />
+      <xsd:element name="adjustBalanceRequest" type="secureLinkTypes:AdjustBalanceRequest" />
+      <xsd:element name="authorizeRecurringAccountRequest" type="secureLinkTypes:AuthorizeRecurringAccountRequest" />
+      <xsd:element name="authorizeRecurringAccountResponse" type="secureLinkTypes:AuthorizeRecurringAccountResponse" />
+      <xsd:element name="removeRecurringAccountRequest" type="secureLinkTypes:RemoveRecurringAccountRequest" />
+      <xsd:element name="validateRecurringAccountRequest" type="secureLinkTypes:ValidateRecurringAccountRequest" />
+      <xsd:element name="validateRecurringAccountResponse" type="secureLinkTypes:ValidateRecurringAccountResponse" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="secureLinkException">
+    <wsdl:part name="fault" element="secureLinkTypes:fault" />
+  </wsdl:message>
+  <wsdl:message name="generateSecureLinkTicketRequest">
+    <wsdl:part name="request" element="secureLinkTypes:generateSecureLinkTicketRequest" />
+  </wsdl:message>
+  <wsdl:message name="generateSecureLinkTicketResponse">
+    <wsdl:part name="response" element="secureLinkTypes:generateSecureLinkTicketResponse" />
+  </wsdl:message>
+  <wsdl:message name="authorizeAccountRequest">
+    <wsdl:part name="request" element="secureLinkTypes:authorizeAccountRequest" />
+  </wsdl:message>
+  <wsdl:message name="authorizeAccountResponse">
+    <wsdl:part name="response" element="secureLinkTypes:authorizeAccountResponse" />
+  </wsdl:message>
+  <wsdl:message name="adjustBalanceRequest">
+    <wsdl:part name="request" element="secureLinkTypes:adjustBalanceRequest" />
+  </wsdl:message>
+  <wsdl:message name="emptyResponse" />
+  <wsdl:message name="authorizeRecurringAccountRequest">
+    <wsdl:part name="request" element="secureLinkTypes:authorizeRecurringAccountRequest" />
+  </wsdl:message>
+  <wsdl:message name="authorizeRecurringAccountResponse">
+    <wsdl:part name="response" element="secureLinkTypes:authorizeRecurringAccountResponse" />
+  </wsdl:message>
+  <wsdl:message name="removeRecurringAccountRequest">
+    <wsdl:part name="request" element="secureLinkTypes:removeRecurringAccountRequest" />
+  </wsdl:message>
+  <wsdl:message name="validateRecurringAccountRequest">
+    <wsdl:part name="request" element="secureLinkTypes:validateRecurringAccountRequest" />
+  </wsdl:message>
+  <wsdl:message name="validateRecurringAccountResponse">
+    <wsdl:part name="response" element="secureLinkTypes:validateRecurringAccountResponse" />
+  </wsdl:message>
+  <wsdl:portType name="TPGSecureLink">
+    <wsdl:operation name="generateSecureLinkTicket">
+      <wsdl:input name="generateSecureLinkTicketRequest" message="secureLinkImpl:generateSecureLinkTicketRequest" />
+      <wsdl:output name="generateSecureLinkTicketResponse" message="secureLinkImpl:generateSecureLinkTicketResponse" />
+      <wsdl:fault name="secureLinkException" message="secureLinkImpl:secureLinkException" />
+    </wsdl:operation>
+    <wsdl:operation name="authorizeAccount">
+      <wsdl:input name="authorizeAccountRequest" message="secureLinkImpl:authorizeAccountRequest" />
+      <wsdl:output name="authorizeAccountResponse" message="secureLinkImpl:authorizeAccountResponse" />
+      <wsdl:fault name="secureLinkException" message="secureLinkImpl:secureLinkException" />
+    </wsdl:operation>
+    <wsdl:operation name="adjustBalance">
+      <wsdl:input name="adjustBalanceRequest" message="secureLinkImpl:adjustBalanceRequest" />
+      <wsdl:output name="adjustBalanceResponse" message="secureLinkImpl:emptyResponse" />
+      <wsdl:fault name="secureLinkException" message="secureLinkImpl:secureLinkException" />
+    </wsdl:operation>
+    <wsdl:operation name="authorizeRecurringAccount">
+      <wsdl:input name="authorizeRecurringAccountRequest" message="secureLinkImpl:authorizeRecurringAccountRequest" />
+      <wsdl:output name="authorizeRecurringAccountResponse" message="secureLinkImpl:authorizeRecurringAccountResponse" />
+      <wsdl:fault name="secureLinkException" message="secureLinkImpl:secureLinkException" />
+    </wsdl:operation>
+    <wsdl:operation name="removeRecurringAccount">
+      <wsdl:input name="removeRecurringAccountRequest" message="secureLinkImpl:removeRecurringAccountRequest" />
+      <wsdl:output name="removeRecurringAccountResponse" message="secureLinkImpl:emptyResponse" />
+      <wsdl:fault name="secureLinkException" message="secureLinkImpl:secureLinkException" />
+    </wsdl:operation>
+    <wsdl:operation name="validateRecurringAccount">
+      <wsdl:input name="validateRecurringAccountRequest" message="secureLinkImpl:validateRecurringAccountRequest" />
+      <wsdl:output name="validateRecurringAccountResponse" message="secureLinkImpl:validateRecurringAccountResponse" />
+      <wsdl:fault name="secureLinkException" message="secureLinkImpl:secureLinkException" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="TPGSecureLink" type="secureLinkImpl:TPGSecureLink">
+    <wsdlsoap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="generateSecureLinkTicket">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="generateSecureLinkTicketRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="generateSecureLinkTicketResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="secureLinkException">
+        <wsdlsoap:fault use="literal" name="secureLinkException" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="authorizeAccount">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="authorizeAccountRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="authorizeAccountResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="secureLinkException">
+        <wsdlsoap:fault use="literal" name="secureLinkException" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="adjustBalance">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="adjustBalanceRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="adjustBalanceResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="secureLinkException">
+        <wsdlsoap:fault use="literal" name="secureLinkException" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="authorizeRecurringAccount">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="authorizeRecurringAccountRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="authorizeRecurringAccountResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="secureLinkException">
+        <wsdlsoap:fault use="literal" name="secureLinkException" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="removeRecurringAccount">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="removeRecurringAccountRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="removeRecurringAccountResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="secureLinkException">
+        <wsdlsoap:fault use="literal" name="secureLinkException" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="validateRecurringAccount">
+      <wsdlsoap:operation soapAction="" />
+      <wsdl:input name="validateRecurringAccountRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="validateRecurringAccountResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="secureLinkException">
+        <wsdlsoap:fault use="literal" name="secureLinkException" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="TPGSecureLink">
+    <wsdl:port name="TPGSecureLink" binding="secureLinkImpl:TPGSecureLink">
+      <wsdlsoap:address location="https://test.secure.touchnet.net:8703/C30002test_tlink/services/TPGSecureLink1234_wrong" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

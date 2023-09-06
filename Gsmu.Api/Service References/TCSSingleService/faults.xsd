@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xsd1="http://fms.treas.gov/tcs/schemas" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://fms.treas.gov/tcs/schemas" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="ErrorResponse" type="xsd1:error_message" />
+  <xs:simpleType name="id">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="4" />
+      <xs:maxLength value="4" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="description">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="256" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="error_message">
+    <xs:sequence>
+      <xs:element name="message_id" type="xsd1:id" />
+      <xs:element name="message_description" type="xsd1:description" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

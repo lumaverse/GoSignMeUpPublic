@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://fms.treas.gov/services/common" targetNamespace="http://fms.treas.gov/services/common" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="AccountHolderName">
+    <xs:restriction base="tns:TCSStringPlus">
+      <xs:minLength value="1" />
+      <xs:maxLength value="80" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="BillingAddress">
+    <xs:restriction base="tns:TCSStringPlus">
+      <xs:maxLength value="80" />
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="BillingCity">
+    <xs:restriction base="tns:TCSAlphaNumericPlus">
+      <xs:maxLength value="40" />
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="BillingState">
+    <xs:restriction base="tns:TCSAlphaNumericPlus">
+      <xs:maxLength value="2" />
+      <xs:minLength value="2" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="BillingZip">
+    <xs:restriction base="tns:TCSAlphaNumericPlus">
+      <xs:maxLength value="20" />
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TCSDollarAmount">
+    <xs:restriction base="tns:DollarAmount">
+      <xs:minInclusive value="0.01" />
+      <xs:maxInclusive value="99999999.99" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DollarAmount">
+    <xs:restriction base="xs:decimal">
+      <xs:fractionDigits value="2" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TCSApplicationID">
+    <xs:annotation>
+      <xs:documentation>The agency-assigned identifier that Pay.gov can use to look up the applicable collection options.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="tns:TCSAlphaNumericPlus">
+      <xs:minLength value="1" />
+      <xs:maxLength value="21" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="paygov_tracking_id">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="21" />
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="AgencyTrackingID">
+    <xs:restriction base="tns:TCSStringASCII2">
+      <xs:maxLength value="21" />
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TCSNumericString">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0-9]*" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TCSAlphaNumericPlus">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-zA-Z0-9\(\)\s\.\-_']*" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TCSStringASCII2">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([a-zA-Z0-9\.\s\-\(\),:@_#$'/&amp;])*" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="CustomFieldValue">
+    <xs:restriction base="tns:TCSString">
+      <xs:minLength value="0" />
+      <xs:maxLength value="255" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TCSString">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([a-zA-Z0-9\.\s\-\+\(\),:@_#$'!=/&amp;])*" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TCSStringPlus">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([a-zA-Z0-9\.\s\-\(\),:@_#'/&amp;])*" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TCSEmail">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([a-zA-Z0-9\-_']+(\.[a-zA-Z0-9\-_']+)*@([a-zA-Z0-9\-_]+\.)+[a-zA-Z]{2,7})?" />
+      <xs:minLength value="0" />
+      <xs:maxLength value="80" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TCSCountryCode">
+    <xs:annotation>
+      <xs:documentation>3-digit numeric ISO country code</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="tns:TCSNumericString">
+      <xs:maxLength value="3" />
+      <xs:minLength value="3" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

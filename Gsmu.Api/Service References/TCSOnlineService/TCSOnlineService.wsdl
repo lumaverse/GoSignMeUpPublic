@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://fms.treas.gov/services/tcsonline" name="TCSOnlineService" targetNamespace="http://fms.treas.gov/services/tcsonline" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xsd:schema>
+      <xsd:import schemaLocation="TCSOnlineService.xsd" namespace="http://fms.treas.gov/services/tcsonline" />
+    </xsd:schema>
+  </types>
+  <message name="startOnlineCollection">
+    <part name="parameters" element="tns:startOnlineCollection" />
+  </message>
+  <message name="startOnlineCollectionResponse">
+    <part name="parameters" element="tns:startOnlineCollectionResponse" />
+  </message>
+  <message name="TCSServiceFault">
+    <part name="fault" element="tns:TCSServiceFault" />
+  </message>
+  <message name="completeOnlineCollection">
+    <part name="parameters" element="tns:completeOnlineCollection" />
+  </message>
+  <message name="completeOnlineCollectionResponse">
+    <part name="parameters" element="tns:completeOnlineCollectionResponse" />
+  </message>
+  <message name="completeOnlineCollectionWithDetails">
+    <part name="parameters" element="tns:completeOnlineCollectionWithDetails" />
+  </message>
+  <message name="completeOnlineCollectionWithDetailsResponse">
+    <part name="parameters" element="tns:completeOnlineCollectionWithDetailsResponse" />
+  </message>
+  <message name="createForce">
+    <part name="parameters" element="tns:createForce" />
+  </message>
+  <message name="createForceResponse">
+    <part name="parameters" element="tns:createForceResponse" />
+  </message>
+  <message name="createForceWithDetails">
+    <part name="parameters" element="tns:createForceWithDetails" />
+  </message>
+  <message name="createForceWithDetailsResponse">
+    <part name="parameters" element="tns:createForceWithDetailsResponse" />
+  </message>
+  <message name="getDetails">
+    <part name="parameters" element="tns:getDetails" />
+  </message>
+  <message name="getDetailsResponse">
+    <part name="parameters" element="tns:getDetailsResponse" />
+  </message>
+  <portType name="TCSOnlineService">
+    <operation name="startOnlineCollection">
+      <input message="tns:startOnlineCollection" />
+      <output message="tns:startOnlineCollectionResponse" />
+      <fault name="TCSServiceFault" message="tns:TCSServiceFault" />
+    </operation>
+    <operation name="completeOnlineCollection">
+      <input message="tns:completeOnlineCollection" />
+      <output message="tns:completeOnlineCollectionResponse" />
+      <fault name="TCSServiceFault" message="tns:TCSServiceFault" />
+    </operation>
+    <operation name="completeOnlineCollectionWithDetails">
+      <input message="tns:completeOnlineCollectionWithDetails" />
+      <output message="tns:completeOnlineCollectionWithDetailsResponse" />
+      <fault name="TCSServiceFault" message="tns:TCSServiceFault" />
+    </operation>
+    <operation name="createForce">
+      <input message="tns:createForce" />
+      <output message="tns:createForceResponse" />
+      <fault name="TCSServiceFault" message="tns:TCSServiceFault" />
+    </operation>
+    <operation name="createForceWithDetails">
+      <input message="tns:createForceWithDetails" />
+      <output message="tns:createForceWithDetailsResponse" />
+      <fault name="TCSServiceFault" message="tns:TCSServiceFault" />
+    </operation>
+    <operation name="getDetails">
+      <input message="tns:getDetails" />
+      <output message="tns:getDetailsResponse" />
+      <fault name="TCSServiceFault" message="tns:TCSServiceFault" />
+    </operation>
+  </portType>
+  <binding name="TCSOnlineServicePortBinding" type="tns:TCSOnlineService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="startOnlineCollection">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="TCSServiceFault">
+        <soap:fault use="literal" name="TCSServiceFault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="completeOnlineCollection">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="TCSServiceFault">
+        <soap:fault use="literal" name="TCSServiceFault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="completeOnlineCollectionWithDetails">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="TCSServiceFault">
+        <soap:fault use="literal" name="TCSServiceFault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="createForce">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="TCSServiceFault">
+        <soap:fault use="literal" name="TCSServiceFault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="createForceWithDetails">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="TCSServiceFault">
+        <soap:fault use="literal" name="TCSServiceFault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getDetails">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+      <fault name="TCSServiceFault">
+        <soap:fault use="literal" name="TCSServiceFault" namespace="" />
+      </fault>
+    </operation>
+  </binding>
+  <service name="TCSOnlineService">
+    <port name="TCSOnlineServicePort" binding="tns:TCSOnlineServicePortBinding">
+      <soap:address location="https://qa.tcs.pay.gov/services/TCSOnlineService/2.0/" />
+    </port>
+  </service>
+</definitions>

@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="Events.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="events">
+          <Key>
+            <PropertyRef Name="eventid" />
+          </Key>
+          <Property Name="eventid" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Insertdate" Type="datetime" />
+          <Property Name="title" Type="nvarchar" MaxLength="50" />
+          <Property Name="description" Type="ntext" />
+          <Property Name="featuredspeaker" Type="nvarchar" MaxLength="50" />
+          <Property Name="Location" Type="nvarchar" MaxLength="50" />
+          <Property Name="DateStart" Type="nvarchar" MaxLength="100" />
+          <Property Name="DateEnd" Type="nvarchar" MaxLength="100" />
+          <Property Name="Eventtime" Type="nvarchar" MaxLength="50" />
+          <Property Name="ContactInfo" Type="nvarchar" MaxLength="100" />
+          <Property Name="ContactEmail" Type="nvarchar" MaxLength="50" />
+          <Property Name="WebsiteLink" Type="nvarchar" MaxLength="100" />
+          <Property Name="Display" Type="nvarchar" MaxLength="1" />
+          <Property Name="Priority" Type="int" />
+          <Property Name="Fees" Type="nvarchar" MaxLength="50" />
+          <Property Name="NeedsReview" Type="nvarchar" MaxLength="1" />
+          <Property Name="CID" Type="int" />
+          <Property Name="rrequest" Type="nvarchar" MaxLength="50" />
+          <Property Name="requestinfo" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="MasterInfo">
+          <Key>
+            <PropertyRef Name="MID" />
+          </Key>
+          <Property Name="MID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MPublicAdd" Type="int" />
+        </EntityType>
+        <EntityContainer Name="EventsStoreContainer">
+          <EntitySet Name="events" EntityType="Self.events" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MasterInfo" EntityType="Self.MasterInfo" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="Events" Alias="Self" p1:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:p1="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="EventsEntities" p1:LazyLoadingEnabled="true">
+          <EntitySet Name="events" EntityType="Events.event" />
+          <EntitySet Name="MasterInfoes" EntityType="Events.MasterInfo" />
+        </EntityContainer>
+        <EntityType Name="event">
+          <Key>
+            <PropertyRef Name="eventid" />
+          </Key>
+          <Property Name="eventid" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="Insertdate" Type="DateTime" Precision="3" />
+          <Property Name="title" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="description" Type="String" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="featuredspeaker" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Location" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="DateStart" Type="String" MaxLength="100" Unicode="true" FixedLength="false" />
+          <Property Name="DateEnd" Type="String" MaxLength="100" Unicode="true" FixedLength="false" />
+          <Property Name="Eventtime" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="ContactInfo" Type="String" MaxLength="100" Unicode="true" FixedLength="false" />
+          <Property Name="ContactEmail" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="WebsiteLink" Type="String" MaxLength="100" Unicode="true" FixedLength="false" />
+          <Property Name="Display" Type="String" MaxLength="1" Unicode="true" FixedLength="false" />
+          <Property Name="Priority" Type="Int32" />
+          <Property Name="Fees" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="NeedsReview" Type="String" MaxLength="1" Unicode="true" FixedLength="false" />
+          <Property Name="CID" Type="Int32" />
+          <Property Name="rrequest" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="requestinfo" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="MasterInfo">
+          <Key>
+            <PropertyRef Name="MID" />
+          </Key>
+          <Property Name="MID" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="MPublicAdd" Type="Int32" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="EventsStoreContainer" CdmEntityContainer="EventsEntities">
+          <EntitySetMapping Name="events">
+            <EntityTypeMapping TypeName="Events.event">
+              <MappingFragment StoreEntitySet="events">
+                <ScalarProperty Name="eventid" ColumnName="eventid" />
+                <ScalarProperty Name="Insertdate" ColumnName="Insertdate" />
+                <ScalarProperty Name="title" ColumnName="title" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="featuredspeaker" ColumnName="featuredspeaker" />
+                <ScalarProperty Name="Location" ColumnName="Location" />
+                <ScalarProperty Name="DateStart" ColumnName="DateStart" />
+                <ScalarProperty Name="DateEnd" ColumnName="DateEnd" />
+                <ScalarProperty Name="Eventtime" ColumnName="Eventtime" />
+                <ScalarProperty Name="ContactInfo" ColumnName="ContactInfo" />
+                <ScalarProperty Name="ContactEmail" ColumnName="ContactEmail" />
+                <ScalarProperty Name="WebsiteLink" ColumnName="WebsiteLink" />
+                <ScalarProperty Name="Display" ColumnName="Display" />
+                <ScalarProperty Name="Priority" ColumnName="Priority" />
+                <ScalarProperty Name="Fees" ColumnName="Fees" />
+                <ScalarProperty Name="NeedsReview" ColumnName="NeedsReview" />
+                <ScalarProperty Name="CID" ColumnName="CID" />
+                <ScalarProperty Name="rrequest" ColumnName="rrequest" />
+                <ScalarProperty Name="requestinfo" ColumnName="requestinfo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MasterInfoes">
+            <EntityTypeMapping TypeName="Events.MasterInfo">
+              <MappingFragment StoreEntitySet="MasterInfo">
+                <ScalarProperty Name="MID" ColumnName="MID" />
+                <ScalarProperty Name="MPublicAdd" ColumnName="MPublicAdd" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

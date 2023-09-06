@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="94c55468-36c8-446d-a48b-7ac301a92125" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="C:\websites\lang2\resources\wsdl\TCSSingleService.wsdl" Protocol="file" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="level3.xsd" MetadataType="Schema" ID="65e70bc7-adf1-4933-8541-524fc3dc24f9" SourceId="1" SourceUrl="file:///C:/websites/lang2/resources/wsdl/level3.xsd" />
+    <MetadataFile FileName="common_types.xsd" MetadataType="Schema" ID="a7c2b7f4-e422-4a15-a6e9-5102ee7b7cac" SourceId="1" SourceUrl="file:///C:/websites/lang2/resources/wsdl/common_types.xsd" />
+    <MetadataFile FileName="transaction_types.xsd" MetadataType="Schema" ID="36cf3a40-77ab-49cf-9c28-4b2759ab6dd2" SourceId="1" SourceUrl="file:///C:/websites/lang2/resources/wsdl/transaction_types.xsd" />
+    <MetadataFile FileName="faults.xsd" MetadataType="Schema" ID="014e5719-0203-4641-b68f-b76d99987c09" SourceId="1" SourceUrl="file:///C:/websites/lang2/resources/wsdl/faults.xsd" />
+    <MetadataFile FileName="TCSSingleService.wsdl" MetadataType="Wsdl" ID="f290cb04-0648-453a-9b97-18ca4093b79c" SourceId="1" SourceUrl="file:///C:/websites/lang2/resources/wsdl/TCSSingleService.wsdl" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

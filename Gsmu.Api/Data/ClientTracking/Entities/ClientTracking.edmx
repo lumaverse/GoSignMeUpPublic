@@ -1,0 +1,361 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="ClientTracking.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Assessment">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="assessment_date" Type="datetime" />
+          <Property Name="points_earned" Type="int" />
+          <Property Name="possible_points" Type="int" />
+          <Property Name="user_ip" Type="varchar" MaxLength="15" />
+        </EntityType>
+        <EntityType Name="AssessmentQuestion">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="assessment_id" Type="int" />
+          <Property Name="question" Type="nvarchar" MaxLength="800" />
+          <Property Name="answer" Type="nvarchar" MaxLength="800" />
+          <Property Name="question_points_earned" Type="int" />
+          <Property Name="question_possible_points" Type="int" />
+          <Property Name="question_num" Type="int" />
+          <Property Name="section_num" Type="int" />
+          <Property Name="section_name" Type="nvarchar" MaxLength="800" />
+          <Property Name="section_question_num" Type="int" />
+        </EntityType>
+        <EntityType Name="GosignmeupRegistrations">
+          <Key>
+            <PropertyRef Name="GRID" />
+          </Key>
+          <Property Name="GRID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="GRClientName" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="GRClientDomainName" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="GRInsertDate" Type="datetime" Nullable="false" />
+          <Property Name="GRStudentName" Type="nvarchar" MaxLength="150" />
+          <Property Name="GRCourse" Type="nvarchar" MaxLength="150" />
+          <Property Name="GREnrollType" Type="nvarchar" MaxLength="25" />
+          <Property Name="GROrderNumber" Type="nvarchar" MaxLength="25" Nullable="false" />
+        </EntityType>
+        <EntityType Name="GosignmeupRegStatClient">
+          <Key>
+            <PropertyRef Name="GosignmeupRegStatClientId" />
+          </Key>
+          <Property Name="GosignmeupRegStatClientId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="GosignmeupRegStatClientSQLIP" Type="nchar" MaxLength="16" />
+          <Property Name="GosignmeupRegStatClientSQLDB" Type="nchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="GosignmeupStudentCount">
+          <Key>
+            <PropertyRef Name="GSCID" />
+          </Key>
+          <Property Name="GSCID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="GSCClientName" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="GSCClientDomainName" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="GSCInsertDate" Type="datetime" Nullable="false" />
+          <Property Name="GSCStudentCount" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Newsletter">
+          <Key>
+            <PropertyRef Name="NewsletterUId" />
+          </Key>
+          <Property Name="NewsletterUId" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Filename" Type="nvarchar" MaxLength="256" Nullable="false" />
+          <Property Name="Filesize" Type="int" Nullable="false" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="NewsletterTag">
+          <Key>
+            <PropertyRef Name="NewsletterTagUId" />
+          </Key>
+          <Property Name="NewsletterTagUId" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Tag" Type="nvarchar" MaxLength="256" Nullable="false" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+          <Property Name="NewsletterId" Type="bigint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PerformanceStats">
+          <Key>
+            <PropertyRef Name="PerformanceStatsId" />
+          </Key>
+          <Property Name="PerformanceStatsId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ClientName" Type="nvarchar" MaxLength="150" />
+          <Property Name="RoutineName" Type="nvarchar" MaxLength="255" />
+          <Property Name="ServerSeconds" Type="real" />
+          <Property Name="ClientSeconds" Type="real" />
+          <Property Name="DateTimeRan" Type="datetime" />
+        </EntityType>
+        <Association Name="FK_NewsletterTag_Newsletter">
+          <End Role="Newsletter" Type="Self.Newsletter" Multiplicity="1" />
+          <End Role="NewsletterTag" Type="Self.NewsletterTag" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Newsletter">
+              <PropertyRef Name="NewsletterUId" />
+            </Principal>
+            <Dependent Role="NewsletterTag">
+              <PropertyRef Name="NewsletterId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="ClientTrackingStoreContainer">
+          <EntitySet Name="Assessment" EntityType="Self.Assessment" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AssessmentQuestion" EntityType="Self.AssessmentQuestion" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="GosignmeupRegistrations" EntityType="Self.GosignmeupRegistrations" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="GosignmeupRegStatClient" EntityType="Self.GosignmeupRegStatClient" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="GosignmeupStudentCount" EntityType="Self.GosignmeupStudentCount" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Newsletter" EntityType="Self.Newsletter" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="NewsletterTag" EntityType="Self.NewsletterTag" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PerformanceStats" EntityType="Self.PerformanceStats" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_NewsletterTag_Newsletter" Association="Self.FK_NewsletterTag_Newsletter">
+            <End Role="Newsletter" EntitySet="Newsletter" />
+            <End Role="NewsletterTag" EntitySet="NewsletterTag" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="ClientTracking" Alias="Self" p1:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:p1="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="ClientTrackingEntities" p1:LazyLoadingEnabled="true">
+          <EntitySet Name="GosignmeupRegistrations" EntityType="ClientTracking.GosignmeupRegistration" />
+          <EntitySet Name="GosignmeupRegStatClients" EntityType="ClientTracking.GosignmeupRegStatClient" />
+          <EntitySet Name="GosignmeupStudentCounts" EntityType="ClientTracking.GosignmeupStudentCount" />
+          <EntitySet Name="Newsletters" EntityType="ClientTracking.Newsletter" />
+          <EntitySet Name="NewsletterTags" EntityType="ClientTracking.NewsletterTag" />
+          <EntitySet Name="PerformanceStats" EntityType="ClientTracking.PerformanceStat" />
+          <AssociationSet Name="FK_NewsletterTag_Newsletter" Association="ClientTracking.FK_NewsletterTag_Newsletter">
+            <End Role="Newsletter" EntitySet="Newsletters" />
+            <End Role="NewsletterTag" EntitySet="NewsletterTags" />
+          </AssociationSet>
+          <EntitySet Name="Assessments" EntityType="ClientTracking.Assessment" />
+          <EntitySet Name="AssessmentQuestions" EntityType="ClientTracking.AssessmentQuestion" />
+        </EntityContainer>
+        <EntityType Name="GosignmeupRegistration">
+          <Key>
+            <PropertyRef Name="GRID" />
+          </Key>
+          <Property Name="GRID" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="GRClientName" Type="String" Nullable="false" MaxLength="150" Unicode="true" FixedLength="false" />
+          <Property Name="GRClientDomainName" Type="String" Nullable="false" MaxLength="150" Unicode="true" FixedLength="false" />
+          <Property Name="GRInsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="GRStudentName" Type="String" MaxLength="150" Unicode="true" FixedLength="false" />
+          <Property Name="GRCourse" Type="String" MaxLength="150" Unicode="true" FixedLength="false" />
+          <Property Name="GREnrollType" Type="String" MaxLength="25" Unicode="true" FixedLength="false" />
+          <Property Name="GROrderNumber" Type="String" Nullable="false" MaxLength="25" Unicode="true" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="GosignmeupRegStatClient">
+          <Key>
+            <PropertyRef Name="GosignmeupRegStatClientId" />
+          </Key>
+          <Property Name="GosignmeupRegStatClientId" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="GosignmeupRegStatClientSQLIP" Type="String" MaxLength="16" Unicode="true" FixedLength="true" />
+          <Property Name="GosignmeupRegStatClientSQLDB" Type="String" MaxLength="50" Unicode="true" FixedLength="true" />
+        </EntityType>
+        <EntityType Name="GosignmeupStudentCount">
+          <Key>
+            <PropertyRef Name="GSCID" />
+          </Key>
+          <Property Name="GSCID" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="GSCClientName" Type="String" Nullable="false" MaxLength="150" Unicode="true" FixedLength="false" />
+          <Property Name="GSCClientDomainName" Type="String" Nullable="false" MaxLength="150" Unicode="true" FixedLength="false" />
+          <Property Name="GSCInsertDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="GSCStudentCount" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Newsletter">
+          <Key>
+            <PropertyRef Name="NewsletterUId" />
+          </Key>
+          <Property Name="NewsletterUId" Type="Int64" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="Filename" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
+          <Property Name="Filesize" Type="Int32" Nullable="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Title" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="NewsletterTags" Relationship="ClientTracking.FK_NewsletterTag_Newsletter" FromRole="Newsletter" ToRole="NewsletterTag" />
+        </EntityType>
+        <EntityType Name="NewsletterTag">
+          <Key>
+            <PropertyRef Name="NewsletterTagUId" />
+          </Key>
+          <Property Name="NewsletterTagUId" Type="Int64" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="Tag" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="NewsletterId" Type="Int64" Nullable="false" />
+          <NavigationProperty Name="Newsletter" Relationship="ClientTracking.FK_NewsletterTag_Newsletter" FromRole="NewsletterTag" ToRole="Newsletter" />
+        </EntityType>
+        <EntityType Name="PerformanceStat">
+          <Key>
+            <PropertyRef Name="PerformanceStatsId" />
+          </Key>
+          <Property Name="PerformanceStatsId" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="ClientName" Type="String" MaxLength="150" Unicode="true" FixedLength="false" />
+          <Property Name="RoutineName" Type="String" MaxLength="255" Unicode="true" FixedLength="false" />
+          <Property Name="ServerSeconds" Type="Single" />
+          <Property Name="ClientSeconds" Type="Single" />
+          <Property Name="DateTimeRan" Type="DateTime" Precision="3" />
+        </EntityType>
+        <Association Name="FK_NewsletterTag_Newsletter">
+          <End Role="Newsletter" Type="ClientTracking.Newsletter" Multiplicity="1" />
+          <End Role="NewsletterTag" Type="ClientTracking.NewsletterTag" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Newsletter">
+              <PropertyRef Name="NewsletterUId" />
+            </Principal>
+            <Dependent Role="NewsletterTag">
+              <PropertyRef Name="NewsletterId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Assessment">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="DateTime" Name="assessment_date" Precision="3" />
+          <Property Type="Int32" Name="points_earned" />
+          <Property Type="Int32" Name="possible_points" />
+          <Property Type="String" Name="user_ip" MaxLength="15" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="AssessmentQuestion">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="assessment_id" />
+          <Property Type="String" Name="question" MaxLength="800" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="answer" MaxLength="800" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="question_points_earned" />
+          <Property Type="Int32" Name="question_possible_points" />
+          <Property Type="Int32" Name="question_num" />
+          <Property Type="Int32" Name="section_num" />
+          <Property Type="String" Name="section_name" MaxLength="800" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="section_question_num" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ClientTrackingStoreContainer" CdmEntityContainer="ClientTrackingEntities">
+          <EntitySetMapping Name="GosignmeupRegistrations">
+            <EntityTypeMapping TypeName="ClientTracking.GosignmeupRegistration">
+              <MappingFragment StoreEntitySet="GosignmeupRegistrations">
+                <ScalarProperty Name="GRID" ColumnName="GRID" />
+                <ScalarProperty Name="GRClientName" ColumnName="GRClientName" />
+                <ScalarProperty Name="GRClientDomainName" ColumnName="GRClientDomainName" />
+                <ScalarProperty Name="GRInsertDate" ColumnName="GRInsertDate" />
+                <ScalarProperty Name="GRStudentName" ColumnName="GRStudentName" />
+                <ScalarProperty Name="GRCourse" ColumnName="GRCourse" />
+                <ScalarProperty Name="GREnrollType" ColumnName="GREnrollType" />
+                <ScalarProperty Name="GROrderNumber" ColumnName="GROrderNumber" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="GosignmeupRegStatClients">
+            <EntityTypeMapping TypeName="ClientTracking.GosignmeupRegStatClient">
+              <MappingFragment StoreEntitySet="GosignmeupRegStatClient">
+                <ScalarProperty Name="GosignmeupRegStatClientId" ColumnName="GosignmeupRegStatClientId" />
+                <ScalarProperty Name="GosignmeupRegStatClientSQLIP" ColumnName="GosignmeupRegStatClientSQLIP" />
+                <ScalarProperty Name="GosignmeupRegStatClientSQLDB" ColumnName="GosignmeupRegStatClientSQLDB" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="GosignmeupStudentCounts">
+            <EntityTypeMapping TypeName="ClientTracking.GosignmeupStudentCount">
+              <MappingFragment StoreEntitySet="GosignmeupStudentCount">
+                <ScalarProperty Name="GSCID" ColumnName="GSCID" />
+                <ScalarProperty Name="GSCClientName" ColumnName="GSCClientName" />
+                <ScalarProperty Name="GSCClientDomainName" ColumnName="GSCClientDomainName" />
+                <ScalarProperty Name="GSCInsertDate" ColumnName="GSCInsertDate" />
+                <ScalarProperty Name="GSCStudentCount" ColumnName="GSCStudentCount" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Newsletters">
+            <EntityTypeMapping TypeName="ClientTracking.Newsletter">
+              <MappingFragment StoreEntitySet="Newsletter">
+                <ScalarProperty Name="NewsletterUId" ColumnName="NewsletterUId" />
+                <ScalarProperty Name="Filename" ColumnName="Filename" />
+                <ScalarProperty Name="Filesize" ColumnName="Filesize" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="NewsletterTags">
+            <EntityTypeMapping TypeName="ClientTracking.NewsletterTag">
+              <MappingFragment StoreEntitySet="NewsletterTag">
+                <ScalarProperty Name="NewsletterTagUId" ColumnName="NewsletterTagUId" />
+                <ScalarProperty Name="Tag" ColumnName="Tag" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="NewsletterId" ColumnName="NewsletterId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PerformanceStats">
+            <EntityTypeMapping TypeName="ClientTracking.PerformanceStat">
+              <MappingFragment StoreEntitySet="PerformanceStats">
+                <ScalarProperty Name="PerformanceStatsId" ColumnName="PerformanceStatsId" />
+                <ScalarProperty Name="ClientName" ColumnName="ClientName" />
+                <ScalarProperty Name="RoutineName" ColumnName="RoutineName" />
+                <ScalarProperty Name="ServerSeconds" ColumnName="ServerSeconds" />
+                <ScalarProperty Name="ClientSeconds" ColumnName="ClientSeconds" />
+                <ScalarProperty Name="DateTimeRan" ColumnName="DateTimeRan" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Assessments">
+            <EntityTypeMapping TypeName="ClientTracking.Assessment">
+              <MappingFragment StoreEntitySet="Assessment">
+                <ScalarProperty Name="user_ip" ColumnName="user_ip" />
+                <ScalarProperty Name="possible_points" ColumnName="possible_points" />
+                <ScalarProperty Name="points_earned" ColumnName="points_earned" />
+                <ScalarProperty Name="assessment_date" ColumnName="assessment_date" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AssessmentQuestions">
+            <EntityTypeMapping TypeName="ClientTracking.AssessmentQuestion">
+              <MappingFragment StoreEntitySet="AssessmentQuestion">
+                <ScalarProperty Name="section_question_num" ColumnName="section_question_num" />
+                <ScalarProperty Name="section_name" ColumnName="section_name" />
+                <ScalarProperty Name="section_num" ColumnName="section_num" />
+                <ScalarProperty Name="question_num" ColumnName="question_num" />
+                <ScalarProperty Name="question_possible_points" ColumnName="question_possible_points" />
+                <ScalarProperty Name="question_points_earned" ColumnName="question_points_earned" />
+                <ScalarProperty Name="answer" ColumnName="answer" />
+                <ScalarProperty Name="question" ColumnName="question" />
+                <ScalarProperty Name="assessment_id" ColumnName="assessment_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

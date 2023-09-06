@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="c5b3215fb26041fcbba5b0e52ba815e8" Name="Diagram1">
+        <EntityTypeShape EntityType="Survey.AnswerComment" Width="1.5" PointX="5.25" PointY="12.625" />
+        <EntityTypeShape EntityType="Survey.AnswerMultiple" Width="1.5" PointX="5.25" PointY="9.625" />
+        <EntityTypeShape EntityType="Survey.AnswerTextArea" Width="1.5" PointX="5.25" PointY="6.625" />
+        <EntityTypeShape EntityType="Survey.Color" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="Survey.CourseSurvey" Width="1.5" PointX="2.75" PointY="0.75" />
+        <EntityTypeShape EntityType="Survey.dtproperty" Width="1.5" PointX="4.75" PointY="0.75" />
+        <EntityTypeShape EntityType="Survey.masterinfo" Width="1.5" PointX="6.75" PointY="0.75" />
+        <EntityTypeShape EntityType="Survey.Question" Width="1.5" PointX="3" PointY="10.75" />
+        <EntityTypeShape EntityType="Survey.QuestionAnswerChoice" Width="1.5" PointX="7.75" PointY="4.75" />
+        <EntityTypeShape EntityType="Survey.ReportRequest" Width="1.5" PointX="3" PointY="14.875" />
+        <EntityTypeShape EntityType="Survey.ReportSetting" Width="1.5" PointX="3" PointY="3.875" />
+        <EntityTypeShape EntityType="Survey.SupplementalQuestion" Width="1.5" PointX="7.75" PointY="7.75" />
+        <EntityTypeShape EntityType="Survey.Survey" Width="1.5" PointX="0.75" PointY="9" />
+        <EntityTypeShape EntityType="Survey.User" Width="1.5" PointX="3" PointY="7.25" />
+        <AssociationConnector Association="Survey.Fk_Question_AnswerComments_QuestionID" />
+        <AssociationConnector Association="Survey.Fk_Users_AnswerComments_UserID" />
+        <AssociationConnector Association="Survey.Fk_Question_AnswerMultiple_QuestionID" />
+        <AssociationConnector Association="Survey.Fk_Users_AnswerMultiple_UserID" />
+        <AssociationConnector Association="Survey.Fk_Question_AnswerTextArea_QuestionID" />
+        <AssociationConnector Association="Survey.Fk_Users_AnswerTextArea_UserID" />
+        <AssociationConnector Association="Survey.Fk_Survey_Question_SurveyID" />
+        <AssociationConnector Association="Survey.Fk_Survey_ReportRequest_SurveyID" />
+        <AssociationConnector Association="Survey.Fk_Survey_ReportSettings_SurveyID" />
+        <AssociationConnector Association="Survey.Fk_Survey_Users_SurveyID" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

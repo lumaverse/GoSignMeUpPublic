@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xsd1="http://fms.treas.gov/tcs/schemas" xmlns="http://fms.treas.gov/" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://fms.treas.gov/tcs/schemas" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="common_types.xsd" />
+  <xs:include schemaLocation="level3.xsd" />
+  <xs:element name="ACHDebitRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="ACHDebit" type="xsd1:ACHDebitRequestType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ACHPrenotificationRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="ACHPrenotification" type="xsd1:ACHPrenotificationRequestType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ACHCancelRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="ACHCancel" type="xsd1:ACHCancelRequestType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PCAuthorizationRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="PCAuthorization" type="xsd1:PCAuthorizationRequestType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PCManualAuthorizationRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="PCManualAuthorization" type="xsd1:PCManualAuthorizationRequestType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PCSaleRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="PCSale" type="xsd1:PCSaleRequestType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PCForceRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="PCForce" type="xsd1:PCForceRequestType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PCForceWithoutPaygovTrackingIdRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="PCForceWithoutPaygovTrackingId" type="xsd1:PCForceWithoutPaygovTrackingIdRequestType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PCRefundRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="PCRefund" type="xsd1:PCRefundRequestType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PCRefundWithoutPaygovTrackingIdRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="PCRefundWithoutPaygovTrackingId" type="xsd1:PCRefundWithoutPaygovTrackingIdRequestType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PCCancelRequest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="PCCancel" type="xsd1:PCCancelRequestType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ACHDebitResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="ACHDebit" type="xsd1:ACHDebitResponseType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ACHPrenotificationResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="ACHPrenotification" type="xsd1:ACHPrenotificationResponseType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ACHCancelResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="ACHCancel" type="xsd1:ACHCancelResponseType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PCAuthorizationResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="PCAuthorization" type="xsd1:PCAuthorizationResponseType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PCManualAuthorizationResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="PCManualAuthorization" type="xsd1:PCManualAuthorizationResponseType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PCSaleResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="PCSale" type="xsd1:PCSaleResponseType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PCForceResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="PCForce" type="xsd1:PCForceResponseType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PCForceWithoutPaygovTrackingIdResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="PCForceWithoutPaygovTrackingId" type="xsd1:PCForceWithoutPaygovTrackingIdResponseType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PCRefundResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="PCRefund" type="xsd1:PCRefundResponseType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PCRefundWithoutPaygovTrackingIdResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="PCRefundWithoutPaygovTrackingId" type="xsd1:PCRefundWithoutPaygovTrackingIdResponseType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PCCancelResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xsd1:tcsServiceInfoGroup" />
+        <xs:element name="PCCancel" type="xsd1:PCCancelResponseType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="PCAuthorizationRequestType">
+    <xs:sequence>
+      <xs:group ref="xsd1:pcRequiredRequestParametersGroup" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersNameGroup" />
+      <xs:element minOccurs="0" name="card_security_code" type="xsd1:card_security_code" />
+      <xs:element minOccurs="0" name="credit_card_track2" type="xsd1:credit_card_track2" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersBillingAddressGroup" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersLevel2and3DataGroup" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersCustomFieldsGroup" />
+      <xs:element minOccurs="0" name="account_holder_email_address" type="xsd1:email_address" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PCManualAuthorizationRequestType">
+    <xs:sequence>
+      <xs:group ref="xsd1:pcRequiredRequestParametersGroup" />
+      <xs:element name="approval_code" type="xsd1:approval_code" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersNameGroup" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersBillingAddressGroup" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersLevel2and3DataGroup" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersCustomFieldsGroup" />
+      <xs:element minOccurs="0" name="account_holder_email_address" type="xsd1:email_address" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PCSaleRequestType">
+    <xs:sequence>
+      <xs:group ref="xsd1:pcRequiredRequestParametersGroup" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersNameGroup" />
+      <xs:element minOccurs="0" name="card_security_code" type="xsd1:card_security_code" />
+      <xs:element minOccurs="0" name="credit_card_track2" type="xsd1:credit_card_track2" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersBillingAddressGroup" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersLevel2and3DataGroup" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersCustomFieldsGroup" />
+      <xs:element minOccurs="0" name="account_holder_email_address" type="xsd1:email_address" />
+      <xs:element minOccurs="0" name="classification" type="xsd1:classification" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PCForceRequestType">
+    <xs:sequence>
+      <xs:group ref="xsd1:pcRequiredRequestParametersForExistingTxGroup" />
+      <xs:element minOccurs="0" name="orig_agency_tracking_id" type="xsd1:optionalAgencyTrackingIdType" />
+      <xs:element minOccurs="0" name="classification" type="xsd1:classification" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PCForceWithoutPaygovTrackingIdRequestType">
+    <xs:sequence>
+      <xs:group ref="xsd1:pcRequiredRequestParametersGroup" />
+      <xs:element name="approval_code" type="xsd1:approval_code" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersNameGroup" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersBillingAddressGroup" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersLevel2and3DataGroup" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersCustomFieldsGroup" />
+      <xs:element minOccurs="0" name="account_holder_email_address" type="xsd1:email_address" />
+      <xs:element minOccurs="0" name="classification" type="xsd1:classification" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PCRefundRequestType">
+    <xs:sequence>
+      <xs:group ref="xsd1:pcRequiredRequestParametersForExistingTxGroup" />
+      <xs:element minOccurs="0" name="orig_agency_tracking_id" type="xsd1:optionalAgencyTrackingIdType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PCRefundWithoutPaygovTrackingIdRequestType">
+    <xs:sequence>
+      <xs:group ref="xsd1:pcRequiredRequestParametersGroup" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersNameGroup" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersBillingAddressGroup" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersLevel2and3DataGroup" />
+      <xs:group minOccurs="0" ref="xsd1:pcOptionalRequestParametersCustomFieldsGroup" />
+      <xs:element minOccurs="0" name="account_holder_email_address" type="xsd1:email_address" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PCCancelRequestType">
+    <xs:sequence>
+      <xs:group ref="xsd1:pcRequiredRequestParametersForExistingTxGroup" />
+      <xs:element minOccurs="0" name="agency_tracking_id" type="xsd1:optionalAgencyTrackingIdType" />
+      <xs:element minOccurs="0" name="account_holder_email_address" type="xsd1:email_address" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PCAuthorizationResponseType">
+    <xs:sequence>
+      <xs:group ref="xsd1:pcRequiredResponseParametersTransInfoGroup" />
+      <xs:group ref="xsd1:pcRequiredResponseParametersPlasticCardAuthGroup" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PCManualAuthorizationResponseType">
+    <xs:sequence>
+      <xs:group ref="xsd1:pcRequiredResponseParametersTransInfoGroup" />
+      <xs:group ref="xsd1:pcRequiredResponseParametersPlasticCardPartialAuthGroup" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PCSaleResponseType">
+    <xs:sequence>
+      <xs:group ref="xsd1:pcRequiredResponseParametersTransInfoGroup" />
+      <xs:element name="approval_code" type="xsd1:approvalCodeResponseType" />
+      <xs:element name="auth_response_code" type="xsd1:auth_response_code" />
+      <xs:element name="auth_response_text" type="xsd1:auth_response_text" />
+      <xs:element name="avs_response_code" type="xsd1:avs_response_code" />
+      <xs:element name="csc_result" type="xsd1:csc_result" />
+      <xs:group ref="xsd1:pcRequiredResponseParametersPlasticCardPartialAuthGroup" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PCForceResponseType">
+    <xs:sequence>
+      <xs:element name="orig_paygov_tracking_id" type="xsd1:optionalPaygovTrackingIdType" />
+      <xs:element name="orig_agency_tracking_id" type="xsd1:optionalAgencyTrackingIdType" />
+      <xs:group ref="xsd1:pcRequiredResponseParametersTransInfoGroup" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PCForceWithoutPaygovTrackingIdResponseType">
+    <xs:sequence>
+      <xs:group ref="xsd1:pcRequiredResponseParametersTransInfoGroup" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PCRefundResponseType">
+    <xs:sequence>
+      <xs:element name="orig_paygov_tracking_id" type="xsd1:optionalPaygovTrackingIdType" />
+      <xs:element name="orig_agency_tracking_id" type="xsd1:optionalAgencyTrackingIdType" />
+      <xs:group ref="xsd1:pcRequiredResponseParametersTransInfoGroup" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PCRefundWithoutPaygovTrackingIdResponseType">
+    <xs:sequence>
+      <xs:group ref="xsd1:pcRequiredResponseParametersTransInfoGroup" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PCCancelResponseType">
+    <xs:sequence>
+      <xs:element name="orig_paygov_tracking_id" type="xsd1:optionalPaygovTrackingIdType" />
+      <xs:group ref="xsd1:pcRequiredResponseParametersTransInfoWithoutPgIdGroup" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ach_payment_options">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="payment_frequency" type="xsd1:payment_frequency" />
+      <xs:element minOccurs="0" name="payment_date" type="xsd1:payment_date" />
+      <xs:element minOccurs="0" name="total_installments" type="xsd1:total_installments" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:group name="pcRequiredRequestParametersGroup">
+    <xs:sequence>
+      <xs:element name="agency_tracking_id" type="xsd1:agency_tracking_id" />
+      <xs:element name="transaction_amount" type="xsd1:transaction_amount" />
+      <xs:element name="account_number" type="xsd1:account_number" />
+      <xs:element name="credit_card_expiration_date" type="xsd1:credit_card_expiration_date" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="pcRequiredRequestParametersForExistingTxGroup">
+    <xs:sequence>
+      <xs:element name="orig_paygov_tracking_id" type="xsd1:paygov_tracking_id" />
+      <xs:element name="transaction_amount" type="xsd1:transaction_amount" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="pcOptionalRequestParametersNameGroup">
+    <xs:sequence>
+      <xs:choice>
+        <xs:element name="business_name" type="xsd1:business_name" />
+        <xs:group ref="xsd1:nameGroup" />
+      </xs:choice>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="pcOptionalRequestParametersBillingAddressGroup">
+    <xs:sequence>
+      <xs:element name="billing_address" type="xsd1:billing_address" />
+      <xs:element minOccurs="0" name="billing_address_2" type="xsd1:billing_address_2" />
+      <xs:element name="billing_city" type="xsd1:billing_city" />
+      <xs:element name="billing_state" type="xsd1:billing_state" />
+      <xs:element name="billing_zip" type="xsd1:billing_zip" />
+      <xs:element name="billing_country" type="xsd1:billing_country" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="pcOptionalRequestParametersLevel2and3DataGroup">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="order_id" type="xsd1:order_id" />
+      <xs:element minOccurs="0" default="0" name="order_tax_amount" type="xsd1:order_tax_amount" />
+      <xs:element minOccurs="0" name="order_level3_data" type="xsd1:order_level3_data" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="pcOptionalRequestParametersCustomFieldsGroup">
+    <xs:sequence>
+      <xs:element name="custom_fields" type="xsd1:custom_fields" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="pcRequiredResponseParametersPlasticCardPartialAuthGroup">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="authorized_amount" nillable="true" type="xsd1:authorized_amount" />
+      <xs:element minOccurs="0" name="remaining_balance" nillable="true" type="xsd1:remaining_balance" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="pcRequiredResponseParametersTransInfoWithoutPgIdGroup">
+    <xs:sequence>
+      <xs:element name="agency_tracking_id" type="xsd1:optionalAgencyTrackingIdType" />
+      <xs:element default="0" name="transaction_amount" type="xsd1:transaction_amount" />
+      <xs:element name="masked_account_number" type="xsd1:masked_account_number" />
+      <xs:element name="return_code" type="xsd1:return_code" />
+      <xs:element name="return_detail" type="xsd1:return_detail" />
+      <xs:element name="transaction_status" type="xsd1:transaction_status" />
+      <xs:element name="transaction_date" nillable="true" type="xsd1:transaction_date" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="pcRequiredResponseParametersTransInfoGroup">
+    <xs:sequence>
+      <xs:element name="paygov_tracking_id" type="xsd1:optionalPaygovTrackingIdType" />
+      <xs:group ref="xsd1:pcRequiredResponseParametersTransInfoWithoutPgIdGroup" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="pcRequiredResponseParametersPlasticCardAuthGroup">
+    <xs:sequence>
+      <xs:element name="approval_code" type="xsd1:approvalCodeResponseType" />
+      <xs:element name="auth_response_code" type="xsd1:auth_response_code" />
+      <xs:element name="auth_response_text" type="xsd1:auth_response_text" />
+      <xs:element name="avs_response_code" type="xsd1:avs_response_code" />
+      <xs:element name="csc_result" type="xsd1:csc_result" />
+      <xs:group ref="xsd1:pcRequiredResponseParametersPlasticCardPartialAuthGroup" />
+    </xs:sequence>
+  </xs:group>
+  <xs:complexType name="ACHDebitRequestType">
+    <xs:sequence>
+      <xs:group ref="xsd1:achRequiredRequestParametersGroup" />
+      <xs:element name="transaction_amount" type="xsd1:transaction_amount" />
+      <xs:element minOccurs="0" name="payment_options" type="xsd1:ach_payment_options" />
+      <xs:group minOccurs="0" ref="xsd1:achOptionalRequestParametersGroup" />
+      <xs:element minOccurs="0" name="classification" type="xsd1:classification" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ACHPrenotificationRequestType">
+    <xs:sequence>
+      <xs:group ref="xsd1:achRequiredRequestParametersGroup" />
+      <xs:element name="transaction_amount" type="xsd1:transaction_amount" />
+      <xs:group minOccurs="0" ref="xsd1:achOptionalRequestParametersGroup" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ACHCancelRequestType">
+    <xs:sequence>
+      <xs:element name="orig_paygov_tracking_id" type="xsd1:paygov_tracking_id" />
+      <xs:element name="transaction_amount" type="xsd1:transaction_amount" />
+      <xs:element minOccurs="0" name="agency_tracking_id" type="xsd1:optionalAgencyTrackingIdType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ACHDebitResponseType">
+    <xs:sequence>
+      <xs:group ref="xsd1:achRequiredResponseParametersWithPgIdGroup" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ACHPrenotificationResponseType">
+    <xs:sequence>
+      <xs:group ref="xsd1:achRequiredResponseParametersWithPgIdGroup" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ACHCancelResponseType">
+    <xs:sequence>
+      <xs:group ref="xsd1:achRequiredResponseParametersGroup" />
+      <xs:element name="orig_paygov_tracking_id" type="xsd1:optionalPaygovTrackingIdType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:group name="achRequiredRequestParametersGroup">
+    <xs:sequence>
+      <xs:element name="agency_tracking_id" type="xsd1:agency_tracking_id" />
+      <xs:element name="account_number" type="xsd1:account_number" />
+      <xs:element name="routing_transit_number" type="xsd1:routing_transit_number" />
+      <xs:element name="account_type" type="xsd1:account_type" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="achOptionalRequestParametersGroup">
+    <xs:sequence>
+      <xs:group minOccurs="0" ref="xsd1:nameGroup" />
+      <xs:element minOccurs="0" name="business_name" type="xsd1:business_name" />
+      <xs:element minOccurs="0" name="check_number" type="xsd1:check_number" />
+      <xs:element minOccurs="0" name="sec_code" type="xsd1:sec_code" />
+      <xs:element minOccurs="0" name="custom_fields" type="xsd1:custom_fields" />
+      <xs:element minOccurs="0" name="account_holder_email_address" type="xsd1:email_address" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="achRequiredResponseParametersGroup">
+    <xs:sequence>
+      <xs:element name="agency_tracking_id" type="xsd1:optionalAgencyTrackingIdType" />
+      <xs:element default="0" name="transaction_amount" type="xsd1:transaction_amount" />
+      <xs:element name="masked_account_number" type="xsd1:masked_account_number" />
+      <xs:element name="effective_date" nillable="true" type="xsd1:effective_date" />
+      <xs:element name="return_code" type="xsd1:return_code" />
+      <xs:element name="return_detail" type="xsd1:return_detail" />
+      <xs:element name="transaction_status" type="xsd1:transaction_status" />
+      <xs:element name="transaction_date" nillable="true" type="xsd1:transaction_date" />
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="achRequiredResponseParametersWithPgIdGroup">
+    <xs:sequence>
+      <xs:group ref="xsd1:achRequiredResponseParametersGroup" />
+      <xs:element name="paygov_tracking_id" type="xsd1:optionalPaygovTrackingIdType" />
+    </xs:sequence>
+  </xs:group>
+</xs:schema>

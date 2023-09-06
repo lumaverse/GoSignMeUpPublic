@@ -1,0 +1,1473 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{18895C8D-8010-4B53-919A-A5B7FCBC3157}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Gsmu.Api</RootNamespace>
+    <AssemblyName>Gsmu.Api</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>8282b3b1</NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AuthorizeNet, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AuthorizeNet.1.8.9\lib\AuthorizeNet.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="BouncyCastle.Crypto, Version=1.7.4137.9688, Culture=neutral, PublicKeyToken=a4292a325f69b123, processorArchitecture=MSIL">
+      <HintPath>..\packages\BouncyCastle.1.7.0\lib\Net40-Client\BouncyCastle.Crypto.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ChilkatDotNet45, Version=9.5.0.56, Culture=neutral, PublicKeyToken=eb5fc1fc52ef09bd, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\chilkat-win32.9.5.0.65\lib\net45\ChilkatDotNet45.dll</HintPath>
+    </Reference>
+    <Reference Include="Dimac.JMail">
+      <HintPath>..\component-binaries\dimac\Dimac.JMail.dll</HintPath>
+    </Reference>
+    <Reference Include="Dimac.JMail.Smtp">
+      <HintPath>..\component-binaries\dimac\Dimac.JMail.Smtp.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.Core.4.3.4.13329\lib\net45-full\DotNetOpenAuth.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.Core.UI, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.Core.UI.4.3.4.13329\lib\net45-full\DotNetOpenAuth.Core.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.InfoCard, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.InfoCard.4.3.4.13329\lib\net45-full\DotNetOpenAuth.InfoCard.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.InfoCard.UI, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.InfoCard.UI.4.3.4.13329\lib\net45-full\DotNetOpenAuth.InfoCard.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.Mvc5">
+      <HintPath>..\packages\DotNetOpenAuth.Mvc5.4.3.4.13329\lib\net45-full\DotNetOpenAuth.Mvc5.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.OAuth.Core.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth.Common, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.OAuth.Common.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth.Consumer, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.OAuth.Consumer.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth.Consumer.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth.ServiceProvider, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.OAuth.ServiceProvider.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth.ServiceProvider.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth2, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.OAuth2.Core.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth2.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth2.AuthorizationServer, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.OAuth2.AuthorizationServer.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth2.AuthorizationServer.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth2.Client, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.OAuth2.Client.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth2.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth2.Client.UI, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.OAuth2.Client.UI.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth2.Client.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth2.ClientAuthorization, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.OAuth2.ClientAuthorization.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth2.ClientAuthorization.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth2.ResourceServer, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.OAuth2.ResourceServer.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth2.ResourceServer.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OpenId, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.OpenId.Core.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OpenId.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OpenId.Provider, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.OpenId.Provider.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OpenId.Provider.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OpenId.Provider.UI, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.OpenId.Provider.UI.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OpenId.Provider.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OpenId.RelyingParty, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.OpenId.RelyingParty.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OpenId.RelyingParty.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OpenId.RelyingParty.UI, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.OpenId.RelyingParty.UI.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OpenId.RelyingParty.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OpenId.UI, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.OpenId.Core.UI.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OpenId.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OpenIdInfoCard.UI, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.OpenIdInfoCard.UI.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OpenIdInfoCard.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OpenIdOAuth, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetOpenAuth.OpenIdOAuth.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OpenIdOAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="Dynamic">
+      <HintPath>..\packages\DynamicQuery.1.0\lib\35\Dynamic.dll</HintPath>
+    </Reference>
+    <Reference Include="EASendMail45">
+      <HintPath>..\..\..\Program Files (x86)\EASendMail\EASendMail45.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Apis, Version=1.10.0.25332, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.1.10.0\lib\net40\Google.Apis.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Apis.Auth, Version=1.10.0.25333, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Auth.1.10.0\lib\net40\Google.Apis.Auth.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Apis.Auth.Mvc4, Version=1.10.0.25334, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Auth.Mvc.1.10.0\lib\net40\Google.Apis.Auth.Mvc4.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Apis.Auth.PlatformServices, Version=1.10.0.25333, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Auth.1.10.0\lib\net40\Google.Apis.Auth.PlatformServices.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Apis.Calendar.v3, Version=1.10.0.165, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Calendar.v3.1.10.0.1650\lib\portable-net40+sl50+win+wpa81+wp80\Google.Apis.Calendar.v3.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Apis.Core, Version=1.10.0.25331, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Core.1.10.0\lib\portable-net40+sl50+win+wpa81+wp80\Google.Apis.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Apis.Oauth2.v2, Version=1.10.0.105, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Oauth2.v2.1.10.0.1050\lib\portable-net40+sl50+win+wpa81+wp80\Google.Apis.Oauth2.v2.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Apis.PlatformServices, Version=1.10.0.25332, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.1.10.0\lib\net40\Google.Apis.PlatformServices.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Apis.Plus.v1, Version=1.10.0.339, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Plus.v1.1.10.0.3390\lib\portable-net40+sl50+win+wpa81+wp80\Google.Apis.Plus.v1.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Kent.Boogaart.HelperTrinity, Version=2.0.2.0, Culture=neutral, PublicKeyToken=cc96fa93a217f7a1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Kent.Boogaart.HelperTrinity.2.0.2\lib\portable-win+net403+sl40+wp+xbox40\Kent.Boogaart.HelperTrinity.dll</HintPath>
+    </Reference>
+    <Reference Include="Kent.Boogaart.KBCsv, Version=3.0.0.0, Culture=neutral, PublicKeyToken=cc96fa93a217f7a1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Kent.Boogaart.KBCsv.3.0.0\lib\portable-win+net45+wp8\Kent.Boogaart.KBCsv.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions.Desktop">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Payflow_dotNET">
+      <HintPath>..\component-binaries\paypal\Payflow_dotNET.dll</HintPath>
+    </Reference>
+    <Reference Include="Paymentech">
+      <HintPath>..\..\Ruby\packages\Paymentech.1.0.4\lib\net45-full\Paymentech.dll</HintPath>
+    </Reference>
+    <Reference Include="PDFjet">
+      <HintPath>..\component-binaries\pdfjet\PDFjet.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.105.2.3\lib\net45\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity.Design" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.DirectoryServices.Protocols" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Net.Http.2.0.20126.16343\lib\net40\System.Net.Http.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net.Http.Extensions, Version=2.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Net.Http.Formatting.Extension.5.2.3.0\lib\System.Net.Http.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Net.Http.Formatting.Extension.5.2.3.0\lib\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Primitives, Version=4.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Net.Http.Formatting.Extension.5.2.3.0\lib\System.Net.Http.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Net.Http.2.0.20126.16343\lib\net40\System.Net.Http.WebRequest.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Validation, Version=2.2.0.0, Culture=neutral, PublicKeyToken=2fc06f0d701809a7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Validation.2.2.8\lib\dotnet\Validation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="WinSCPnet, Version=1.2.10.5874, Culture=neutral, PublicKeyToken=2271ec4a3c56d0bf, processorArchitecture=MSIL">
+      <HintPath>..\packages\WinSCP.5.7.6\lib\WinSCPnet.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Zlib.Portable, Version=1.11.0.0, Culture=neutral, PublicKeyToken=431cba815f6a8b5b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Zlib.Portable.Signed.1.11.0\lib\portable-net4+sl5+wp8+win8+wpa81+MonoTouch+MonoAndroid\Zlib.Portable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Authorization\CASAuthentication.cs" />
+    <Compile Include="Authorization\GsmuAuthorizationAttribute.cs" />
+    <Compile Include="Authorization\LDAPAuthentication.cs" />
+    <Compile Include="Authorization\LoggedInUserType.cs" />
+    <Compile Include="BLL\SystemConfig\PublicOptionsManager.cs" />
+    <Compile Include="Commerce\AccountingData.cs" />
+    <Compile Include="Commerce\ShoppingCart\CheckoutInfo.cs" />
+    <Compile Include="Commerce\ShoppingCart\CreditCardPayments.cs" />
+    <Compile Include="Commerce\ShoppingCart\MembershipShoppingCartItem.cs" />
+    <Compile Include="Commerce\ShoppingCart\MembershipShoppingCart.cs" />
+    <Compile Include="Commerce\ShoppingCart\CourseExtraParticipantMissingException.cs" />
+    <Compile Include="Commerce\ShoppingCart\CourseMultipleStudentItem.cs" />
+    <Compile Include="Commerce\ShoppingCart\PayOption.cs" />
+    <Compile Include="Data\AccountInfo.cs" />
+    <Compile Include="Data\Calendar\CalendarModel.cs" />
+    <Compile Include="Data\ClientTracking\Entities\Assessment.cs">
+      <DependentUpon>ClientTracking.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ClientTracking\Entities\AssessmentQuestion.cs">
+      <DependentUpon>ClientTracking.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\DatabaseSchemaColumnModel.cs" />
+    <Compile Include="Data\DatabaseSchemaHelper.cs" />
+    <Compile Include="Data\DataStoreHelper.cs" />
+    <Compile Include="Data\DataStoreResult.cs" />
+    <Compile Include="Data\DataStores\Commerce\DailyAccounting.cs" />
+    <Compile Include="Data\Events\Queries.cs" />
+    <Compile Include="Data\IDataStoreHelper.cs" />
+    <Compile Include="Data\RoomManagement\Entities\email_components.cs">
+      <DependentUpon>RoomManagement.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RoomManagement\Entities\listing_hours.cs">
+      <DependentUpon>RoomManagement.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Admin\Administrator.cs" />
+    <Compile Include="Data\School\Attendance\AttendanceConfig.cs" />
+    <Compile Include="Data\School\Certificate\UserCertificate.cs" />
+    <Compile Include="Data\School\CourseRoster\ClassList.cs" />
+    <Compile Include="Data\School\CourseRoster\ConfirmationArea.cs" />
+    <Compile Include="Data\School\CourseRoster\Coupon.cs" />
+    <Compile Include="Data\School\CourseRoster\Course_Roster.cs" />
+    <Compile Include="Data\School\CourseRoster\LayoutOrderModel.cs" />
+    <Compile Include="Data\School\CourseRoster\Queries.cs" />
+    <Compile Include="Data\School\CourseRoster\ReviewOrders.cs" />
+    <Compile Include="Data\School\CourseRoster\RosterCancelStatus.cs" />
+    <Compile Include="Data\School\CourseRoster\rostermaterial.cs" />
+    <Compile Include="Data\School\CourseRoster\RosterReport.cs" />
+    <Compile Include="Data\School\CourseSettings\CouponsModel.cs" />
+    <Compile Include="Data\School\Course\CourseCancelState.cs" />
+    <Compile Include="Data\School\Course\CourseColorGroupingHelper.cs" />
+    <Compile Include="Data\School\Course\CourseCredit.cs" />
+    <Compile Include="Data\School\Course\CourseCreditHelper.cs" />
+    <Compile Include="Data\School\Course\CourseEnrollmentStatistics.cs" />
+    <Compile Include="Data\School\Course\CourseEnrollmentStatisticsType.cs" />
+    <Compile Include="Data\School\Course\CourseEnrollmentStatus.cs" />
+    <Compile Include="Data\School\Course\CourseFilesHelper.cs" />
+    <Compile Include="Data\School\Course\CourseIconsandLegend.cs" />
+    <Compile Include="Data\School\Course\CoursePrerequisiteRegModel.cs" />
+    <Compile Include="Data\School\Course\CourseSettings.cs" />
+    <Compile Include="Data\School\Course\CourseType.cs" />
+    <Compile Include="Data\School\Course\CourseCreditType.cs" />
+    <Compile Include="Data\School\Course\CustomCourseField5_MasterCourseIDList.cs" />
+    <Compile Include="Data\School\Course\PricingOption.cs" />
+    <Compile Include="Data\School\CustomTranscript\CustomTranscript.cs" />
+    <Compile Include="Data\School\DataLists.cs" />
+    <Compile Include="Data\School\Distrcit\Queries.cs" />
+    <Compile Include="Data\School\EmailAuditTrail\Queries.cs" />
+    <Compile Include="Data\School\Entities\AdHocReportTemplate.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\AdministratorReportView.cs" />
+    <Compile Include="Data\School\Entities\AdminMenuSelection.cs" />
+    <Compile Include="Data\School\Entities\adminpass.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Attendance.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\AttendanceDetail.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\AttendanceStatu.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\AttendanceView.cs" />
+    <Compile Include="Data\School\Entities\Audience.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\AuditTrail.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\AutoReserveCourse.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\BackgroundProcessRequest.cs" />
+    <Compile Include="Data\School\Entities\BlackboardLog.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\BlackboardServersInfo.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\BlackboardUserRole.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Certification.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\CertificationsCourse.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\CertificationsStudent.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\CertificationsStudentCompleted.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\CitrixLog.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Country.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Coupon.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Course.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\coursearchive.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\CourseCategory.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\CourseChoice.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\CourseExpense.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\CourseExtraParticipant.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\CourseListAdminPortalView.cs" />
+    <Compile Include="Data\School\Entities\CourseOutline.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\CoursePreReg.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\CoursePricingOption.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\CourseRosterMoreInfoView.cs" />
+    <Compile Include="Data\School\Entities\CoursesGridComn.cs" />
+    <Compile Include="Data\School\Entities\CoursesListView.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\CoursesPendingRequest.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\CoursesRequirement.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\CourseSurveyNIU.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Course_Roster.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Course_Time.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Course_Times_Menu.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\CRMaterialListView.cs" />
+    <Compile Include="Data\School\Entities\customcetificate.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\customimptemp.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\customtranscript.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Department.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\District.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\DistrictExtraInfo.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\DynamicMembershipConfiguration.cs" />
+    <Compile Include="Data\School\Entities\DynamicMembershipPricingOption.cs" />
+    <Compile Include="Data\School\Entities\EmailAuditTrail.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\EmailList.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\EmailQueue.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\EmployeeType.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\FastTrackCours.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\FieldMask.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\FieldSpec.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\GetAllMasterInfoes_Result.cs" />
+    <Compile Include="Data\School\Entities\GradeExtraInfo.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Grade_Level.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\HeliusLMSlog.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Icon.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Instructor.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\InstructorRate.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\ISchoolEntities.cs" />
+    <Compile Include="Data\School\Entities\licenseinfo.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Location.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\MainCategory.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Manager.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\MasterInfo.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\MasterInfo2.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\MasterInfo3.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\masterinfo4.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Material.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Membership.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Membership_Roster.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\NavLink.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\NEWEMP.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\OptionalInfo.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\OrderDetailView.cs" />
+    <Compile Include="Data\School\Entities\OrderInProgress.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\OrderTransaction.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Parent.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\ParentLevelOne.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\ParentLevelThree.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\ParentLevelTwo.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\ParentLevelTwoToThreeRelated.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Payment_Option.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\PDFHeaderFooterInfo.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\PricingOption.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\ReportRequest.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\ReviewOrderView.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\RoomDirection.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\RoommateRequest.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\RoomNumber.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\RosterCostMaterialGridComn.cs" />
+    <Compile Include="Data\School\Entities\rostermaterial.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\RosterReportView.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\SalesTax.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\SAPIntegration.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\SAPIntegrationFunction.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\School.Context.cs" />
+    <Compile Include="Data\School\Entities\School.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\School.Designer.cs">
+      <DependentUpon>School.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\School1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>School.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\SchoolExtraInfo.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\SchoolsGradeLevelsRelated.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\sp_DailyAccountingGrid_Result.cs" />
+    <Compile Include="Data\School\Entities\sp_EnrollmentGraphSummary_Result.cs" />
+    <Compile Include="Data\School\Entities\sp_RevenueProfitAndLossGrid_Result.cs" />
+    <Compile Include="Data\School\Entities\sp_RosterReportV2_Result.cs" />
+    <Compile Include="Data\School\Entities\sp_StudentGraphSummary_Result.cs" />
+    <Compile Include="Data\School\Entities\Student.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\StudentMedicalInfo.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\StudentMergeHistory.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\StudentQuestionnaire.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\StudentRate.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\StudentRegSortOrder.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\StudentsGradeLog.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\StudentsGridComn.cs" />
+    <Compile Include="Data\School\Entities\StudentsOtherInfoView.cs" />
+    <Compile Include="Data\School\Entities\StudentValidation.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\SubAdminToSubSite.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\SubCategory.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\SubSite.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\SubSubCategory.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Supervisor.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\SupervisorSchool.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\SupervisorStudent.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Terminology.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\Transcript.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\transcriptimport.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\UpdateTracking.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\uploadedfile.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\UserBBDateInformation.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\UserSession.cs" />
+    <Compile Include="Data\School\Entities\WebServiceSetting.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Entities\WizardConfiguration.cs" />
+    <Compile Include="Data\School\Grade\Queries.cs" />
+    <Compile Include="Data\School\Instructor\Instructor.cs" />
+    <Compile Include="Data\School\Instructor\InstructorHelper.cs" />
+    <Compile Include="Data\School\Instructor\InstructorModel.cs" />
+    <Compile Include="Data\School\MasterInfo.cs" />
+    <Compile Include="Data\School\MasterInfo3.cs" />
+    <Compile Include="Data\School\masterinfo4.cs" />
+    <Compile Include="Data\School\Memberships\Memberships.cs" />
+    <Compile Include="Data\School\SchoolEntities.cs" />
+    <Compile Include="Data\School\School\Queries.cs" />
+    <Compile Include="Data\School\School\School.cs" />
+    <Compile Include="Data\School\Student\StudentHelper.cs" />
+    <Compile Include="Data\School\SubAdmin\SubAdministrator.cs" />
+    <Compile Include="Data\School\Supervisor\ListingStudentModel.cs" />
+    <Compile Include="Data\School\Supervisor\Supervisor.cs" />
+    <Compile Include="Data\School\Supervisor\SupervisorHelper.cs" />
+    <Compile Include="Data\School\Terminology\TerminologyHelper.cs" />
+    <Compile Include="Data\School\Terminology\TermsEnum.cs" />
+    <Compile Include="Data\School\Transcripts\Transcripts.cs" />
+    <Compile Include="Data\School\User\DataListsModel.cs" />
+    <Compile Include="Data\School\User\Queries.cs" />
+    <Compile Include="Data\School\User\UploadImage.cs" />
+    <Compile Include="Data\School\User\UserInfo.cs" />
+    <Compile Include="Data\School\User\UserModel.cs" />
+    <Compile Include="Data\School\User\UserRegFields.cs" />
+    <Compile Include="Data\ExtJsDataStoreHelper.cs" />
+    <Compile Include="Data\School\User\UserWidget.cs" />
+    <Compile Include="Data\Survey\Entities\dtproperty.cs">
+      <DependentUpon>Survey.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Survey\Entities\Survey1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Survey.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Survey\SurveyFunction.cs" />
+    <Compile Include="Data\School\Attendance\AttendanceModel.cs" />
+    <Compile Include="Data\Survey\SurveyModel.cs" />
+    <Compile Include="Data\ViewModels\BaseModels\MasterInfoBaseModel.cs" />
+    <Compile Include="Data\ViewModels\DataStores\Commerce\DailyAccountingViewModel.cs" />
+    <Compile Include="Data\ViewModels\Grid\SystemSettingSortField.cs" />
+    <Compile Include="Data\ViewModels\Layout\BGColorInfo.cs" />
+    <Compile Include="Data\ViewModels\Layout\CourseSearchViewConfiguration.cs" />
+    <Compile Include="Data\ViewModels\Layout\GridSearchColumns.cs" />
+    <Compile Include="Data\ViewModels\Layout\LayoutButtonConfiguration.cs" />
+    <Compile Include="Data\ViewModels\Layout\LayoutConfiguration.cs" />
+    <Compile Include="Data\ViewModels\Layout\SearchColumns.cs" />
+    <Compile Include="Data\ViewModels\Layout\TileJulySearchColumns.cs" />
+    <Compile Include="Data\ViewModels\SystemConfig\CustomizableStudentRegistrationFieldsViewModel.cs" />
+    <Compile Include="Data\ViewModels\SystemConfig\PresetStudentRegistrationFieldsViewModel.cs" />
+    <Compile Include="Data\ViewModels\SystemConfig\PublicOptionsViewModel.cs" />
+    <Compile Include="Data\ViewModels\SystemConfig\StudentRegistrationFieldsViewModel.cs" />
+    <Compile Include="Data\ViewModels\UserFields\UserFieldsModel.cs" />
+    <Compile Include="Data\WebConfiguration.cs" />
+    <Compile Include="Encryption\HmacSha1.cs" />
+    <Compile Include="Export\ExtJsCsvExport.cs" />
+    <Compile Include="Export\ExtJsCvsExportFieldInfo.cs" />
+    <Compile Include="Export\GradeCertificate\PdfGradeCertificate.cs" />
+    <Compile Include="Export\PDFSigninSheet.cs" />
+    <Compile Include="Export\StudentTranscript\PdfStudentTranscript.cs" />
+    <Compile Include="Integration\Blackboard\API\BlackBoardAPIConnector.cs" />
+    <Compile Include="Integration\Blackboard\API\BlackboardAPIRequest.cs" />
+    <Compile Include="Integration\Blackboard\API\BlackBoardAuthorizer.cs" />
+    <Compile Include="Integration\Blackboard\API\Services\BlackBoardCourseServices.cs" />
+    <Compile Include="Integration\Blackboard\API\Services\BlackBoardUserServices.cs" />
+    <Compile Include="Integration\Blackboard\API\Services\RestServices.cs" />
+    <Compile Include="Integration\Blackboard\BlackboardResponse.cs" />
+    <Compile Include="Integration\Blackboard\Connector\NodeConnector.cs" />
+    <Compile Include="Integration\Blackboard\ServiceInterface.cs" />
+    <Compile Include="Integration\Blackboard\BlackboardSso.cs" />
+    <Compile Include="Integration\Blackboard\Configuration.cs" />
+    <Compile Include="Integration\Blackboard\ConnectorMap.cs" />
+    <Compile Include="Integration\Blackboard\ConnectorEnum.cs" />
+    <Compile Include="Integration\Blackboard\Connector\DataSourceKeyConnector.cs" />
+    <Compile Include="Integration\Blackboard\Connector\UserConnector.cs" />
+    <Compile Include="Integration\Blackboard\TesterAPIDLL.cs" />
+    <Compile Include="Integration\Canvas\Clients\AccountClient.cs" />
+    <Compile Include="Integration\Canvas\CanvasClient.cs" />
+    <Compile Include="Integration\Canvas\CanvasExport.cs" />
+    <Compile Include="Integration\Canvas\CanvasImport.cs" />
+    <Compile Include="Integration\Canvas\Clients\CourseClient.cs" />
+    <Compile Include="Integration\Canvas\Clients\EnrollmentClient.cs" />
+    <Compile Include="Integration\Canvas\Clients\UserClient.cs" />
+    <Compile Include="Integration\Canvas\Configuration.cs" />
+    <Compile Include="Integration\Canvas\EnrollmentSynchronizationResponse.cs" />
+    <Compile Include="Integration\Canvas\Entities\Account.cs" />
+    <Compile Include="Integration\Canvas\Entities\Authentication.cs" />
+    <Compile Include="Integration\Canvas\Entities\Calendar.cs" />
+    <Compile Include="Integration\Canvas\Entities\AuthenticationProvider.cs" />
+    <Compile Include="Integration\Canvas\Entities\UserLoginDetails.cs" />
+    <Compile Include="Integration\Canvas\Entities\CourseSection.cs" />
+    <Compile Include="Integration\Canvas\Entities\CommunicationChannel.cs" />
+    <Compile Include="Integration\Canvas\Entities\CommunicationChannelType.cs" />
+    <Compile Include="Integration\Canvas\Entities\CommunicationChannelWorkflowState.cs" />
+    <Compile Include="Integration\Canvas\Entities\Course.cs" />
+    <Compile Include="Integration\Canvas\Entities\Enrollment.cs" />
+    <Compile Include="Integration\Canvas\Entities\EnrollmentState.cs" />
+    <Compile Include="Integration\Canvas\Entities\EnrollmenType.cs" />
+    <Compile Include="Integration\Canvas\Entities\Error.cs" />
+    <Compile Include="Integration\Canvas\Entities\ErrorDetails.cs" />
+    <Compile Include="Integration\Canvas\Entities\Grades.cs" />
+    <Compile Include="Integration\Canvas\Entities\PageType.cs" />
+    <Compile Include="Integration\Canvas\Entities\User.cs" />
+    <Compile Include="Integration\Canvas\Entities\CourseWorkflowState.cs" />
+    <Compile Include="Integration\Canvas\PaginationHelper.cs" />
+    <Compile Include="Integration\Canvas\RawResponse.cs" />
+    <Compile Include="Integration\Canvas\Response.cs" />
+    <Compile Include="Integration\Canvas\UserSynchronizationResponse.cs" />
+    <Compile Include="Integration\Canvas\UserSynchronizationResult.cs" />
+    <Compile Include="Integration\Canvas\CourseSynchronizationResponse.cs" />
+    <Compile Include="Integration\ClubPilates\ClubPilatesHelper.cs" />
+    <Compile Include="Integration\Google\GoogleHelper.cs" />
+    <Compile Include="Integration\Haiku\HaikuExport.cs" />
+    <Compile Include="Integration\Haiku\HaikuImport.cs" />
+    <Compile Include="Integration\Haiku\HaikuResponseErrorException.cs" />
+    <Compile Include="Integration\GsmuEntityType.cs" />
+    <Compile Include="Integration\Haiku\Import\HaikuCsvImport.cs" />
+    <Compile Include="Integration\Haiku\Import\HaikuImportCvs.cs" />
+    <Compile Include="Integration\Haiku\Responses\Classes.cs" />
+    <Compile Include="Integration\Haiku\Responses\Entities\UserType.cs" />
+    <Compile Include="Integration\Haiku\Configuration.cs" />
+    <Compile Include="Integration\Haiku\Responses\Entities\Authentication.cs" />
+    <Compile Include="Integration\Haiku\Responses\Entities\Class.cs" />
+    <Compile Include="Integration\Haiku\Responses\Entities\Error.cs" />
+    <Compile Include="Integration\Haiku\HaikuClient.cs" />
+    <Compile Include="Integration\Haiku\Responses\Entities\Pong.cs" />
+    <Compile Include="Integration\Haiku\Response.cs" />
+    <Compile Include="Integration\Haiku\Responses\Entities\Roster.cs" />
+    <Compile Include="Integration\Haiku\Responses\Entities\User.cs" />
+    <Compile Include="Integration\Haiku\Responses\PaginatedList.cs" />
+    <Compile Include="Integration\Haiku\Responses\Rosters.cs" />
+    <Compile Include="Integration\Haiku\Responses\Users.cs" />
+    <Compile Include="Integration\Spreedly\SpreedlyHelper.cs" />
+    <Compile Include="Integration\SynchronizationStatus.cs" />
+    <Compile Include="Integration\Lti\Configuration.cs" />
+    <Compile Include="Integration\Lti\LtiHelper.cs" />
+    <Compile Include="Integration\Lti\OAuth\AccessToken.cs" />
+    <Compile Include="Integration\Lti\OAuth\ConsumerDescription.cs" />
+    <Compile Include="Integration\Lti\OAuth\RequestToken.cs" />
+    <Compile Include="Integration\Lti\OAuth\TokenManager.cs" />
+    <Compile Include="Integration\Canvas\PaginationType.cs" />
+    <Compile Include="Integration\Shibboleth\ShibbolethHelper.cs" />
+    <Compile Include="Language\ClassFieldDescriptor.cs" />
+    <Compile Include="Language\ConvertHelper.cs" />
+    <Compile Include="Language\ListToDataTableExtension.cs" />
+    <Compile Include="Language\NameValueCollectionToQueryStringBehavior.cs" />
+    <Compile Include="Language\ReflectionHelper.cs" />
+    <Compile Include="Language\StringHelper.cs" />
+    <Compile Include="Logging\LogManager.cs" />
+    <Compile Include="Networking\Mail\EmailFunction.cs" />
+    <Compile Include="Data\Connections.cs" />
+    <Compile Include="Data\CreditCardPaymentHelper.cs" />
+    <Compile Include="Data\GrammarHelper.cs" />
+    <Compile Include="Data\School\CourseRoster\OrderModel.cs" />
+    <Compile Include="Data\School\Course\Course.cs" />
+    <Compile Include="Data\School\Course\CourseInternalState.cs" />
+    <Compile Include="Data\School\Course\InstructorModel.cs" />
+    <Compile Include="Data\School\Course\InternalCourseSettings.cs" />
+    <Compile Include="Data\School\Course\PricingModel.cs" />
+    <Compile Include="Data\School\Course\PricingOptionType.cs" />
+    <Compile Include="Data\ViewModels\Layout\LayoutArea.cs" />
+    <Compile Include="Data\ViewModels\Layout\LayoutButton.cs" />
+    <Compile Include="Data\ViewModels\Layout\LayoutManager.cs" />
+    <Compile Include="Data\School\Material\Material.cs" />
+    <Compile Include="Data\School\Student\DistrictListModel.cs" />
+    <Compile Include="Data\School\Student\EnrollmentFunction.cs" />
+    <Compile Include="Data\School\Student\EnrollmentModel.cs" />
+    <Compile Include="Data\School\Student\SchoolListModel.cs" />
+    <Compile Include="Data\School\Student\Student.cs" />
+    <Compile Include="Data\School\Student\UserDashboardModel.cs" />
+    <Compile Include="Data\School\Student\UserDashQueries.cs" />
+    <Compile Include="Data\School\Student\UserStudentModel.cs" />
+    <Compile Include="Data\Survey\CourseSurvey\CourseSurvey.cs" />
+    <Compile Include="Data\Survey\Survey.cs" />
+    <Compile Include="Data\ViewModels\CreditCardPaymentModel.cs" />
+    <Compile Include="Data\ViewModels\DisplayMode.cs" />
+    <Compile Include="Language\EnumHelper.cs" />
+    <Compile Include="Data\ClientTracking\Entities\ClientTracking.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ClientTracking.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ClientTracking\Entities\ClientTracking.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ClientTracking.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ClientTracking\Entities\ClientTracking.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ClientTracking.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ClientTracking\Entities\GosignmeupRegistration.cs">
+      <DependentUpon>ClientTracking.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ClientTracking\Entities\GosignmeupRegStatClient.cs">
+      <DependentUpon>ClientTracking.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ClientTracking\Entities\GosignmeupStudentCount.cs">
+      <DependentUpon>ClientTracking.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ClientTracking\Entities\Newsletter.cs">
+      <DependentUpon>ClientTracking.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ClientTracking\Entities\NewsletterTag.cs">
+      <DependentUpon>ClientTracking.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ClientTracking\Entities\PerformanceStat.cs">
+      <DependentUpon>ClientTracking.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Authorization\AuthorizationHelper.cs" />
+    <Compile Include="Data\School\Course\CourseActiveState.cs" />
+    <Compile Include="Data\ViewModels\Grid\CourseOrderByField.cs" />
+    <Compile Include="Data\Events\Entities\event.cs">
+      <DependentUpon>Events.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Events\Entities\Events.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Events.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Events\Entities\Events.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Events.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Events\Entities\Events.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Events.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Events\Entities\MasterInfo.cs">
+      <DependentUpon>Events.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\School\Course\PricingOptionsHelper.cs" />
+    <Compile Include="Data\ViewModels\ViewTemplateType.cs" />
+    <Compile Include="Data\ViewModels\Grid\GridColumnModel.cs" />
+    <Compile Include="Data\OrderByDirection.cs" />
+    <Compile Include="Data\QueryState.cs" />
+    <Compile Include="Data\RoomManagement\Entities\BuildingDetail.cs">
+      <DependentUpon>RoomManagement.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RoomManagement\Entities\config.cs">
+      <DependentUpon>RoomManagement.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RoomManagement\Entities\floor.cs">
+      <DependentUpon>RoomManagement.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RoomManagement\Entities\FloorsScrollerConfig.cs">
+      <DependentUpon>RoomManagement.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RoomManagement\Entities\Holiday.cs">
+      <DependentUpon>RoomManagement.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RoomManagement\Entities\listing_countries.cs">
+      <DependentUpon>RoomManagement.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RoomManagement\Entities\member.cs">
+      <DependentUpon>RoomManagement.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RoomManagement\Entities\multi_days_booking.cs">
+      <DependentUpon>RoomManagement.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RoomManagement\Entities\room.cs">
+      <DependentUpon>RoomManagement.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RoomManagement\Entities\RoomAudience.cs">
+      <DependentUpon>RoomManagement.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RoomManagement\Entities\RoomEqApproval.cs">
+      <DependentUpon>RoomManagement.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RoomManagement\Entities\RoomEquipment.cs">
+      <DependentUpon>RoomManagement.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RoomManagement\Entities\RoomManagement.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RoomManagement.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RoomManagement\Entities\RoomManagement.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RoomManagement.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RoomManagement\Entities\RoomManagement.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RoomManagement.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RoomManagement\Entities\RoomSetup.cs">
+      <DependentUpon>RoomManagement.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RoomManagement\Entities\RoomWaitingList.cs">
+      <DependentUpon>RoomManagement.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RoomManagement\Entities\room_booking.cs">
+      <DependentUpon>RoomManagement.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\RoomManagement\Entities\tempDB.cs">
+      <DependentUpon>RoomManagement.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Survey\Entities\AnswerComment.cs">
+      <DependentUpon>Survey.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Survey\Entities\AnswerMultiple.cs">
+      <DependentUpon>Survey.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Survey\Entities\AnswerTextArea.cs">
+      <DependentUpon>Survey.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Survey\Entities\Color.cs">
+      <DependentUpon>Survey.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Survey\Entities\CourseSurvey.cs">
+      <DependentUpon>Survey.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Survey\Entities\masterinfo.cs">
+      <DependentUpon>Survey.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Survey\Entities\Question.cs">
+      <DependentUpon>Survey.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Survey\Entities\QuestionAnswerChoice.cs">
+      <DependentUpon>Survey.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Survey\Entities\ReportRequest.cs">
+      <DependentUpon>Survey.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Survey\Entities\ReportSetting.cs">
+      <DependentUpon>Survey.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Survey\Entities\SupplementalQuestion.cs">
+      <DependentUpon>Survey.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Survey\Entities\Survey.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Survey.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Survey\Entities\Survey.cs">
+      <DependentUpon>Survey.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Survey\Entities\Survey.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Survey.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Survey\Entities\User.cs">
+      <DependentUpon>Survey.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ViewModels\ListingType.cs" />
+    <Compile Include="Authorization\GuestUser.cs" />
+    <Compile Include="Authorization\AbstractSiteUser.cs" />
+    <Compile Include="Data\School\Student\MembershipHelper.cs" />
+    <Compile Include="Data\School\Student\MembershipType.cs" />
+    <Compile Include="Export\PDFReporting.cs" />
+    <Compile Include="Networking\Mail\MailClient.cs" />
+    <Compile Include="Networking\Mail\MailHandler.cs" />
+    <Compile Include="Networking\Mail\MailSettings.cs" />
+    <Compile Include="Networking\Mail\SendCalendarEventViaEmail.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Data\School\Category\Queries.cs" />
+    <Compile Include="Data\School\Course\Queries.cs" />
+    <Compile Include="Data\Settings.cs" />
+    <Compile Include="Data\School\Course\CourseModel.cs" />
+    <Compile Include="Data\ViewModels\Grid\GridModel.cs" />
+    <Compile Include="Data\ViewModels\Grid\GridPagerModel.cs" />
+    <Compile Include="Commerce\CreditCardPayments.cs" />
+    <Compile Include="Commerce\ShoppingCart\CourseShoppingCart.cs" />
+    <Compile Include="Commerce\ShoppingCart\CourseShoppingCartItem.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\TCSOnlineService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\TCSSingleService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Update\AbstractUpdater.cs" />
+    <Compile Include="Update\Modules\ConnectionStringsConfigFileUpdater.cs" />
+    <Compile Include="Update\Modules\SupervisorActiveFieldUpdate.cs" />
+    <Compile Include="Update\Updater.cs" />
+    <Compile Include="Web References\TPGSecureLink\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+    <Compile Include="Web\ControllerExtensions.cs" />
+    <Compile Include="Web\EmbedHelper.cs" />
+    <Compile Include="Web\HtmlHelperExtension.cs" />
+    <Compile Include="Web\ObjectHelper.cs" />
+    <Compile Include="Web\DevelopmentModeAttribute.cs" />
+    <Compile Include="Web\RequireAdminModeAttribute.cs" />
+    <Compile Include="Web\NoVirtualPropertySerializationContractResolver.cs" />
+    <Compile Include="Web\SerializationHelper.cs" />
+    <Compile Include="Web\WebContextObject.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EntityDeploy Include="Data\ClientTracking\Entities\ClientTracking.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>ClientTracking.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="App.Config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Data\ClientTracking\Entities\ClientTracking.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ClientTracking.edmx</DependentUpon>
+      <LastGenOutput>ClientTracking.Context.cs</LastGenOutput>
+    </None>
+    <None Include="Data\ClientTracking\Entities\ClientTracking.edmx.diagram">
+      <DependentUpon>ClientTracking.edmx</DependentUpon>
+    </None>
+    <None Include="Data\ClientTracking\Entities\ClientTracking.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ClientTracking.edmx</DependentUpon>
+      <LastGenOutput>ClientTracking.cs</LastGenOutput>
+    </None>
+    <EntityDeploy Include="Data\Events\Entities\Events.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>Events.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="Data\Events\Entities\Events.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Events.edmx</DependentUpon>
+      <LastGenOutput>Events.Context.cs</LastGenOutput>
+    </None>
+    <None Include="Data\Events\Entities\Events.edmx.diagram">
+      <DependentUpon>Events.edmx</DependentUpon>
+    </None>
+    <None Include="Data\Events\Entities\Events.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Events.edmx</DependentUpon>
+      <LastGenOutput>Events.cs</LastGenOutput>
+    </None>
+    <EntityDeploy Include="Data\RoomManagement\Entities\RoomManagement.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>RoomManagement.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="Data\RoomManagement\Entities\RoomManagement.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>RoomManagement.edmx</DependentUpon>
+      <LastGenOutput>RoomManagement.Context.cs</LastGenOutput>
+    </None>
+    <None Include="Data\RoomManagement\Entities\RoomManagement.edmx.diagram">
+      <DependentUpon>RoomManagement.edmx</DependentUpon>
+    </None>
+    <None Include="Data\RoomManagement\Entities\RoomManagement.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>RoomManagement.edmx</DependentUpon>
+      <LastGenOutput>RoomManagement.cs</LastGenOutput>
+    </None>
+    <EntityDeploy Include="Data\Survey\Entities\Survey.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>Survey.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <EntityDeploy Include="Data\School\Entities\School.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>School1.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="Data\School\Entities\School.edmx.diagram">
+      <DependentUpon>School.edmx</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Data\Survey\Entities\Survey.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Survey.edmx</DependentUpon>
+      <LastGenOutput>Survey.Context.cs</LastGenOutput>
+    </None>
+    <None Include="Data\Survey\Entities\Survey.edmx.diagram">
+      <DependentUpon>Survey.edmx</DependentUpon>
+    </None>
+    <None Include="Data\Survey\Entities\Survey.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Survey.edmx</DependentUpon>
+      <LastGenOutput>Survey1.cs</LastGenOutput>
+    </None>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\TCSOnlineService\Gsmu.Api.TCSOnlineService.CompleteOnlineCollectionResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSOnlineService\Gsmu.Api.TCSOnlineService.completeOnlineCollectionResponse1.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSOnlineService\Gsmu.Api.TCSOnlineService.CompleteOnlineCollectionWithDetailsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSOnlineService\Gsmu.Api.TCSOnlineService.completeOnlineCollectionWithDetailsResponse1.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSOnlineService\Gsmu.Api.TCSOnlineService.CreateForceResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSOnlineService\Gsmu.Api.TCSOnlineService.createForceResponse1.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSOnlineService\Gsmu.Api.TCSOnlineService.CreateForceWithDetailsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSOnlineService\Gsmu.Api.TCSOnlineService.createForceWithDetailsResponse1.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSOnlineService\Gsmu.Api.TCSOnlineService.GetDetailsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSOnlineService\Gsmu.Api.TCSOnlineService.getDetailsResponse1.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSOnlineService\Gsmu.Api.TCSOnlineService.StartOnlineCollectionResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSOnlineService\Gsmu.Api.TCSOnlineService.startOnlineCollectionResponse1.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSOnlineService\TCSOnlineService.wsdl" />
+    <None Include="Service References\TCSOnlineService\TCSOnlineService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TCSOnlineService\tcs_common_types.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TCSSingleService\common_types.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TCSSingleService\faults.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.ACHCancelResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.ACHDebitResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.ACHPrenotificationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.PCAuthorizationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.PCCancelResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.PCForceResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.PCForceWithoutPaygovTrackingIdResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.PCManualAuthorizationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.PCRefundResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.PCRefundWithoutPaygovTrackingIdResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.PCSaleResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.processACHCancelResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.processACHDebitResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.processACHPrenotificationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.processPCAuthorizationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.processPCCancelResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.processPCForceResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.processPCForceWithoutPaygovTrackingIdResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.processPCManualAuthorizationResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.processPCRefundResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.processPCRefundWithoutPaygovTrackingIdResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\Gsmu.Api.TCSSingleService.processPCSaleResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TCSSingleService\level3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TCSSingleService\TCSSingleService.wsdl" />
+    <None Include="Service References\TCSSingleService\transaction_types.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web References\TPGSecureLink\AuthorizeAccountResponse1.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\TPGSecureLink\AuthorizeRecurringAccountResponse1.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\TPGSecureLink\GenerateSecureLinkTicketResponse1.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\TPGSecureLink\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web References\TPGSecureLink\secureLink-partner.wsdl">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web References\TPGSecureLink\ValidateRecurringAccountResponse1.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Dynamic Expressions.html" />
+    <None Include="Service References\TCSOnlineService\configuration91.svcinfo" />
+    <None Include="Service References\TCSOnlineService\configuration.svcinfo" />
+    <None Include="Service References\TCSOnlineService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\TCSSingleService\configuration91.svcinfo" />
+    <None Include="Service References\TCSSingleService\configuration.svcinfo" />
+    <None Include="Service References\TCSSingleService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <Content Include="WinSCP.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferences Include="Web References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferenceUrl Include="..\wsdl\secureLink-partner.wsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\TPGSecureLink\</RelPath>
+      <UpdateFromURL>..\wsdl\secureLink-partner.wsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>Gsmu_Api_TPGSecureLink1_TPGSecureLink</CachedSettingsPropName>
+    </WebReferenceUrl>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\TCSOnlineService\" />
+    <WCFMetadataStorage Include="Service References\TCSSingleService\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="E:\websites\blackboardAPI\BlackBoardAPI\BlackBoardAPI.csproj">
+      <Project>{73badd96-f241-4fc9-8a35-d192d37f123f}</Project>
+      <Name>BlackBoardAPI</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

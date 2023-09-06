@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="b83830ac9040408d80d602709edddc91" Name="Diagram1">
+        <EntityTypeShape EntityType="RoomManagement.BuildingDetail" Width="1.5" PointX="3" PointY="1.375" />
+        <EntityTypeShape EntityType="RoomManagement.config" Width="1.5" PointX="7.75" PointY="6.75" />
+        <EntityTypeShape EntityType="RoomManagement.email_components" Width="1.5" PointX="7.75" PointY="9.75" />
+        <EntityTypeShape EntityType="RoomManagement.floor" Width="1.5" PointX="0.75" PointY="5.75" />
+        <EntityTypeShape EntityType="RoomManagement.FloorsScrollerConfig" Width="1.5" PointX="9.75" PointY="9.75" />
+        <EntityTypeShape EntityType="RoomManagement.Holiday" Width="1.5" PointX="0.75" PointY="11.75" />
+        <EntityTypeShape EntityType="RoomManagement.listing_countries" Width="1.5" PointX="7.75" PointY="2.625" />
+        <EntityTypeShape EntityType="RoomManagement.listing_hours" Width="1.5" PointX="11.75" PointY="6.75" />
+        <EntityTypeShape EntityType="RoomManagement.member" Width="1.5" PointX="10" PointY="1" />
+        <EntityTypeShape EntityType="RoomManagement.multi_days_booking" Width="1.5" PointX="11.75" PointY="9.75" />
+        <EntityTypeShape EntityType="RoomManagement.room" Width="1.5" PointX="3" PointY="6.125" />
+        <EntityTypeShape EntityType="RoomManagement.room_booking" Width="1.5" PointX="5.25" PointY="4.25" />
+        <EntityTypeShape EntityType="RoomManagement.RoomAudience" Width="1.5" PointX="12.75" PointY="0.75" />
+        <EntityTypeShape EntityType="RoomManagement.RoomEqApproval" Width="1.5" PointX="7.75" PointY="12.75" />
+        <EntityTypeShape EntityType="RoomManagement.RoomEquipment" Width="1.5" PointX="12.75" PointY="3.75" />
+        <EntityTypeShape EntityType="RoomManagement.RoomSetup" Width="1.5" PointX="2.75" PointY="13.75" />
+        <EntityTypeShape EntityType="RoomManagement.tempDB" Width="1.5" PointX="4.75" PointY="13.75" />
+        <EntityTypeShape EntityType="RoomManagement.RoomWaitingList" Width="1.5" PointX="13.75" PointY="6.75" />
+        <AssociationConnector Association="RoomManagement.Fk_Floors_BuildingDetails_FloorId" />
+        <AssociationConnector Association="RoomManagement.Fk_Floors_room_floor_id" />
+        <AssociationConnector Association="RoomManagement.Fk_listing_countries_members_country_id" />
+        <AssociationConnector Association="RoomManagement.Fk_room_room_booking_room_id" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
