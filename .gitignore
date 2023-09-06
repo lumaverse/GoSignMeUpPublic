@@ -1,2 +1,10 @@
 
 Gsmu.Web/admin/
+.vs/gsmu.net/v15/Server/sqlite3/storage.ide-shm
+.vs/config/applicationhost.config
+.vs/gsmu.net/config/applicationhost.config
+*.lock
+*.ide-wal
+*.ide
+.vs/gsmu.net/v16/.suo
+.vs/gsmu.net/v15/.suo
