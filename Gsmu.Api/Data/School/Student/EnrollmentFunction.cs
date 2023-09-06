@@ -1576,6 +1576,11 @@ namespace Gsmu.Api.Data.School.Student
                             {
                                 cr.EnrollMaster = cr.STUDENTID;
                             }
+
+                            if (PaymentModel is null)
+                            {
+                                cr.TIMEADDED = order.orderdate;
+                            }
                             cr.eventid = coursedetails.eventid;
                             cr.COURSEID = coursedetails.cid;
                             cr.STUDENTID = userdetails.sid;
