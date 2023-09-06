@@ -182,3 +182,5 @@ C:\websites\lang2\Gsmu.Service.BusinessLogic\obj\Debug\Gsmu.Service.BusinessLogi
 C:\websites\lang2\Gsmu.Service.BusinessLogic\bin\Debug\BlackBoardAPI.dll
 C:\websites\lang2\Gsmu.Service.BusinessLogic\bin\Debug\BlackBoardAPI.pdb
 C:\websites\lang2\Gsmu.Service.BusinessLogic\obj\Debug\Gsmu.Service.BusinessLogic.csprojAssemblyReference.cache
+C:\websites\Lumaverse_GSMU\GoSignMeUpPublic\Gsmu.Service.BusinessLogic\obj\Debug\Gsmu.Service.BusinessLogic.dll
+C:\websites\Lumaverse_GSMU\GoSignMeUpPublic\Gsmu.Service.BusinessLogic\obj\Debug\Gsmu.Service.BusinessLogic.pdb

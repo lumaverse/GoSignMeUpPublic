@@ -175,3 +175,5 @@ C:\websites\lang2\Gsmu.Service.Interface\obj\Debug\Gsmu.Service.Interface.pdb
 C:\websites\lang2\Gsmu.Service.Interface\bin\Debug\BlackBoardAPI.dll
 C:\websites\lang2\Gsmu.Service.Interface\bin\Debug\BlackBoardAPI.pdb
 C:\websites\lang2\Gsmu.Service.Interface\obj\Debug\Gsmu.Service.Interface.csprojAssemblyReference.cache
+C:\websites\Lumaverse_GSMU\GoSignMeUpPublic\Gsmu.Service.Interface\obj\Debug\Gsmu.Service.Interface.dll
+C:\websites\Lumaverse_GSMU\GoSignMeUpPublic\Gsmu.Service.Interface\obj\Debug\Gsmu.Service.Interface.pdb
