@@ -1579,7 +1579,7 @@ namespace Gsmu.Api.Data.School.Student
 
                             if (PaymentModel is null)
                             {
-                                cr.TIMEADDED = order.orderdate;
+                                cr.TIMEADDED = DateTime.Parse(order.orderdate.Value.ToString("yyyy-MM-dd hh:mm"));
                             }
                             cr.eventid = coursedetails.eventid;
                             cr.COURSEID = coursedetails.cid;
