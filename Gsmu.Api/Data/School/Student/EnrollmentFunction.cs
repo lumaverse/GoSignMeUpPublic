@@ -1576,6 +1576,11 @@ namespace Gsmu.Api.Data.School.Student
                             {
                                 cr.EnrollMaster = cr.STUDENTID;
                             }
+
+                            if (PaymentModel is null)
+                            {
+                                cr.TIMEADDED = DateTime.Parse(order.orderdate.Value.ToString("yyyy-MM-dd hh:mm"));
+                            }
                             cr.eventid = coursedetails.eventid;
                             cr.COURSEID = coursedetails.cid;
                             cr.STUDENTID = userdetails.sid;
