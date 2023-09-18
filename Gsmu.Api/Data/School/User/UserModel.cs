@@ -1028,12 +1028,12 @@ namespace Gsmu.Api.Data.School.User
                                 user_update.name.given = ui.first;
                                 user_update.name.family = ui.last;
 
-                                string[] bbSystemRole = new string[1];
+                              //  string[] bbSystemRole = new string[1];
                                 string[] bbInstitutionRole = new string[1];
-                                bbSystemRole[0] = Configuration.Instance.BlackboardSystemRole;
+                                //bbSystemRole[0] = Configuration.Instance.BlackboardSystemRole;
                                 bbInstitutionRole[0] =Configuration.Instance.BlackboardInstitutionalRole;
 
-                                user_update.systemRoleIds = bbSystemRole;
+                                //user_update.systemRoleIds = bbSystemRole;
                                 user_update.institutionRoleIds = bbInstitutionRole;
                                 BBRespUserProfile updateduser = handelr.CreateNewUser(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl, user_update,"", jsonToken, "");
                                 st.Blackboard_user_UUID = updateduser.uuid;
