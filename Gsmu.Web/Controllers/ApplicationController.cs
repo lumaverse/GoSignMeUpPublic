@@ -1214,28 +1214,6 @@ namespace Gsmu.Web.Controllers
         {
             return "Done marking.";
         }
-        public ActionResult TestList()
-        {
-            var result = new JavaScriptResult();
-            TestList test = new TestList();
-            test.id = 1;
-            test.Title = "Title 1";
-            test.userID = "12034";
-            test.Descriptiom = "This is description";
-
-            List<TestList> TestLists = new List<TestList>();
-            TestLists.Add(test);
-            TestList test2 = new TestList();
-            test2.id = 1;
-            test2.Title = "Title 2";
-            test2.userID = "12034";
-            test2.Descriptiom = "This is description 2";
-            TestLists.Add(test2);
-            string arguments = SerializationHelper.SerializeEntity(TestLists);
-            result.Script = arguments;
-            return result;
-        }
-
         public ActionResult TestBB_Courses()
         {
             BlackBoardAPI.BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
@@ -1258,6 +1236,111 @@ namespace Gsmu.Web.Controllers
             
             return result;
 
+        }
+
+        public string DebugBlackBoard(string url, string query, string jsonparams)
+        {
+            BlackBoardAPI.BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
+            BBToken BBToken = new BBToken();
+            BBToken = handelr.GenerateAccessToken(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl);
+            var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
+
+
+                var bbresult = handelr.DebugBlackBoard(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl,jsonToken,url,query,jsonparams);
+
+            return bbresult;
+        }
+
+
+        public string CopyandCreateNewCourse()
+        {
+            BlackBoardAPI.BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
+            BBToken BBToken = new BBToken();
+            BBToken = handelr.GenerateAccessToken(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl);
+            var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
+            string result = "";
+
+            using (var db = new SchoolEntities())
+            {
+                db.Configuration.LazyLoadingEnabled = false;
+                db.Configuration.ProxyCreationEnabled = false;
+                db.Configuration.AutoDetectChangesEnabled = false;
+                var courseDetails = (from course in db.Courses
+                                     where course.CustomCourseField1 != "" && course.CustomCourseField2 != "" && course.CustomCourseField1 !=null && course.CustomCourseField2!=null
+                                     select new
+                                     {
+                                         SourceCourseId = course.CustomCourseField2,
+                                         NewId = course.CustomCourseField1
+                                     }).ToList();
+
+
+
+
+                string SourceCourseId = "";
+                copyCourse copyCourse = new copyCourse();
+                copyCourse.targetCourse = new targetCourse();
+                copyCourse.targetCourse.courseId = "";
+                copyCourse.copy = new copy();
+
+                foreach (var course in courseDetails)
+                {
+                    SourceCourseId = course.SourceCourseId;
+                    copyCourse = new copyCourse();
+                    copyCourse.targetCourse = new targetCourse();
+                    copyCourse.targetCourse.courseId = course.NewId;
+                    copyCourse.targetCourse.id = new List<string>();
+                    copyCourse.copy = new copy();
+                    copyCourse.copy.adaptiveReleaseRules = true;
+                    copyCourse.copy.announcements = true;
+                    copyCourse.copy.assessments = true;
+                    copyCourse.copy.blogs = true;
+                    copyCourse.copy.calendar = true;
+                    copyCourse.copy.contacts = true;
+                    copyCourse.copy.contentAlignments = true;
+                    copyCourse.copy.contentAreas = true;
+                    copyCourse.copy.discussions = "None";
+                    copyCourse.copy.glossary = true;
+                    copyCourse.copy.gradebook = true;
+                    copyCourse.copy.groupSettings = true;
+                    copyCourse.copy.journals = true;
+                    copyCourse.copy.retentionRules = true;
+                    copyCourse.copy.rubrics = true;
+                    copyCourse.copy.settings = new settings();
+                    copyCourse.copy.settings.availability = true;
+                    copyCourse.copy.settings.bannerImage = true;
+                    copyCourse.copy.settings.duration = true;
+                    copyCourse.copy.settings.enrollmentOptions = true;
+                    copyCourse.copy.settings.guestAccess = true;
+                    copyCourse.copy.settings.languagePack = true;
+                    copyCourse.copy.settings.navigationSettings = true;
+                    copyCourse.copy.settings.observerAccess = true;
+
+                    copyCourse.copy.wikis = true;
+                    copyCourse.copy.tasks = true;
+
+                    result = result + " <br> '" + SourceCourseId+"'";
+                    var bbcourses = handelr.GetCourseDetails(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, SourceCourseId, "courseId", "", jsonToken);
+                    dynamic json = JsonConvert.DeserializeObject(bbcourses);
+                    string uuid = "";
+                    if (json != null)
+                    {
+                        BBCourse obj_course = JsonConvert.DeserializeObject<BBCourse>(bbcourses);
+                        uuid = obj_course.uuid;
+                    }
+
+                    if (uuid != "")
+                    {
+                        result = result + "|Message:"+handelr.CopyandCreateNewCourse(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, copyCourse, SourceCourseId, jsonToken);
+                    }
+
+                    else
+                    {
+                        result = result + " Course Id not exist.";
+                    }
+                }
+            }
+
+            return result;
         }
 
 
