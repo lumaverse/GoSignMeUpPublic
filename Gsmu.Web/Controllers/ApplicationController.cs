@@ -1188,13 +1188,20 @@ namespace Gsmu.Web.Controllers
         }
 
 
-        public void TestBB()
+        public BBHierarchies TestBB()
         {
-            // BlackboardAPIRequest BlackboardAPIRequest = new BlackboardAPIRequest();
-            // BlackboardAPIRequest.GetBlackBoardCourses();
+            if (Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardUseAPI)
+            {
+                BlackBoardAPI.BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
+                BBToken BBToken = new BBToken();
+                BBToken = handelr.GenerateAccessToken(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl);
+                var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
+                var datasources = handelr.GetBBAPIHierarchiess(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl,"", "", "", jsonToken);
 
-            // Api.Integration.Blackboard.TesterAPIDLL tester = new Api.Integration.Blackboard.TesterAPIDLL();
-            //tester.GetBlackBoardCourses();
+                return datasources;
+            }
+
+            return null;
         }
 
         public bool TestLog()
