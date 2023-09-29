@@ -1267,11 +1267,7 @@ namespace Gsmu.Web.Controllers
                 db.Configuration.AutoDetectChangesEnabled = false;
                 var courseDetails = (from course in db.Courses
                                      where course.BBCourseCloned == 0 && course.blackboard_api_uuid == null && course.COURSEID > 10371 && course.CustomCourseField1 != "" && course.CustomCourseField2 != "" && course.CustomCourseField1 !=null && course.CustomCourseField2!=null
-                                     select new
-                                     {
-                                         SourceCourseId = course.CustomCourseField2,
-                                         NewId = course.CustomCourseField1
-                                     }).ToList();
+                                     select course).ToList();
 
 
 
@@ -1284,10 +1280,10 @@ namespace Gsmu.Web.Controllers
 
                 foreach (var course in courseDetails)
                 {
-                    SourceCourseId = course.SourceCourseId;
+                    SourceCourseId = course.CustomCourseField2;
                     copyCourse = new copyCourse();
                     copyCourse.targetCourse = new targetCourse();
-                    copyCourse.targetCourse.courseId = course.NewId;
+                    copyCourse.targetCourse.courseId = course.CustomCourseField1;
                     copyCourse.copy = new copy();
                     copyCourse.copy.adaptiveReleaseRules = true;
                     copyCourse.copy.announcements = true;
@@ -1316,7 +1312,7 @@ namespace Gsmu.Web.Controllers
 
                     copyCourse.copy.wikis = true;
                     copyCourse.copy.tasks = true;
-                    result = "New ID: " + course.NewId;
+                    result = "New ID: " + course.CustomCourseField1;
                     result = result + " <br> Source '" + SourceCourseId+"' | ";
                     var bbcourses = handelr.GetCourseDetails(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, SourceCourseId, "courseId", "", jsonToken);
                     dynamic json = JsonConvert.DeserializeObject(bbcourses);
@@ -1325,11 +1321,22 @@ namespace Gsmu.Web.Controllers
                     {
                         BBCourse obj_course = JsonConvert.DeserializeObject<BBCourse>(bbcourses);
                         uuid = obj_course.uuid;
+
                     }
 
                     if (uuid != "")
                     {
-                        result = result + "uuid " + uuid + "<br>json: " + json  + "<br>| Message:" +handelr.CopyandCreateNewCourse(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, copyCourse, SourceCourseId, jsonToken,"");
+
+                       var bbNewCourse= handelr.CopyandCreateNewCourse(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, copyCourse, course.CustomCourseField2, jsonToken, "");
+ 
+                        var bbaddedcourses = handelr.GetCourseDetails(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, course.CustomCourseField1, "courseId", "", jsonToken);
+                        BBCourse obj_course = JsonConvert.DeserializeObject<BBCourse>(bbaddedcourses);
+
+                        course.blackboard_api_uuid = obj_course.uuid;
+                        db.SaveChanges();
+                        obj_course.name = course.COURSENAME;
+                        var updated_course = handelr.UpdateBlackbooardCourseDetails(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, obj_course,course.CustomCourseField1, "", jsonToken);
+                        result = result + "uuid " + uuid + "<br>json: " + json + "<br>| Message:" + bbaddedcourses + "<br> Updated Course:"+updated_course;
                     }
 
                     else
