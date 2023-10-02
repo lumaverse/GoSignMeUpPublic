@@ -56,16 +56,18 @@
 
             TableName = "Instructors";
             userregfieldspec = dlists.AllInstructorUserFields;
-
-            if (Model.Instructor.canvas_user_id > 0 && Model.Instructor.PASSWORD.IndexOf("canvas") > 0)
+            if (Model.Instructor != null)
             {
-                hideUsernameAndPassword = true;
-                userManagementProvider = "Canvas";
-            }
-            if (!string.IsNullOrWhiteSpace(Model.Instructor.lti_user_id))
-            {
-                hideUsernameAndPassword = true;
-                userManagementProvider = "LTI";
+                if (Model.Instructor.canvas_user_id > 0 && Model.Instructor.PASSWORD.IndexOf("canvas") > 0)
+                {
+                    hideUsernameAndPassword = true;
+                    userManagementProvider = "Canvas";
+                }
+                if (!string.IsNullOrWhiteSpace(Model.Instructor.lti_user_id))
+                {
+                    hideUsernameAndPassword = true;
+                    userManagementProvider = "LTI";
+                }
             }
 
             break;
