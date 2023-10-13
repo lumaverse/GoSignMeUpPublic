@@ -1035,8 +1035,13 @@ namespace Gsmu.Api.Data.School.User
                                 bbInstitutionRole[0] =Configuration.Instance.BlackboardInstitutionalRole;
                                 //user_update.systemRoleIds = bbSystemRole;
                                 user_update.institutionRoleIds = bbInstitutionRole;
-                                BBRespUserProfile updateduser = handelr.CreateNewUser(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl, user_update,"", jsonToken, "");
+
+
+
+                                BBRespUserProfile updateduser = handelr.CreateNewUser(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl, user_update,"", jsonToken,"", Configuration.Instance.StudentInstitutionalHierarchyNodeId);
                                 st.Blackboard_user_UUID = updateduser.uuid;
+
+   
                             }
                         }
                         else
@@ -1621,7 +1626,7 @@ namespace Gsmu.Api.Data.School.User
 
                    // user_update.systemRoleIds = bbSystemRole;
                     user_update.institutionRoleIds = bbInstitutionRole;
-                    BBRespUserProfile updateduser = handelr.CreateNewUser(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl, user_update, "", jsonToken, "");
+                    BBRespUserProfile updateduser = handelr.CreateNewUser(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl, user_update, "", jsonToken, "", Configuration.Instance.StudentInstitutionalHierarchyNodeId);
                     it.Blackboard_user_UUID = updateduser.uuid;
                 }
             }
