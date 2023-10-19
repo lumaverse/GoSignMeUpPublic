@@ -136,8 +136,12 @@ function checkPhoneFormat(val, field) {
     }
 }
 
-function checkPasswordFormat(val, field, isSpecialCase) {
+function checkPasswordFormat(val, field, isSpecialCase, format) {
     if (val == "**********"|| val == "") {
+        return true;
+    }
+    else if (format == "None")
+    {
         return true;
     }
     else {
