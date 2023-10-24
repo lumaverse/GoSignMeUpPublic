@@ -286,8 +286,13 @@ namespace Gsmu.Web.Areas.Public.Controllers
 
         public bool ValidateUrlReferrer()
         {
+
             try
             {
+                if(!Gsmu.Api.Data.WebConfiguration.RequiredReferrerCheck)
+                {
+                    return true;
+                }
                 if (HttpContext.Request.UrlReferrer.Authority.ToString().ToLower() != Settings.Instance.GetMasterInfo4().DotNetSiteRootUrl.ToLower().Replace("/", "").Replace("https:", ""))
                 {
                     return false;
