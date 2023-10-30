@@ -646,20 +646,21 @@
                     <text>
 
                     var cmbxfld = Ext.getCmp('@formId' + 'school');
-                    var CmboStoreSchool = cmbxfld.getStore();
-                    CmboStoreSchool.filter([
-                        { id: 'district', property: 'district', value: @Html.Json(fldvalue) }
-                    ]);
-                    CmboStoreSchool.on('load', function() {
-                        cmbxfld.Text = '';
-                        if(CmboStoreSchool.data.length==0){
-                            cmbxfld.emptyText = 'No record available';
-                        }else{
-                            cmbxfld.emptyText = '@emptyText';
-                        }
-                        cmbxfld.applyEmptyText();
-                    })
-
+                    if (cmbxfld != undefined) {
+                        var CmboStoreSchool = cmbxfld.getStore();
+                        CmboStoreSchool.filter([
+                            { id: 'district', property: 'district', value: @Html.Json(fldvalue) }
+                        ]);
+                        CmboStoreSchool.on('load', function () {
+                            cmbxfld.Text = '';
+                            if (CmboStoreSchool.data.length == 0) {
+                                cmbxfld.emptyText = 'No record available';
+                            } else {
+                                cmbxfld.emptyText = '@emptyText';
+                            }
+                            cmbxfld.applyEmptyText();
+                        })
+                    }
                     </text>
                 }
             },
