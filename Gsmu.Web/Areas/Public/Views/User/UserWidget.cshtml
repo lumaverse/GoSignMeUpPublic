@@ -27,6 +27,7 @@
     bool BlackboardSsoEnabled = blackboard.Configuration.Instance.BlackboardSsoEnabled;
     bool canvasEnabled = Gsmu.Api.Integration.Canvas.Configuration.Instance.EnableOAuth2Authentication;
     bool isBlackboardOwned = false;
+    string passwordFormat = System.Configuration.ConfigurationManager.AppSettings["PasswordFormat"];
 
     if (ViewBag.cmode == "txt")
     {
@@ -1495,7 +1496,7 @@
                                     {
                                         isSpecialCase = true;
                                     }
-                                    return checkPasswordFormat(field.getValue(), field, isSpecialCase);
+                                        return checkPasswordFormat(field.getValue(), field, isSpecialCase,'@passwordFormat');
                                 }
                                 },{
                                     xtype: 'displayfield', //for displaying custom error
