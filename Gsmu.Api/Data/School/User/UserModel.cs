@@ -1003,7 +1003,10 @@ namespace Gsmu.Api.Data.School.User
                             if (user.userName != null)
                             {
                                 BBUser user_update = new BBUser();
-                                user_update.dataSourceId = Settings.Instance.GetMasterInfo4().blackboard_students_dsk;
+                                if (Settings.Instance.GetMasterInfo4().blackboard_students_dsk != "" && Settings.Instance.GetMasterInfo4().blackboard_students_dsk != null)
+                                {
+                                    user_update.dataSourceId = Settings.Instance.GetMasterInfo4().blackboard_students_dsk;
+                                }
                                 user_update.password = st.STUDNUM;
 
                                 user_update.contact = new ProfileContactObj();
@@ -1019,7 +1022,10 @@ namespace Gsmu.Api.Data.School.User
                             else
                             {
                                 BBUser user_update = new BBUser();
-                                user_update.dataSourceId = Settings.Instance.GetMasterInfo4().blackboard_students_dsk;
+                                if (Settings.Instance.GetMasterInfo4().blackboard_students_dsk != "" && Settings.Instance.GetMasterInfo4().blackboard_students_dsk != null)
+                                {
+                                    user_update.dataSourceId = Settings.Instance.GetMasterInfo4().blackboard_students_dsk;
+                                }
                                 user_update.userName = ui.username;
                                 user_update.password = ui.password;
 
