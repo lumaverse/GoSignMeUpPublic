@@ -715,12 +715,27 @@ namespace Gsmu.Web.Controllers
                             BBToken = handelr.GenerateAccessToken(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl);
                             var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
                             var bbcourses = handelr.GetCourseDetails(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, Key, "courseId", "", jsonToken);
+
                             dynamic json = JsonConvert.DeserializeObject(bbcourses);
 
                             if (json != null)
                             {
+
                                 BBCourse obj_course = JsonConvert.DeserializeObject<BBCourse>(bbcourses);
-                                callResult = obj_course.uuid + "|" + obj_course.name;
+                                var datasourceKeyDetails = handelr.GetDatasourceKeyDetails(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, obj_course.dataSourceId, "dsk", "", jsonToken);
+                                datasource datasource = JsonConvert.DeserializeObject<datasource>(datasourceKeyDetails);
+                                string globaldsk = "";
+                                if(obj_course.dataSourceId != Gsmu.Api.Integration.Blackboard.Configuration.Instance.CoursesDsk)
+                                {
+                                    var globaldatasourceKeyDetails = handelr.GetDatasourceKeyDetails(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, Gsmu.Api.Integration.Blackboard.Configuration.Instance.CoursesDsk, "dsk", "", jsonToken);
+                                    datasource globaldatasource = JsonConvert.DeserializeObject<datasource>(globaldatasourceKeyDetails);
+                                    globaldsk = globaldatasource.description;
+                                }
+                                if(globaldsk=="")
+                                {
+                                    globaldsk = Gsmu.Api.Integration.Blackboard.Configuration.Instance.CoursesDsk;
+                                }
+                                callResult = obj_course.uuid + "|" + obj_course.name +"|"+ datasource.description+"|" + obj_course.dataSourceId+"|" + globaldsk;
                             }
                             else
                             {
@@ -888,6 +903,34 @@ namespace Gsmu.Web.Controllers
                             callResult ="Major="+ bbcourses.learn.major+" Minor="+ bbcourses.learn.minor;
                         }
                         break;
+
+                    case "update-bb-course-datasourceid":
+                        {
+                            if (Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardUseAPI)
+                            {
+                                BlackBoardAPI.BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
+                                BBToken BBToken = new BBToken();
+                                BBToken = handelr.GenerateAccessToken(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl);
+                                var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
+                                var bbcourses = handelr.GetCourseDetails(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, Key, "courseId", "", jsonToken);
+                                dynamic json = JsonConvert.DeserializeObject(bbcourses);
+
+                                if (json != null)
+                                {
+                                    BBCourse obj_course = JsonConvert.DeserializeObject<BBCourse>(bbcourses);
+                                    obj_course.dataSourceId = Gsmu.Api.Integration.Blackboard.Configuration.Instance.CoursesDsk;
+                                    var updated_course = handelr.UpdateBlackbooardCourseDetails(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, obj_course, Key, "", jsonToken);
+
+                                    callResult = updated_course;
+                                }
+                                else
+                                {
+                                    callResult = null;
+                                }
+                            }
+
+                                break;
+                        }
                 }
 
                 //}
