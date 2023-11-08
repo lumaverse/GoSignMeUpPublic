@@ -3942,7 +3942,7 @@ namespace Gsmu.Api.Data.School.Student
                         BBToken = handelr.GenerateAccessToken(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl);
                         var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
                         BBEnrollment myEnrollmentData = new BBEnrollment();
-                        myEnrollmentData.courseRoleId = "Student";
+                        myEnrollmentData.courseRoleId = Gsmu.Api.Integration.Blackboard.Configuration.Instance.StudentDsk;
                         handelr.CreateNewEnrollment(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, myEnrollmentData, studentuuid.Blackboard_user_UUID, courseuuid.blackboard_api_uuid, "uuid", "uuid", "", jsonToken);
 
 
