@@ -5710,7 +5710,8 @@ namespace Gsmu.Web.Areas.Public.Controllers
 
         public bool ValidateUrlReferrer()
         {
-            if(HttpContext.Request.UrlReferrer.Authority.ToString().ToLower()!= Settings.Instance.GetMasterInfo4().DotNetSiteRootUrl.ToLower().Replace("/","").Replace("https:",""))
+            var test = Settings.Instance.GetMasterInfo4().DotNetSiteRootUrl.ToLower().Replace("/", "").Replace("https:", "");
+            if (HttpContext.Request.UrlReferrer.Authority.ToString().ToLower()!= Settings.Instance.GetMasterInfo4().DotNetSiteRootUrl.ToLower().Replace("/","").Replace("https:",""))
             {
                 return false;
             }

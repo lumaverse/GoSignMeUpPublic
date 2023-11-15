@@ -24,6 +24,7 @@ using Gsmu.Api.Integration.Blackboard;
 using BlackBoardAPI;
 using static BlackBoardAPI.BlackBoardAPIModel;
 using System.Web.Script.Serialization;
+using Newtonsoft.Json;
 
 namespace Gsmu.Api.Data.School.User
 {
@@ -1005,7 +1006,22 @@ namespace Gsmu.Api.Data.School.User
                                 BBUser user_update = new BBUser();
                                 if (Settings.Instance.GetMasterInfo4().blackboard_students_dsk != "" && Settings.Instance.GetMasterInfo4().blackboard_students_dsk != null)
                                 {
-                                    user_update.dataSourceId = Settings.Instance.GetMasterInfo4().blackboard_students_dsk;
+                                    string tempDSK = Settings.Instance.GetMasterInfo4().blackboard_students_dsk;
+                                    if (!string.IsNullOrEmpty(tempDSK))
+                                    {
+                                        if (tempDSK.IndexOf("_") < 0)
+                                        {
+                                            var globaldatasourceKeyDetails = handelr.GetDatasourceKeyDetails(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, Gsmu.Api.Integration.Blackboard.Configuration.Instance.StudentDsk, "dsk", "", jsonToken);
+                                            datasource globaldatasource = JsonConvert.DeserializeObject<datasource>(globaldatasourceKeyDetails);
+                                            string actualDSK = globaldatasource.id;
+
+                                            user_update.dataSourceId = actualDSK;
+                                        }
+                                        else
+                                        {
+                                            user_update.dataSourceId = tempDSK;
+                                        }
+                                    }
                                 }
                                 user_update.password = st.STUDNUM;
 
@@ -1016,15 +1032,28 @@ namespace Gsmu.Api.Data.School.User
                                 user_update.name.family = st.LAST;
 
                                 BBRespUserProfile updateduser = handelr.UpdateExisitingUser(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl, user_update, user.userName, "", "", jsonToken, "");
-
-
                             }
                             else
                             {
                                 BBUser user_update = new BBUser();
                                 if (Settings.Instance.GetMasterInfo4().blackboard_students_dsk != "" && Settings.Instance.GetMasterInfo4().blackboard_students_dsk != null)
                                 {
-                                    user_update.dataSourceId = Settings.Instance.GetMasterInfo4().blackboard_students_dsk;
+                                    string tempDSK = Settings.Instance.GetMasterInfo4().blackboard_students_dsk;
+                                    if (!string.IsNullOrEmpty(tempDSK))
+                                    {
+                                        if (tempDSK.IndexOf("_") < 0)
+                                        {
+                                            var globaldatasourceKeyDetails = handelr.GetDatasourceKeyDetails(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, Gsmu.Api.Integration.Blackboard.Configuration.Instance.StudentDsk, "dsk", "", jsonToken);
+                                            datasource globaldatasource = JsonConvert.DeserializeObject<datasource>(globaldatasourceKeyDetails);
+                                            string actualDSK = globaldatasource.id;
+
+                                            user_update.dataSourceId = actualDSK;
+                                        }
+                                        else
+                                        {
+                                            user_update.dataSourceId = tempDSK;
+                                        }
+                                    }                                    
                                 }
                                 user_update.userName = ui.username;
                                 user_update.password = ui.password;
@@ -1042,12 +1071,8 @@ namespace Gsmu.Api.Data.School.User
                                 //user_update.systemRoleIds = bbSystemRole;
                                 user_update.institutionRoleIds = bbInstitutionRole;
 
-
-
                                 BBRespUserProfile updateduser = handelr.CreateNewUser(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl, user_update,"", jsonToken,"", Configuration.Instance.StudentInstitutionalHierarchyNodeId);
-                                st.Blackboard_user_UUID = updateduser.uuid;
-
-   
+                                st.Blackboard_user_UUID = updateduser.uuid;   
                             }
                         }
                         else
@@ -1080,7 +1105,27 @@ namespace Gsmu.Api.Data.School.User
                             BBToken = handelr.GenerateAccessToken(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl);
                             var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
                             BBUser user_update = new BBUser();
-                            user_update.dataSourceId = Settings.Instance.GetMasterInfo4().blackboard_students_dsk;
+
+                            if (Settings.Instance.GetMasterInfo4().blackboard_students_dsk != "" && Settings.Instance.GetMasterInfo4().blackboard_students_dsk != null)
+                            {
+                                string tempDSK = Settings.Instance.GetMasterInfo4().blackboard_students_dsk;
+                                if (!string.IsNullOrEmpty(tempDSK))
+                                {
+                                    if (tempDSK.IndexOf("_") < 0)
+                                    {
+                                        var globaldatasourceKeyDetails = handelr.GetDatasourceKeyDetails(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, Gsmu.Api.Integration.Blackboard.Configuration.Instance.StudentDsk, "dsk", "", jsonToken);
+                                        datasource globaldatasource = JsonConvert.DeserializeObject<datasource>(globaldatasourceKeyDetails);
+                                        string actualDSK = globaldatasource.id;
+
+                                        user_update.dataSourceId = actualDSK;
+                                    }
+                                    else
+                                    {
+                                        user_update.dataSourceId = tempDSK;
+                                    }
+                                }
+                            }
+
                             //user_update.userName = Request["username"];
                             user_update.password = st.STUDNUM;
                             //user_update.userName = st.Blackboard_user_UUID;
@@ -1090,9 +1135,7 @@ namespace Gsmu.Api.Data.School.User
                             user_update.name.given = st.FIRST;
                             user_update.name.family = st.LAST;
 
-
                             BBRespUserProfile updateduser = handelr.UpdateExisitingUser(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl, user_update, st.Blackboard_user_UUID, "uuid", "", jsonToken, "");
-
                         }
                         else
                         {
@@ -1615,7 +1658,27 @@ namespace Gsmu.Api.Data.School.User
                 else
                 {
                     BBUser user_update = new BBUser();
-                    user_update.dataSourceId = Settings.Instance.GetMasterInfo4().blackboard_instructors_dsk;
+
+                    if (Settings.Instance.GetMasterInfo4().blackboard_instructors_dsk != "" && Settings.Instance.GetMasterInfo4().blackboard_instructors_dsk != null)
+                    {
+                        string tempDSK = Settings.Instance.GetMasterInfo4().blackboard_instructors_dsk;
+                        if (!string.IsNullOrEmpty(tempDSK))
+                        {
+                            if (tempDSK.IndexOf("_") < 0)
+                            {
+                                var globaldatasourceKeyDetails = handelr.GetDatasourceKeyDetails(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, Gsmu.Api.Integration.Blackboard.Configuration.Instance.InstructorsDsk, "dsk", "", jsonToken);
+                                datasource globaldatasource = JsonConvert.DeserializeObject<datasource>(globaldatasourceKeyDetails);
+                                string actualDSK = globaldatasource.id;
+
+                                user_update.dataSourceId = actualDSK;
+                            }
+                            else
+                            {
+                                user_update.dataSourceId = tempDSK;
+                            }
+                        }
+                    }
+                    
                     user_update.userName = ui.username;
                     user_update.password = ui.password;
 
