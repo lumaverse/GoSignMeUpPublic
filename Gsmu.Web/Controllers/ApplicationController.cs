@@ -93,7 +93,8 @@ namespace Gsmu.Web.Controllers
             string pureHash = "haiku" + DateTime.Now.ToString("M/d/yyyy") + ' ' + DateTime.Now.ToString("HH:mm") + ' ' + LMSCallHashKey;
             string ServerHash = Gsmu.Api.Encryption.HmacSha1.Encode("haiku" + DateTime.Now.ToString("M/d/yyyy") + ' ' + DateTime.Now.ToString("HH:mm"), LMSCallHashKey);
             object callResult = null;
-            if (Gsmu.Api.Web.RequireAdminModeAttribute.IsAdminMode || 1 == 1 || (ServerHash == CallerRequestHash) || AuthorizationHelper.CurrentInstructorUser != null)
+            //if ((ServerHash == CallerRequestHash) || AuthorizationHelper.CurrentInstructorUser != null)
+            if (Gsmu.Api.Web.RequireAdminModeAttribute.IsAdminMode || (ServerHash == CallerRequestHash) || AuthorizationHelper.CurrentInstructorUser != null)
             {
                 //try
                 //{
@@ -817,39 +818,50 @@ namespace Gsmu.Web.Controllers
                             BBToken BBToken = new BBToken();
                             BBToken = handelr.GenerateAccessToken(BB_sec_key, BB_app_key, "", bb_connection_url);
                             var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
-                            var bbcolumns = handelr.GetCourseGradeColumnDetails(BB_sec_key, BB_app_key, "", bb_connection_url, _course.Course.blackboard_api_uuid, "uuid", "", jsonToken);
-                            dynamic json = JsonConvert.DeserializeObject(bbcolumns);
+                            string curCourse_identify = "";
+                            string curCourse_id_field = "";
+                            if (!string.IsNullOrEmpty(_course.Course.blackboard_api_uuid)) {
+                                curCourse_identify = _course.Course.blackboard_api_uuid;
+                                curCourse_id_field = "uuid";
+                            } else
+                            {
+                                curCourse_identify = _course.Course.CustomCourseField1;
+                                curCourse_id_field = "courseId";
+                            }
+                            var bbcolumns = handelr.GetCourseGradeColumnDetails(BB_sec_key, BB_app_key, "", bb_connection_url, curCourse_identify, curCourse_id_field, "", jsonToken);
+                            dynamic jsonColumns = JsonConvert.DeserializeObject(bbcolumns);
                             dynamic jsonGrade = null;
                             string columnId = "";
                             var gradeholder = "";
                             string FinalGradeColumn = Settings.Instance.GetMasterInfo3().BlackboardGradeCenterColumnName.ToLower();
 
-                            foreach (var item in json)
+                            foreach (var itemCol in jsonColumns)
                             {
-                                foreach (var details in item)
+                                foreach (var detailCol in itemCol)
                                 {
-                                    foreach (var columns in details)
+                                    foreach (var columns in detailCol)
                                     {
                                         try
                                         {
                                             //if (columns["externalGrade"] != null )
                                             string GradeBookFinalColumn = columns["name"].ToString().ToLower();
-                                            if (columns["name"].ToString().ToLower() == FinalGradeColumn)
+                                            if (GradeBookFinalColumn == FinalGradeColumn)
                                             {
 
-                                                using (var db = new SchoolEntities())
+                                                using (var db1= new SchoolEntities())
                                                 {
-                                                    db.Configuration.LazyLoadingEnabled = false;
-                                                    db.Configuration.ProxyCreationEnabled = false;
-                                                    db.Configuration.AutoDetectChangesEnabled = false;
-                                                    var rosterDetails = (from roster in db.Course_Rosters where roster.COURSEID == courseId.Value && roster.PaidInFull != 0 && roster.Cancel == 0 select roster).ToList();
+                                                    db1.Configuration.LazyLoadingEnabled = false;
+                                                    db1.Configuration.ProxyCreationEnabled = false;
+                                                    db1.Configuration.AutoDetectChangesEnabled = false;
+                                                    var rosterDetails = (from roster in db1.Course_Rosters where roster.COURSEID == courseId.Value && roster.PaidInFull != 0 && roster.Cancel == 0 && roster.canvas_skip == 0 select roster).ToList();
                                                     columnId = columns["id"];
                                                     Student stud = new Student();
                                                     foreach (var roster in rosterDetails)
                                                     {
-                                                        stud = (from _student in db.Students where _student.STUDENTID == roster.STUDENTID.Value && _student.InActive == 0 select _student).FirstOrDefault();
+                                                        stud = (from _student in db1.Students where _student.STUDENTID == roster.STUDENTID.Value && _student.InActive == 0 select _student).FirstOrDefault();
                                                         string studIdentity = "";
                                                         string studIdentityField = "";
+                                                        string gsmustudentid = stud.STUDENTID.ToString();
                                                         if (string.IsNullOrEmpty(stud.Blackboard_user_UUID))
                                                         {
                                                             studIdentity = stud.USERNAME;
@@ -860,27 +872,54 @@ namespace Gsmu.Web.Controllers
                                                             studIdentity = stud.Blackboard_user_UUID;
                                                             studIdentityField = "uuid";
                                                         }
+                                                        string courseIdentity = "";
+                                                        string courseIdentityField = "";
+                                                        if (string.IsNullOrEmpty(_course.Course.blackboard_api_uuid))
+                                                        {
+                                                            courseIdentity = _course.Course.CustomCourseField1;
+                                                            courseIdentityField = "courseId";
+                                                        }
+                                                        else
+                                                        {
+                                                            courseIdentity = _course.Course.blackboard_api_uuid;
+                                                            courseIdentityField = "uuid";
+                                                        }
                                                         if (stud != null) {
-                                                            gradeholder = handelr.GetCourseGradeValue(BB_sec_key, BB_app_key, "", bb_connection_url, _course.Course.blackboard_api_uuid, columnId, studIdentity, studIdentityField, "", jsonToken);
+                                                            gradeholder = handelr.GetCourseGradeValue(BB_sec_key, BB_app_key, "", bb_connection_url, courseIdentity, courseIdentityField, columnId, studIdentity, studIdentityField, "", jsonToken);
                                                             jsonGrade = JsonConvert.DeserializeObject(gradeholder);
 
+                                                            //grade from  BB is available 
                                                             if (jsonGrade != null)
                                                             {
-                                                                string myFinalGrade = jsonGrade["displayGrade"]["score"];
-                                                                roster.StudentGrade = myFinalGrade;
+                                                                string myBBGrade = "";
+                                                                float myBBScore = 0;
+                                                                float transid;
+                                                                var finalBBGradeScore = "";
+                                                                string finalBBGradeScoreType = jsonGrade["displayGrade"]["scaleType"].ToString();
+                                                                //organize course type
+                                                                if (finalBBGradeScoreType == "Score")
+                                                                {
+                                                                    finalBBGradeScore = jsonGrade["displayGrade"]["score"].ToString("0.00");
+                                                                    var isNumericValue = float.TryParse(finalBBGradeScore, out transid);
+                                                                    if (isNumericValue)
+                                                                    {
+                                                                        //foundPassingGrade = 0;
+                                                                    }
+                                                                } else if (finalBBGradeScoreType == "Percent")
+                                                                {
+                                                                    finalBBGradeScore = jsonGrade["displayGrade"]["score"].ToString();
+                                                                } else if (finalBBGradeScoreType == "Letter")
+                                                                {
+                                                                    finalBBGradeScore = jsonGrade["displayGrade"]["text"].ToString();
+                                                                }
+                                                                roster.StudentGrade = finalBBGradeScore.ToString();
                                                                 roster.bb_graded_date = DateTime.Now.Date;
                                                                 int foundPassingGrade = 0;
 
+                                                                //cycle through declared passing grade
                                                                 foreach (var grade_value in Settings.Instance.GetMasterInfo3().BlackboardGradeCenterColumnValue.Split('@'))
                                                                 {
-                                                                    double transid;
-                                                                    var isNumericValue = Double.TryParse(grade_value, out transid);
-                                                                    if (isNumericValue)                                                                        
-                                                                    {
-                                                                        foundPassingGrade = 0;
-                                                                    }
-
-                                                                    if (roster.StudentGrade == grade_value && foundPassingGrade == 0)
+                                                                    if (finalBBGradeScore == grade_value && foundPassingGrade == 0)
                                                                     {
                                                                         /*var coursedates = (from course_date in db.Course_Times where course_date.COURSEID == roster.COURSEID select course_date).ToList();
                                                                         var attendancedate = (from attendance_date in db.AttendanceDetails where attendance_date.RosterId == roster.RosterID select attendance_date).ToList();
@@ -907,23 +946,46 @@ namespace Gsmu.Web.Controllers
                                                                         roster.ATTENDED = -1;
                                                                         roster.canvas_skip = 99; // for bb need to process survey/cert
                                                                         roster.DIDNTATTEND = 0;
+
+                                                                        //insert into grade log
+                                                                        StudentsGradeLog myBBStudGrade = new StudentsGradeLog();
+                                                                        myBBStudGrade.bbcoursename = "";
+                                                                        myBBStudGrade.bbcoursenum = curCourse_identify;
+                                                                        myBBStudGrade.bbusername = studIdentity;
+                                                                        myBBStudGrade.gsmucourseid = courseId.Value.ToString();
+                                                                        myBBStudGrade.gsmustudentid = roster.STUDENTID.Value.ToString();
+                                                                        myBBStudGrade.bbgrade = finalBBGradeScore.ToString();
+                                                                        myBBStudGrade.dateadded = DateTime.Now;
+                                                                        db1.StudentsGradeLogs.Add(myBBStudGrade);
+
                                                                         foundPassingGrade = 1;
-                                                                    }
-                                                                }
-                                                                db.Entry(roster).State = System.Data.Entity.EntityState.Modified;
+                                                                    } //matching grade with declared passing grade
+                                                                } //cycle through all declared passing grade
+                                                                db1.Entry(roster).State = System.Data.Entity.EntityState.Modified;
+                                                                Gsmu.Api.Data.School.Entities.AuditTrail Audittrail = new Gsmu.Api.Data.School.Entities.AuditTrail();
+                                                                Audittrail.TableName = Request.UserHostName;
+                                                                Audittrail.DetailDescription = "Blakcboard - Grade Pull API - ColID: " + columnId;
+                                                                Audittrail.AuditDate = DateTime.Now;
+                                                                Audittrail.StudentID = int.Parse(gsmustudentid);
+                                                                Audittrail.CourseID = courseId.Value;
+                                                                Audittrail.RoutineName = "SyncGrade--Admin";
+                                                                Audittrail.UserName = "Grade Routine";
+                                                                Audittrail.AuditAction = "info found BB Grade Record: " + gradeholder.ToString();
+                                                                Gsmu.Api.Logging.LogManagerDispossable LogManager = new Api.Logging.LogManagerDispossable();
+                                                                LogManager.LogSiteActivity(Audittrail);
                                                             }
-                                                            db.SaveChanges();
-                                                        }
-                                                    }
-                                                }
-                                            }
+                                                            db1.SaveChanges();
+                                                        } //stud != null
+                                                    } //rosterDetails
+                                                } //SchoolEntities
+                                            } //GradeBookFinalColumn
                                         }
                                         catch(Exception e) {
                                             string errMsg = " - " + e.Message;
                                         }
-                                    }
-                                }
-                            }
+                                    } //detailCol
+                                } //itemCol
+                            } //jsonColumns
                             callResult = gradeholder;
                         }
                         break;
