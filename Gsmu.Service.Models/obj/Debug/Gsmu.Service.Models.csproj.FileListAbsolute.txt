@@ -9,3 +9,9 @@ C:\websites\lang2\Gsmu.Service.Models\obj\Debug\Gsmu.Service.Models.csproj.CoreC
 C:\websites\lang2\Gsmu.Service.Models\obj\Debug\Gsmu.Service.Models.dll
 C:\websites\lang2\Gsmu.Service.Models\obj\Debug\Gsmu.Service.Models.pdb
 C:\websites\lang2\Gsmu.Service.Models\obj\Debug\Gsmu.Service.Models.csprojAssemblyReference.cache
+C:\websites\Lumaverse_GSMU_josephm\GoSignMeUpPublic\Gsmu.Service.Models\bin\Debug\Gsmu.Service.Models.dll
+C:\websites\Lumaverse_GSMU_josephm\GoSignMeUpPublic\Gsmu.Service.Models\bin\Debug\Gsmu.Service.Models.pdb
+C:\websites\Lumaverse_GSMU_josephm\GoSignMeUpPublic\Gsmu.Service.Models\obj\Debug\Gsmu.Service.Models.csprojAssemblyReference.cache
+C:\websites\Lumaverse_GSMU_josephm\GoSignMeUpPublic\Gsmu.Service.Models\obj\Debug\Gsmu.Service.Models.csproj.CoreCompileInputs.cache
+C:\websites\Lumaverse_GSMU_josephm\GoSignMeUpPublic\Gsmu.Service.Models\obj\Debug\Gsmu.Service.Models.dll
+C:\websites\Lumaverse_GSMU_josephm\GoSignMeUpPublic\Gsmu.Service.Models\obj\Debug\Gsmu.Service.Models.pdb
