@@ -853,7 +853,7 @@ namespace Gsmu.Web.Controllers
                                                     db1.Configuration.LazyLoadingEnabled = false;
                                                     db1.Configuration.ProxyCreationEnabled = false;
                                                     db1.Configuration.AutoDetectChangesEnabled = false;
-                                                    var rosterDetails = (from roster in db1.Course_Rosters where roster.COURSEID == courseId.Value && roster.PaidInFull != 0 && roster.Cancel == 0 && roster.canvas_skip == 0 select roster).ToList();
+                                                    var rosterDetails = (from roster in db1.Course_Rosters where roster.ATTENDED == 0 && roster.COURSEID == courseId.Value && roster.PaidInFull != 0 && roster.Cancel == 0 && (roster.canvas_skip == 0 || roster.canvas_skip == null) select roster).ToList();
                                                     columnId = columns["id"];
                                                     Student stud = new Student();
                                                     foreach (var roster in rosterDetails)
