@@ -159,14 +159,6 @@ function checkPasswordFormat(val, field, isSpecialCase, format) {
             validfield = false
         }
 
-        var regEx1 = /(?=.*[A-Z])/;
-        errmsg1 = "At least one capital letter </br>"
-        if (regEx1.test(val)) {
-            errmsgall += "<img src='/Images/Icons/FamFamFam/accept.png'/> " + errmsg1
-        } else {
-            errmsgall += "<img src='/Images/Icons/FamFamFam/crossinv.png'/> " + errmsg1
-            validfield = false
-        }
 
         var regEx2 = /(?=.*[0-9])/;
         errmsg2 = "At least one number </br>"
