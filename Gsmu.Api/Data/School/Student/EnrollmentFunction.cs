@@ -2122,7 +2122,7 @@ namespace Gsmu.Api.Data.School.Student
 
                         try
                         {
-                            EnrollUserToBlackBoardApi(roster.COURSEID.Value, roster.STUDENTID.Value,0,"student");
+                            EnrollUserToBlackBoardApi(roster.COURSEID.Value, roster.STUDENTID.Value,0,"student", roster.RosterID);
                         }
                         catch { }
                     }
@@ -3926,7 +3926,7 @@ namespace Gsmu.Api.Data.School.Student
             }
         }
 
-        public void EnrollUserToBlackBoardApi(int courseid, int studentid, int instructorid, string userType)
+        public void EnrollUserToBlackBoardApi(int courseid, int studentid, int instructorid, string userType, int gsmurosterid)
         {
             string BB_sec_key = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey;
             string BB_app_key = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey;
@@ -4007,7 +4007,13 @@ namespace Gsmu.Api.Data.School.Student
                         }
 
                         BBEnrollment myEnrollmentData = new BBEnrollment();
+                        //if (string.IsNullOrEmpty(Gsmu.Api.Integration.Blackboard.Configuration.Instance.CourseRosterDsk))
+                        //{
                         myEnrollmentData.courseRoleId = "Student";
+                        //} else
+                        //{
+                        //myEnrollmentData.courseRoleId = Gsmu.Api.Integration.Blackboard.Configuration.Instance.CourseRosterDsk;
+                        //}
                         
                         if (string.IsNullOrEmpty(studentuuid.Blackboard_user_UUID))
                         {
@@ -4033,13 +4039,24 @@ namespace Gsmu.Api.Data.School.Student
                         var jsonToken2 = new JavaScriptSerializer().Serialize(BBToken2);
 
                         var result= handelr2.CreateNewEnrollment(BB_sec_key, BB_app_key, "", bb_connection_url, myEnrollmentData, studBB_identifier, courseBB_identifier, studfieldsearch, coursefieldsearch, "", jsonToken2);
+                        //update GSMU roster with id
+                        var Context2 = new SchoolEntities();
+                        var GSMUcourseRoster = Context2.Course_Rosters.Where(cr => cr.RosterID == gsmurosterid).SingleOrDefault();
+                        if (GSMUcourseRoster != null)
+                        {
+                            GSMUcourseRoster.blackboard_roster_id = result.id;
+                            Context2.SaveChanges();
+                            EmailFunction emailFunc = new EmailFunction();
+                            emailFunc.SendBlackboardEmailConfirmation(courseuuid,studentuuid);
+                        }
                         Gsmu.Api.Data.School.Entities.AuditTrail Audittrail = new Gsmu.Api.Data.School.Entities.AuditTrail();
                         Audittrail.TableName = "Course Roster";
                         Audittrail.DetailDescription = "Blakcboard Enrollment-Public";
                         Audittrail.AuditDate = DateTime.Now;
+                        Audittrail.CourseID = courseid;
                         Audittrail.RoutineName = "Enroll-" + AuthorizationHelper.CurrentUser.LoggedInUserType;
                         Audittrail.UserName = AuthorizationHelper.CurrentUser.LoggedInUsername;
-                        Audittrail.AuditAction = "info" + result.responseMessage;
+                        //Audittrail.AuditAction = "info" + result.responseMessage;
                         Gsmu.Api.Logging.LogManagerDispossable LogManager = new Api.Logging.LogManagerDispossable();
                         LogManager.LogSiteActivity(Audittrail);
                     }
@@ -4072,7 +4089,6 @@ namespace Gsmu.Api.Data.School.Student
                                         var globaldatasourceKeyDetails = handelr.GetDatasourceKeyDetails(BB_sec_key, BB_app_key, "", bb_connection_url, Gsmu.Api.Integration.Blackboard.Configuration.Instance.InstructorsDsk, "dsk", "", jsonToken);
                                         datasource globaldatasource = JsonConvert.DeserializeObject<datasource>(globaldatasourceKeyDetails);
                                         string actualDSK = globaldatasource.id;
-
                                         user_update.dataSourceId = actualDSK;
                                     }
                                     else

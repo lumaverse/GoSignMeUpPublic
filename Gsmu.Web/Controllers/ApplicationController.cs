@@ -1511,6 +1511,52 @@ namespace Gsmu.Web.Controllers
             return result;
         }
 
+        public string UpdateCourseEnrollmentInfo()
+        {
+            //no normalization yet
+            string BB_sec_key = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey;
+            string BB_app_key = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey;
+            string bb_connection_url = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl;
+            Gsmu.Api.Data.School.Student.EnrollmentFunction enrollmentFunction = new Gsmu.Api.Data.School.Student.EnrollmentFunction();
+            BlackBoardAPI.BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
+            BBToken BBToken = new BBToken();
+            BBToken = handelr.GenerateAccessToken(BB_sec_key, BB_app_key, "", bb_connection_url);
+            var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
+            string result = "";
+            int tempGSMUCourseID = 0;
+            int tempGSMURosterID = 0;
+
+            if (!string.IsNullOrEmpty(Request["courseid"]))
+            {
+                tempGSMUCourseID = Convert.ToInt32(Request["courseid"]);
+            }
+            if (!string.IsNullOrEmpty(Request["rosterid"]))
+            {
+                tempGSMURosterID = Convert.ToInt32(Request["rosterid"]);
+            }
+            if (tempGSMUCourseID != 0 && tempGSMURosterID == 0)
+            {
+                using (var db2 = new SchoolEntities())
+                {
+                    foreach (var _roster in (from roster in db2.Course_Rosters where roster.COURSEID == tempGSMUCourseID && roster.PaidInFull != 0 && roster.Cancel == 0 select roster).ToList())
+                    {
+                        enrollmentFunction.EnrollUserToBlackBoardApi(tempGSMUCourseID, _roster.STUDENTID.Value, 0, "student", _roster.RosterID);
+                    }
+                }
+            }
+            else if (tempGSMURosterID != 0)
+            {
+                using (var db2 = new SchoolEntities())
+                {
+                    foreach (var _roster in (from roster in db2.Course_Rosters where roster.RosterID == tempGSMURosterID && roster.PaidInFull != 0 && roster.Cancel == 0 select roster).ToList())
+                    {
+                        enrollmentFunction.EnrollUserToBlackBoardApi(tempGSMUCourseID, _roster.STUDENTID.Value, 0, "student", _roster.RosterID);
+                    }
+                }
+            }
+            return result;
+        }
+
         public string CopyandCreateNewCourse()
         {
             Gsmu.Api.Data.School.Student.EnrollmentFunction enrollmentFunction = new Gsmu.Api.Data.School.Student.EnrollmentFunction();
@@ -1631,11 +1677,11 @@ namespace Gsmu.Web.Controllers
 
                             foreach (var _roster in (from roster in db2.Course_Rosters where roster.COURSEID == course.COURSEID && roster.PaidInFull != 0 && roster.Cancel == 0 select roster).ToList())
                             {
-                                enrollmentFunction.EnrollUserToBlackBoardApi(course.COURSEID, _roster.STUDENTID.Value, 0, "student");
+                                enrollmentFunction.EnrollUserToBlackBoardApi(course.COURSEID, _roster.STUDENTID.Value, 0, "student", _roster.RosterID);
                             }
                             foreach (var _instructor in (from instructor in db2.Instructors where instructor.INSTRUCTORID == course.INSTRUCTORID && instructor.DISABLED == 0 select instructor).ToList())
                             {
-                                enrollmentFunction.EnrollUserToBlackBoardApi(course.COURSEID, 0, _instructor.INSTRUCTORID, "instructor");
+                                enrollmentFunction.EnrollUserToBlackBoardApi(course.COURSEID, 0, _instructor.INSTRUCTORID, "instructor",0);
                             }
                         }
                     }

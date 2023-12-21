@@ -1009,7 +1009,9 @@ namespace Gsmu.Api.Data.School.User
                                     string tempDSK = Settings.Instance.GetMasterInfo4().blackboard_students_dsk;
                                     if (!string.IsNullOrEmpty(tempDSK))
                                     {
-                                        if (tempDSK.IndexOf("_") < 0)
+                                        int countbar = tempDSK.Count(f => f == '_');
+                                        //if (tempDSK.IndexOf("_") < 0)
+                                        if (countbar != 2)
                                         {
                                             var globaldatasourceKeyDetails = handelr.GetDatasourceKeyDetails(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, Gsmu.Api.Integration.Blackboard.Configuration.Instance.StudentDsk, "dsk", "", jsonToken);
                                             datasource globaldatasource = JsonConvert.DeserializeObject<datasource>(globaldatasourceKeyDetails);
@@ -1041,7 +1043,9 @@ namespace Gsmu.Api.Data.School.User
                                     string tempDSK = Settings.Instance.GetMasterInfo4().blackboard_students_dsk;
                                     if (!string.IsNullOrEmpty(tempDSK))
                                     {
-                                        if (tempDSK.IndexOf("_") < 0)
+                                        int countbar = tempDSK.Count(f => f == '_');
+                                        //if (tempDSK.IndexOf("_") < 0)
+                                        if (countbar != 2)
                                         {
                                             var globaldatasourceKeyDetails = handelr.GetDatasourceKeyDetails(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, Gsmu.Api.Integration.Blackboard.Configuration.Instance.StudentDsk, "dsk", "", jsonToken);
                                             datasource globaldatasource = JsonConvert.DeserializeObject<datasource>(globaldatasourceKeyDetails);
