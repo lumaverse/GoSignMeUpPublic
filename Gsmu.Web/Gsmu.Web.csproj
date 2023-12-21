@@ -4827,7 +4827,6 @@
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="SilentFormPost.asp" />
     <Content Include="Styles\Common.css" />
-    <Content Include="Temp\placeholder-for-publishing-required-do-not-delete.txt" />
     <Content Include="Views\Shared\_PartialConfirmation.cshtml" />
     <Content Include="Views\Shared\_PrintLayout.cshtml" />
     <Content Include="Scripts.Gsmu\Models\GradeExtraInfo.js" />
@@ -5018,6 +5017,7 @@
     <Folder Include="Areas\Adm\Views\Course\" />
     <Folder Include="Areas\Membership\Scripts\" />
     <Folder Include="Areas\Membership\Styles\" />
+    <Folder Include="Temp\" />
     <Folder Include="Views\Schedule\" />
   </ItemGroup>
   <ItemGroup>
