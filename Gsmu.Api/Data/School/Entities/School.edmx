@@ -2406,6 +2406,8 @@
           <Property Name="CompleteSupAccountToSupervisor" Type="int" />
           <Property Name="blackboard_api_url" Type="nvarchar" MaxLength="250" />
           <Property Name="use_blackboard_api" Type="int" />
+          <Property Name="blackboard_access_token" Type="nvarchar" MaxLength="250" />
+          <Property Name="blackboard_token_expiry" Type="datetime" />
         </EntityType>
         <EntityType Name="Materials">
           <Key>
@@ -7548,6 +7550,8 @@ warning 6002: The table/view 'school.dbo.StudentsOtherInfoView' does not have a 
           <Property Name="CompleteSupAccountToSupervisor" Type="Int32" />
           <Property Type="String" Name="blackboard_api_url" MaxLength="250" FixedLength="false" Unicode="true" />
           <Property Name="use_blackboard_api" Type="Int32" />
+          <Property Name="blackboard_access_token" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="blackboard_token_expiry" Type="DateTime" Precision="3" />
         
 
 
@@ -13108,6 +13112,8 @@ warning 6002: The table/view 'school.dbo.StudentsOtherInfoView' does not have a 
               <MappingFragment StoreEntitySet="masterinfo4">
 
 
+                <ScalarProperty Name="blackboard_token_expiry" ColumnName="blackboard_token_expiry" />
+                <ScalarProperty Name="blackboard_access_token" ColumnName="blackboard_access_token" />
                 <ScalarProperty Name="use_blackboard_api" ColumnName="use_blackboard_api" />
                 <ScalarProperty Name="blackboard_api_url" ColumnName="blackboard_api_url" />
                 <ScalarProperty Name="CompleteSupAccountToSupervisor" ColumnName="CompleteSupAccountToSupervisor" />

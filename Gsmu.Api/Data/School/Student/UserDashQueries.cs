@@ -383,9 +383,7 @@ namespace Gsmu.Api.Data.School.Student
                             if (Configuration.Instance.BlackboardUseAPI)
                             {
                                 BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
-                                BBToken BBToken = new BBToken();
-                                BBToken = handelr.GenerateAccessToken(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl);
-                                var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
+                                var jsonToken = AuthorizationHelper.getCurrentBBAccessToken();
                                 var user = handelr.GetUserDetails(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl, student.USERNAME, "", "", jsonToken);
 
                                 if (user.userName != null)

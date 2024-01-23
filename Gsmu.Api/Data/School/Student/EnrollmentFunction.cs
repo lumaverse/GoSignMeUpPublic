@@ -3090,10 +3090,8 @@ namespace Gsmu.Api.Data.School.Student
 					if (Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardUseAPI && Settings.Instance.GetMasterInfo3().bb_allow_normalize == 1)
 					{
 						BlackBoardAPI.BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
-						BBToken BBToken = new BBToken();
-						BBToken = handelr.GenerateAccessToken(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl);
-						var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
-						var _skey = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey;
+                        var jsonToken = AuthorizationHelper.getCurrentBBAccessToken();
+                        var _skey = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey;
 						var _akey = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey;
 						var _curl = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl;
 						handelr.DeleteUserBBEnrollment(_skey, _akey, "", _curl, studentuuid.Blackboard_user_UUID, courseuuid.blackboard_api_uuid, "uuid", "uuid", "", jsonToken);
@@ -3948,9 +3946,7 @@ namespace Gsmu.Api.Data.School.Student
                     if (Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardUseAPI && Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardMembershipIntegrationEnabled)
                     {
                         BlackBoardAPI.BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
-                        BBToken BBToken = new BBToken();
-                        BBToken = handelr.GenerateAccessToken(BB_sec_key, BB_app_key, "", bb_connection_url);
-                        var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
+                        var jsonToken = AuthorizationHelper.getCurrentBBAccessToken();
 
                         //look up to see if use exists.
                         var user = handelr.GetUserDetails(BB_sec_key, BB_app_key, "", bb_connection_url, studentuuid.USERNAME, "", "", jsonToken);
@@ -3964,7 +3960,7 @@ namespace Gsmu.Api.Data.School.Student
                                 string tempDSK = Settings.Instance.GetMasterInfo4().blackboard_students_dsk;
                                 if (!string.IsNullOrEmpty(tempDSK))
                                 {
-                                    if (tempDSK.IndexOf("_") < 0)
+                                    if (tempDSK.IndexOf("_") == -1 || tempDSK.IndexOf("_") > 0)
                                     {
                                         var globaldatasourceKeyDetails = handelr.GetDatasourceKeyDetails(BB_sec_key, BB_app_key, "", bb_connection_url, Gsmu.Api.Integration.Blackboard.Configuration.Instance.StudentDsk, "dsk", "", jsonToken);
                                         datasource globaldatasource = JsonConvert.DeserializeObject<datasource>(globaldatasourceKeyDetails);
@@ -3999,7 +3995,7 @@ namespace Gsmu.Api.Data.School.Student
                             //update GSMU with uuid
                             var Context = new SchoolEntities();
                             var st = Context.Students.Where(s => s.STUDENTID == studentuuid.STUDENTID).SingleOrDefault();
-                            if (st != null)
+                            if (st != null && updateduser.uuid != null)
                             {
                                 st.Blackboard_user_UUID = updateduser.uuid;
                                 Context.SaveChanges();
@@ -4034,20 +4030,28 @@ namespace Gsmu.Api.Data.School.Student
                             coursefieldsearch = "uuid";
                         }
                         BlackBoardAPI.BlackboardAPIRequestHandler handelr2 = new BlackboardAPIRequestHandler();
-                        BBToken BBToken2 = new BBToken();
-                        BBToken2 = handelr2.GenerateAccessToken(BB_sec_key, BB_app_key, "", bb_connection_url);
-                        var jsonToken2 = new JavaScriptSerializer().Serialize(BBToken2);
+                        //BBToken BBToken2 = new BBToken();
+                        //BBToken2 = handelr2.GenerateAccessToken(BB_sec_key, BB_app_key, "", bb_connection_url);
+                        //var jsonToken2 = new JavaScriptSerializer().Serialize(BBToken2);
+                        var jsonToken2 = AuthorizationHelper.getCurrentBBAccessToken();
 
                         var result= handelr2.CreateNewEnrollment(BB_sec_key, BB_app_key, "", bb_connection_url, myEnrollmentData, studBB_identifier, courseBB_identifier, studfieldsearch, coursefieldsearch, "", jsonToken2);
                         //update GSMU roster with id
                         var Context2 = new SchoolEntities();
                         var GSMUcourseRoster = Context2.Course_Rosters.Where(cr => cr.RosterID == gsmurosterid).SingleOrDefault();
-                        if (GSMUcourseRoster != null)
+                        if (GSMUcourseRoster != null && result.id != null && Settings.Instance.GetMasterInfo3().BBStudentRegEmailEnable == 1)
                         {
                             GSMUcourseRoster.blackboard_roster_id = result.id;
-                            Context2.SaveChanges();
-                            EmailFunction emailFunc = new EmailFunction();
-                            emailFunc.SendBlackboardEmailConfirmation(courseuuid,studentuuid);
+                            if (string.IsNullOrEmpty(GSMUcourseRoster.bb_sent_confirm))
+                            {
+                                GSMUcourseRoster.bb_sent_confirm = DateTime.Now.ToString("MM/dd/yyyy hh:mm tt");
+                                Context2.SaveChanges();
+                                EmailFunction emailFunc = new EmailFunction();
+                                emailFunc.SendBlackboardEmailConfirmation(courseuuid, studentuuid);
+                            } else
+                            {
+                                Context2.SaveChanges();
+                            }
                         }
                         Gsmu.Api.Data.School.Entities.AuditTrail Audittrail = new Gsmu.Api.Data.School.Entities.AuditTrail();
                         Audittrail.TableName = "Course Roster";
@@ -4066,9 +4070,7 @@ namespace Gsmu.Api.Data.School.Student
                     if (Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardUseAPI)
                     {
                         BlackBoardAPI.BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
-                        BBToken BBToken = new BBToken();
-                        BBToken = handelr.GenerateAccessToken(BB_sec_key, BB_app_key, "", bb_connection_url);
-                        var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
+                        var jsonToken = AuthorizationHelper.getCurrentBBAccessToken();
                         BBEnrollment myEnrollmentData = new BBEnrollment();
                         myEnrollmentData.courseRoleId = Settings.Instance.GetMasterInfo3().BlackboardCourseRole;
 

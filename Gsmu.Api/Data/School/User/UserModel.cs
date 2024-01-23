@@ -996,9 +996,7 @@ namespace Gsmu.Api.Data.School.User
                         if (Configuration.Instance.BlackboardUseAPI && Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardMembershipIntegrationEnabled)
                         {
                             BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
-                            BBToken BBToken = new BBToken();
-                            BBToken = handelr.GenerateAccessToken(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl);
-                            var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
+                            var jsonToken = AuthorizationHelper.getCurrentBBAccessToken();
                             var user = handelr.GetUserDetails(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl, st.USERNAME,"", "", jsonToken);
 
                             if (user.userName != null)
@@ -1105,9 +1103,7 @@ namespace Gsmu.Api.Data.School.User
                         if (Configuration.Instance.BlackboardUseAPI && Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardMembershipIntegrationEnabled)
                         {
                             BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
-                            BBToken BBToken = new BBToken();
-                            BBToken = handelr.GenerateAccessToken(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl);
-                            var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
+                            var jsonToken = AuthorizationHelper.getCurrentBBAccessToken();
                             BBUser user_update = new BBUser();
 
                             if (Settings.Instance.GetMasterInfo4().blackboard_students_dsk != "" && Settings.Instance.GetMasterInfo4().blackboard_students_dsk != null)
@@ -1638,9 +1634,7 @@ namespace Gsmu.Api.Data.School.User
             if (Configuration.Instance.BlackboardUseAPI && Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardMembershipIntegrationEnabled)
             {
                 BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
-                BBToken BBToken = new BBToken();
-                BBToken = handelr.GenerateAccessToken(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl);
-                var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
+                var jsonToken = AuthorizationHelper.getCurrentBBAccessToken();
                 var user = handelr.GetUserDetails(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl, it.USERNAME, "", "", jsonToken);
 
                 if (user.userName != null)
@@ -2588,9 +2582,7 @@ namespace Gsmu.Api.Data.School.User
                         if (userid != 0)
                         {
                             BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
-                            BBToken BBToken = new BBToken();
-                            BBToken = handelr.GenerateAccessToken(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl);
-                            var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
+                            var jsonToken = AuthorizationHelper.getCurrentBBAccessToken();
                             BBUser user_update = new BBUser();
                             ProfileAvailabilityObj availability = new ProfileAvailabilityObj();
                             availability.available = available;

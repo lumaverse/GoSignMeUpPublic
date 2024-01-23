@@ -59,9 +59,7 @@ namespace Gsmu.Web.Areas.Adm.Controllers
                 if (node!="root")
                 {
                     BlackBoardAPI.BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
-                    BBToken BBToken = new BBToken();
-                    BBToken = handelr.GenerateAccessToken(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl);
-                    var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
+                    var jsonToken = Gsmu.Api.Authorization.AuthorizationHelper.getCurrentBBAccessToken();
                     var hierarchies = handelr.GetChildHierarchy(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, "", "", node, jsonToken);
                     foreach (var item in hierarchies.results)
                     {
@@ -71,9 +69,7 @@ namespace Gsmu.Web.Areas.Adm.Controllers
                 else
                 {
                     BlackBoardAPI.BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
-                    BBToken BBToken = new BBToken();
-                    BBToken = handelr.GenerateAccessToken(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl);
-                    var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
+                    var jsonToken = Gsmu.Api.Authorization.AuthorizationHelper.getCurrentBBAccessToken();
                     var hierarchies = handelr.GetBBAPIHierarchiess(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, "", "", "", jsonToken);
                     foreach(var item in hierarchies.results)
                     {
@@ -99,11 +95,11 @@ namespace Gsmu.Web.Areas.Adm.Controllers
             if (Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardUseAPI)
             {
                 BlackBoardAPI.BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
-                BBToken BBToken = new BBToken();
-                BBToken = handelr.GenerateAccessToken(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl);
-                var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
+                //BBToken BBToken = new BBToken();
+                //BBToken = handelr.GenerateAccessToken(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl);
+                //var jsonToken = new JavaScriptSerializer().Serialize(BBToken);
+                var jsonToken = Gsmu.Api.Authorization.AuthorizationHelper.getCurrentBBAccessToken();
                 var datasources = handelr.GetBBAPIDataSources(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, "", "", "", jsonToken);
-
 
                 object[] json = new object[datasources.results.Count()];
                 int index = 0;

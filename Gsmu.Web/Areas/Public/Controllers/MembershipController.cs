@@ -33,7 +33,7 @@ namespace Gsmu.Web.Areas.Public.Controllers
 
             if (!ValidateUrlReferrer())
             {
-                return Content("Invalid Request.");
+                return Content("Invalid Request. Err705.");
             }
             ViewBag.CASConfigLoginGsmu = GetCASConfig();
             ViewBag.hide_SupervisorLogin_onCartCheckOut = 0;
@@ -77,7 +77,7 @@ namespace Gsmu.Web.Areas.Public.Controllers
 
             if (!ValidateUrlReferrer())
             {
-                return Content("Invalid Request.");
+                return Content("Invalid Request. Err706.");
             }
             try
             {
@@ -141,7 +141,7 @@ namespace Gsmu.Web.Areas.Public.Controllers
 
             if (!ValidateUrlReferrer())
             {
-                return Content("Invalid Request.");
+                return Content("Invalid Request. Err707.");
             }
             try
             {
@@ -185,7 +185,7 @@ namespace Gsmu.Web.Areas.Public.Controllers
 
             if (!ValidateUrlReferrer())
             {
-                return Content("Invalid Request.");
+                return Content("Invalid Request. Err708.");
             }
             try
             {
@@ -231,7 +231,7 @@ namespace Gsmu.Web.Areas.Public.Controllers
 
             if (!ValidateUrlReferrer())
             {
-                return Content("Invalid Request.");
+                return Content("Invalid Request. Err710.");
             }
             var result = new JsonResult();
             try
