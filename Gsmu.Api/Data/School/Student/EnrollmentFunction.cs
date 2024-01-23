@@ -3948,7 +3948,7 @@ namespace Gsmu.Api.Data.School.Student
                         BlackBoardAPI.BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
                         var jsonToken = AuthorizationHelper.getCurrentBBAccessToken();
 
-                        //look up to see if use exists.
+                        //look up to see if student user exists.
                         var user = handelr.GetUserDetails(BB_sec_key, BB_app_key, "", bb_connection_url, studentuuid.USERNAME, "", "", jsonToken);
                         if (user.userName == null)
                         {

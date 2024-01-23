@@ -1059,7 +1059,61 @@ namespace Gsmu.Web.Controllers
                             callResult ="Major="+ bbcourses.learn.major+" Minor="+ bbcourses.learn.minor;
                         }
                         break;
+                    case "roster_individual_gsmu_to_bb":
+                        {
+                            //********** WARNING
+                            //**********courseId.Value here is actually RosterID
+                            //********** WARNING
+                            //basic call: /application/adminfunction?callback=jsonp1704915394366&call=roster_individual_gsmu_to_bb&courseId=<roster ID>
+                            using (var db = new SchoolEntities())
+                            {
+                                Api.Data.School.Student.EnrollmentFunction enrollmentFunction = new Api.Data.School.Student.EnrollmentFunction();
+                                var rosterDetails = (from roster in db.Course_Rosters where roster.RosterID == courseId.Value && roster.PaidInFull != 0 && roster.Cancel == 0 && roster.blackboard_roster_id == null select roster).ToList();
+                                callResult = callResult + "<br />Initiating Manual Blackboard Enrollment.";
+                                //Student stud = new Student();
+                                foreach (var roster in rosterDetails)
+                                {
+                                    var _course = new CourseModel(roster.COURSEID.Value);
+                                    if (_course != null && _course.Course.blackboard_api_uuid != null)
+                                    {
+                                        callResult = callResult + "<br />Processing enrollments." + roster.RosterID;
+                                        //stud = (from _student in db.Students where _student.STUDENTID == roster.STUDENTID.Value select _student).FirstOrDefault();
+                                        enrollmentFunction.EnrollUserToBlackBoardApi(roster.COURSEID.Value, roster.STUDENTID.Value, 0, "student", roster.RosterID);
+                                    }
+                                    else
+                                    {
+                                        callResult = callResult + "<br />Course of the enrollment is not in Blackboard.";
+                                    }
+                                }           
+                            }
+                            break;
+                        }
 
+                    case "roster_gsmu_to_bb":
+                        {
+                            // FYI
+                            //this is a fail-safe function to pickup all enrollments from admin/ftp/webservice import or classic/webservice enrollments
+                            ////basic call: /application/adminfunction?callback=jsonp1704915394366&call=roster_gsmu_to_bb
+                            using (var db = new SchoolEntities())
+                            {
+                                Api.Data.School.Student.EnrollmentFunction enrollmentFunction = new Api.Data.School.Student.EnrollmentFunction();
+                                var course_ids = (from c in db.Courses where c.BBCourseCloned == 1 && c.blackboard_api_uuid != null select c.COURSEID).ToList();
+                                var baselineDate = DateTime.Now.AddHours(-48);
+                                callResult = callResult + "<br />Initiating Manual Blackboard all course Enrollment.";
+                                foreach (var _cid in course_ids)
+                                {                                    
+                                    //var roster_ids = (from roster in db.Course_Rosters where roster.COURSEID == _cid select roster.STUDENTID).ToList();
+
+                                    var roster_ids = (from roster in db.Course_Rosters where roster.DATEADDED >= baselineDate && roster.COURSEID == _cid && roster.PaidInFull != 0 && roster.Cancel == 0 && roster.blackboard_roster_id == null select roster).ToList();
+                                    foreach (var roster in roster_ids)
+                                    {
+                                        callResult = callResult + "<br />Processing courses: " + _cid;
+                                        enrollmentFunction.EnrollUserToBlackBoardApi(_cid, roster.STUDENTID.Value, 0, "student", roster.RosterID);
+                                    }
+                                }
+                            }
+                            break;
+                        }
                     case "update-bb-course-datasourceid":
                         {
                             if (Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardUseAPI)
