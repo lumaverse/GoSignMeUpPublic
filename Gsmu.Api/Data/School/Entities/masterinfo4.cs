@@ -121,5 +121,6 @@ namespace Gsmu.Api.Data.School.Entities
         public Nullable<int> use_blackboard_api { get; set; }
         public string blackboard_access_token { get; set; }
         public Nullable<System.DateTime> blackboard_token_expiry { get; set; }
+        public string rubysessionsalt { get; set; }
     }
 }

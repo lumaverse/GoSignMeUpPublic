@@ -76,7 +76,9 @@ namespace Gsmu.Api.Web
 
         public static void InitializeAdminMode()
         {
+
             var context = System.Web.HttpContext.Current;
+            context.Session.Remove(VARIABLE_NAME);
             var adminmode = context.Request[VARIABLE_NAME];
             if (adminmode != null && adminmode != "true")
             {
@@ -91,13 +93,29 @@ namespace Gsmu.Api.Web
         public static void SetAdminMode()
         {
             var context = System.Web.HttpContext.Current;
-            
+
             var asp = Settings.Instance.GetMasterInfo4().AspSiteRootUrl ?? string.Empty;
             asp = asp.ToLower();
 
+            var salt = Settings.Instance.GetMasterInfo4().rubysessionsalt ?? string.Empty;
+            string hmacsign = Gsmu.Api.Encryption.HmacSha1.Encode(DateTime.Now.ToShortDateString(), salt);
+
+            var token = System.Web.HttpContext.Current.Request.Params["token"];
+            if (token != null)
+            {
+                token = token.ToLower();
+            }
+
             if (!string.IsNullOrWhiteSpace(asp) && (context.Request.UrlReferrer == null || !context.Request.UrlReferrer.ToString().ToLower().StartsWith(asp)))
             {
-                context.Session.Remove(VARIABLE_NAME);
+                if (hmacsign == token)
+                {
+                    context.Session[VARIABLE_NAME] = "true";
+                }
+                else
+                {
+                    context.Session.Remove(VARIABLE_NAME);
+                }
             }
             else
             {
