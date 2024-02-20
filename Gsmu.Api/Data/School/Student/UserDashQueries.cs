@@ -427,7 +427,7 @@ namespace Gsmu.Api.Data.School.Student
                             return "successupdate";
                         }
 
-                        
+                        return "successupdatepartial";
                     }
                 }
                 catch
@@ -435,7 +435,7 @@ namespace Gsmu.Api.Data.School.Student
                     return "failed";
                 }
             }
-            if (logintype == "Sup")
+            else if (logintype == "Sup")
             {
                 try
                 {
