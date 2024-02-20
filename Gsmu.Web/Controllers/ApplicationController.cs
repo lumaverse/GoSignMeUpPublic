@@ -1614,42 +1614,46 @@ namespace Gsmu.Web.Controllers
 
         public string UpdateCourseEnrollmentInfo()
         {
-            //no normalization yet
-            string BB_sec_key = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey;
-            string BB_app_key = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey;
-            string bb_connection_url = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl;
-            Gsmu.Api.Data.School.Student.EnrollmentFunction enrollmentFunction = new Gsmu.Api.Data.School.Student.EnrollmentFunction();
-            BlackBoardAPI.BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
-            var jsonToken = AuthorizationHelper.getCurrentBBAccessToken();
             string result = "";
-            int tempGSMUCourseID = 0;
-            int tempGSMURosterID = 0;
+            if (Gsmu.Api.Web.RequireAdminModeAttribute.IsAdminMode)
+            {
+                //no normalization yet
+                string BB_sec_key = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey;
+                string BB_app_key = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey;
+                string bb_connection_url = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl;
+                Gsmu.Api.Data.School.Student.EnrollmentFunction enrollmentFunction = new Gsmu.Api.Data.School.Student.EnrollmentFunction();
+                BlackBoardAPI.BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
+                var jsonToken = AuthorizationHelper.getCurrentBBAccessToken();
 
-            if (!string.IsNullOrEmpty(Request["courseid"]))
-            {
-                tempGSMUCourseID = Convert.ToInt32(Request["courseid"]);
-            }
-            if (!string.IsNullOrEmpty(Request["rosterid"]))
-            {
-                tempGSMURosterID = Convert.ToInt32(Request["rosterid"]);
-            }
-            if (tempGSMUCourseID != 0 && tempGSMURosterID == 0)
-            {
-                using (var db2 = new SchoolEntities())
+                int tempGSMUCourseID = 0;
+                int tempGSMURosterID = 0;
+
+                if (!string.IsNullOrEmpty(Request["courseid"]))
                 {
-                    foreach (var _roster in (from roster in db2.Course_Rosters where roster.COURSEID == tempGSMUCourseID && roster.PaidInFull != 0 && roster.Cancel == 0 select roster).ToList())
+                    tempGSMUCourseID = Convert.ToInt32(Request["courseid"]);
+                }
+                if (!string.IsNullOrEmpty(Request["rosterid"]))
+                {
+                    tempGSMURosterID = Convert.ToInt32(Request["rosterid"]);
+                }
+                if (tempGSMUCourseID != 0 && tempGSMURosterID == 0)
+                {
+                    using (var db2 = new SchoolEntities())
                     {
-                        enrollmentFunction.EnrollUserToBlackBoardApi(tempGSMUCourseID, _roster.STUDENTID.Value, 0, "student", _roster.RosterID);
+                        foreach (var _roster in (from roster in db2.Course_Rosters where roster.COURSEID == tempGSMUCourseID && roster.PaidInFull != 0 && roster.Cancel == 0 select roster).ToList())
+                        {
+                            enrollmentFunction.EnrollUserToBlackBoardApi(tempGSMUCourseID, _roster.STUDENTID.Value, 0, "student", _roster.RosterID);
+                        }
                     }
                 }
-            }
-            else if (tempGSMURosterID != 0)
-            {
-                using (var db2 = new SchoolEntities())
+                else if (tempGSMURosterID != 0)
                 {
-                    foreach (var _roster in (from roster in db2.Course_Rosters where roster.RosterID == tempGSMURosterID && roster.PaidInFull != 0 && roster.Cancel == 0 select roster).ToList())
+                    using (var db2 = new SchoolEntities())
                     {
-                        enrollmentFunction.EnrollUserToBlackBoardApi(tempGSMUCourseID, _roster.STUDENTID.Value, 0, "student", _roster.RosterID);
+                        foreach (var _roster in (from roster in db2.Course_Rosters where roster.RosterID == tempGSMURosterID && roster.PaidInFull != 0 && roster.Cancel == 0 select roster).ToList())
+                        {
+                            enrollmentFunction.EnrollUserToBlackBoardApi(tempGSMUCourseID, _roster.STUDENTID.Value, 0, "student", _roster.RosterID);
+                        }
                     }
                 }
             }
@@ -1658,146 +1662,149 @@ namespace Gsmu.Web.Controllers
 
         public string CopyandCreateNewCourse()
         {
-            Gsmu.Api.Data.School.Student.EnrollmentFunction enrollmentFunction = new Gsmu.Api.Data.School.Student.EnrollmentFunction();
-            string BB_sec_key = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey;
-            string BB_app_key = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey;
-            string bb_connection_url = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl;
-            BlackBoardAPI.BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
-            var jsonToken = AuthorizationHelper.getCurrentBBAccessToken();
             string result = "";
-
-            using (var db = new SchoolEntities())
+            if (Gsmu.Api.Web.RequireAdminModeAttribute.IsAdminMode)
             {
-                Course courseforUpdate = null;
-                db.Configuration.LazyLoadingEnabled = false;
-                db.Configuration.ProxyCreationEnabled = false;
-                db.Configuration.AutoDetectChangesEnabled = false;
-                var courseDetails = (from course in db.Courses
-                                     where course.BBCourseCloned == 0 && (course.blackboard_api_uuid == null || course.blackboard_api_uuid == "") && course.CustomCourseField1 != "" && course.CustomCourseField2 != "" && course.CustomCourseField1 !=null && course.CustomCourseField2!=null
-                                     select course).ToList();
+                Gsmu.Api.Data.School.Student.EnrollmentFunction enrollmentFunction = new Gsmu.Api.Data.School.Student.EnrollmentFunction();
+                string BB_sec_key = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey;
+                string BB_app_key = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey;
+                string bb_connection_url = Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl;
+                BlackBoardAPI.BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
+                var jsonToken = AuthorizationHelper.getCurrentBBAccessToken();
 
-                string SourceCourseId = "";
-                copyCourse copyCourse = new copyCourse();
-                copyCourse.targetCourse = new targetCourse();
-                copyCourse.targetCourse.courseId = "";
-                copyCourse.copy = new copy();
-
-                BBCourse bb_updated_course = new BBCourse();
-
-                foreach (var course in courseDetails)
+                using (var db = new SchoolEntities())
                 {
-                    SourceCourseId = course.CustomCourseField2;
-                    copyCourse = new copyCourse();
+                    Course courseforUpdate = null;
+                    db.Configuration.LazyLoadingEnabled = false;
+                    db.Configuration.ProxyCreationEnabled = false;
+                    db.Configuration.AutoDetectChangesEnabled = false;
+                    var courseDetails = (from course in db.Courses
+                                         where course.BBCourseCloned == 0 && (course.blackboard_api_uuid == null || course.blackboard_api_uuid == "") && course.CustomCourseField1 != "" && course.CustomCourseField2 != "" && course.CustomCourseField1 != null && course.CustomCourseField2 != null
+                                         select course).ToList();
+
+                    string SourceCourseId = "";
+                    copyCourse copyCourse = new copyCourse();
                     copyCourse.targetCourse = new targetCourse();
-                    copyCourse.targetCourse.courseId = course.CustomCourseField1;
+                    copyCourse.targetCourse.courseId = "";
                     copyCourse.copy = new copy();
-                    copyCourse.copy.adaptiveReleaseRules = true;
-                    copyCourse.copy.announcements = true;
-                    copyCourse.copy.assessments = true;
-                    copyCourse.copy.blogs = true;
-                    copyCourse.copy.calendar = true;
-                    copyCourse.copy.contacts = true;
-                    copyCourse.copy.contentAlignments = true;
-                    copyCourse.copy.contentAreas = true;
-                    copyCourse.copy.discussions = "None";
-                    copyCourse.copy.glossary = true;
-                    copyCourse.copy.gradebook = true;
-                    copyCourse.copy.groupSettings = true;
-                    copyCourse.copy.journals = true;
-                    copyCourse.copy.retentionRules = true;
-                    copyCourse.copy.rubrics = true;
-                    copyCourse.copy.settings = new settings();
-                    copyCourse.copy.settings.availability = true;
-                    copyCourse.copy.settings.bannerImage = true;
-                    copyCourse.copy.settings.duration = true;
-                    copyCourse.copy.settings.enrollmentOptions = true;
-                    copyCourse.copy.settings.guestAccess = true;
-                    copyCourse.copy.settings.languagePack = true;
-                    copyCourse.copy.settings.navigationSettings = true;
-                    copyCourse.copy.settings.observerAccess = true;
 
-                    copyCourse.copy.wikis = true;
-                    copyCourse.copy.tasks = true;
-                    result = result+ "New ID: " + course.CustomCourseField1;
-                    result = result + " <br> Source '" + SourceCourseId+"' | ";
-                    var bbcourses = handelr.GetCourseDetails(BB_sec_key, BB_app_key, "", bb_connection_url, SourceCourseId, "courseId", "", jsonToken);
-                    dynamic json = JsonConvert.DeserializeObject(bbcourses);
-                    string uuid = "";
-                    if (json != null)
+                    BBCourse bb_updated_course = new BBCourse();
+
+                    foreach (var course in courseDetails)
                     {
-                        BBCourse obj_course = JsonConvert.DeserializeObject<BBCourse>(bbcourses);
-                        uuid = obj_course.uuid;
+                        SourceCourseId = course.CustomCourseField2;
+                        copyCourse = new copyCourse();
+                        copyCourse.targetCourse = new targetCourse();
+                        copyCourse.targetCourse.courseId = course.CustomCourseField1;
+                        copyCourse.copy = new copy();
+                        copyCourse.copy.adaptiveReleaseRules = true;
+                        copyCourse.copy.announcements = true;
+                        copyCourse.copy.assessments = true;
+                        copyCourse.copy.blogs = true;
+                        copyCourse.copy.calendar = true;
+                        copyCourse.copy.contacts = true;
+                        copyCourse.copy.contentAlignments = true;
+                        copyCourse.copy.contentAreas = true;
+                        copyCourse.copy.discussions = "None";
+                        copyCourse.copy.glossary = true;
+                        copyCourse.copy.gradebook = true;
+                        copyCourse.copy.groupSettings = true;
+                        copyCourse.copy.journals = true;
+                        copyCourse.copy.retentionRules = true;
+                        copyCourse.copy.rubrics = true;
+                        copyCourse.copy.settings = new settings();
+                        copyCourse.copy.settings.availability = true;
+                        copyCourse.copy.settings.bannerImage = true;
+                        copyCourse.copy.settings.duration = true;
+                        copyCourse.copy.settings.enrollmentOptions = true;
+                        copyCourse.copy.settings.guestAccess = true;
+                        copyCourse.copy.settings.languagePack = true;
+                        copyCourse.copy.settings.navigationSettings = true;
+                        copyCourse.copy.settings.observerAccess = true;
+
+                        copyCourse.copy.wikis = true;
+                        copyCourse.copy.tasks = true;
+                        result = result + "New ID: " + course.CustomCourseField1;
+                        result = result + " <br> Source '" + SourceCourseId + "' | ";
+                        var bbcourses = handelr.GetCourseDetails(BB_sec_key, BB_app_key, "", bb_connection_url, SourceCourseId, "courseId", "", jsonToken);
+                        dynamic json = JsonConvert.DeserializeObject(bbcourses);
+                        string uuid = "";
+                        if (json != null)
+                        {
+                            BBCourse obj_course = JsonConvert.DeserializeObject<BBCourse>(bbcourses);
+                            uuid = obj_course.uuid;
+                        }
+
+                        if (uuid != "")
+                        {
+                            var bbNewCourse = handelr.CopyandCreateNewCourse(BB_sec_key, BB_app_key, "", bb_connection_url, copyCourse, course.CustomCourseField2, jsonToken, "");
+                            var bbaddedcourses = handelr.GetCourseDetails(BB_sec_key, BB_app_key, "", bb_connection_url, course.CustomCourseField1, "courseId", "", jsonToken);
+                            BBCourse obj_course = JsonConvert.DeserializeObject<BBCourse>(bbaddedcourses);
+
+                            obj_course.name = course.COURSENAME;
+
+                            if (Gsmu.Api.Integration.Blackboard.Configuration.Instance.CoursesDsk != "" && Gsmu.Api.Integration.Blackboard.Configuration.Instance.CoursesDsk != null)
+                            {
+                                string tempDSK = Gsmu.Api.Integration.Blackboard.Configuration.Instance.CoursesDsk;
+                                if (tempDSK.IndexOf("_") < 0)
+                                {
+                                    var globaldatasourceKeyDetails = handelr.GetDatasourceKeyDetails(BB_sec_key, BB_app_key, "", bb_connection_url, tempDSK, "dsk", "", jsonToken);
+                                    datasource globaldatasource = JsonConvert.DeserializeObject<datasource>(globaldatasourceKeyDetails);
+                                    string actualDSK = globaldatasource.id;
+
+                                    obj_course.dataSourceId = actualDSK;
+                                }
+                                else
+                                {
+                                    obj_course.dataSourceId = tempDSK;
+                                }
+                            }
+                            //var updated_course = handelr.UpdateBlackbooardCourseDetails(BB_sec_key, BB_app_key, "", bb_connection_url, obj_course,course.CustomCourseField1, "", jsonToken);
+                            var updated_course = handelr.UpdateBlackbooardCourseDetails(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, obj_course, course.CustomCourseField1, "", jsonToken);
+                            result = result + "source uuid: " + uuid + "<br>json: " + json + "<br>| Message:" + bbaddedcourses + "<br> Updated Course:" + updated_course;
+
+                            try
+                            {
+                                bb_updated_course = JsonConvert.DeserializeObject<BBCourse>(updated_course);
+                            }
+                            catch { }
+
+                            using (var db2 = new SchoolEntities())
+                            {
+                                courseforUpdate = (from _course in db2.Courses where _course.COURSEID == course.COURSEID select _course).FirstOrDefault();
+                                courseforUpdate.blackboard_api_uuid = bb_updated_course.uuid;
+                                courseforUpdate.BBCourseCloned = 1;
+                                courseforUpdate.bb_last_integration_date = DateTime.Now;
+                                result = result + "<br>|new course uuid: " + bb_updated_course.uuid;
+
+                                db2.SaveChanges();
+
+                                foreach (var _roster in (from roster in db2.Course_Rosters where roster.COURSEID == course.COURSEID && roster.PaidInFull != 0 && roster.Cancel == 0 select roster).ToList())
+                                {
+                                    enrollmentFunction.EnrollUserToBlackBoardApi(course.COURSEID, _roster.STUDENTID.Value, 0, "student", _roster.RosterID);
+                                }
+                                foreach (var _instructor in (from instructor in db2.Instructors where instructor.INSTRUCTORID == course.INSTRUCTORID && instructor.DISABLED == 0 select instructor).ToList())
+                                {
+                                    enrollmentFunction.EnrollUserToBlackBoardApi(course.COURSEID, 0, _instructor.INSTRUCTORID, "instructor", 0);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            result = result + " Course Id not exist.";
+                        }
+                        Gsmu.Api.Data.School.Entities.AuditTrail Audittrail = new Gsmu.Api.Data.School.Entities.AuditTrail();
+                        Audittrail.TableName = Request.UserHostName;
+                        Audittrail.DetailDescription = "Blakcboard Copy/Create Course";
+                        Audittrail.AuditDate = DateTime.Now;
+                        Audittrail.RoutineName = "CreateCourse-" + AuthorizationHelper.CurrentUser.LoggedInUserType + " -Admin";
+                        Audittrail.UserName = AuthorizationHelper.CurrentUser.LoggedInUsername;
+                        Audittrail.AuditAction = "info" + result + " x ";
+                        Gsmu.Api.Logging.LogManagerDispossable LogManager = new Api.Logging.LogManagerDispossable();
+                        LogManager.LogSiteActivity(Audittrail);
                     }
 
-                    if (uuid != "")
-                    {
-                        var bbNewCourse= handelr.CopyandCreateNewCourse(BB_sec_key, BB_app_key, "", bb_connection_url, copyCourse, course.CustomCourseField2, jsonToken, "");
-                        var bbaddedcourses = handelr.GetCourseDetails(BB_sec_key, BB_app_key, "", bb_connection_url, course.CustomCourseField1, "courseId", "", jsonToken);
-                        BBCourse obj_course = JsonConvert.DeserializeObject<BBCourse>(bbaddedcourses);
-
-                        obj_course.name = course.COURSENAME;                        
-
-                        if (Gsmu.Api.Integration.Blackboard.Configuration.Instance.CoursesDsk != "" && Gsmu.Api.Integration.Blackboard.Configuration.Instance.CoursesDsk != null)
-                        {
-                            string tempDSK = Gsmu.Api.Integration.Blackboard.Configuration.Instance.CoursesDsk;
-                            if (tempDSK.IndexOf("_") < 0)
-                            {
-                                var globaldatasourceKeyDetails = handelr.GetDatasourceKeyDetails(BB_sec_key, BB_app_key, "", bb_connection_url, tempDSK, "dsk", "", jsonToken);
-                                datasource globaldatasource = JsonConvert.DeserializeObject<datasource>(globaldatasourceKeyDetails);
-                                string actualDSK = globaldatasource.id;
-
-                                obj_course.dataSourceId = actualDSK;
-                            }
-                            else
-                            {
-                                obj_course.dataSourceId = tempDSK;
-                            }                            
-                        }
-                        //var updated_course = handelr.UpdateBlackbooardCourseDetails(BB_sec_key, BB_app_key, "", bb_connection_url, obj_course,course.CustomCourseField1, "", jsonToken);
-                        var updated_course = handelr.UpdateBlackbooardCourseDetails(Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecretKey, Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackBoardSecurityKey, "", Gsmu.Api.Integration.Blackboard.Configuration.Instance.BlackboardConnectionUrl, obj_course, course.CustomCourseField1, "", jsonToken);
-                        result = result + "source uuid: " + uuid + "<br>json: " + json + "<br>| Message:" + bbaddedcourses + "<br> Updated Course:"+updated_course;
-
-                        try
-                        {
-                            bb_updated_course = JsonConvert.DeserializeObject<BBCourse>(updated_course);
-                        }
-                        catch { }
-
-                        using (var db2 = new SchoolEntities())
-                        {
-                            courseforUpdate = (from _course in db2.Courses where _course.COURSEID == course.COURSEID select _course).FirstOrDefault();
-                            courseforUpdate.blackboard_api_uuid = bb_updated_course.uuid;
-                            courseforUpdate.BBCourseCloned = 1;
-                            courseforUpdate.bb_last_integration_date = DateTime.Now;
-                            result = result + "<br>|new course uuid: " + bb_updated_course.uuid;
-
-                            db2.SaveChanges();
-
-                            foreach (var _roster in (from roster in db2.Course_Rosters where roster.COURSEID == course.COURSEID && roster.PaidInFull != 0 && roster.Cancel == 0 select roster).ToList())
-                            {
-                                enrollmentFunction.EnrollUserToBlackBoardApi(course.COURSEID, _roster.STUDENTID.Value, 0, "student", _roster.RosterID);
-                            }
-                            foreach (var _instructor in (from instructor in db2.Instructors where instructor.INSTRUCTORID == course.INSTRUCTORID && instructor.DISABLED == 0 select instructor).ToList())
-                            {
-                                enrollmentFunction.EnrollUserToBlackBoardApi(course.COURSEID, 0, _instructor.INSTRUCTORID, "instructor",0);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        result = result + " Course Id not exist.";
-                    }
-                    Gsmu.Api.Data.School.Entities.AuditTrail Audittrail = new Gsmu.Api.Data.School.Entities.AuditTrail();
-                    Audittrail.TableName = Request.UserHostName;
-                    Audittrail.DetailDescription = "Blakcboard Copy/Create Course";
-                    Audittrail.AuditDate = DateTime.Now;
-                    Audittrail.RoutineName = "CreateCourse-" + AuthorizationHelper.CurrentUser.LoggedInUserType + " -Admin";
-                    Audittrail.UserName = AuthorizationHelper.CurrentUser.LoggedInUsername;
-                    Audittrail.AuditAction = "info" + result + " x ";
-                    Gsmu.Api.Logging.LogManagerDispossable LogManager = new Api.Logging.LogManagerDispossable();
-                    LogManager.LogSiteActivity(Audittrail);
                 }
-
             }
             return result;
         }

@@ -97,7 +97,7 @@ namespace Gsmu.Api.Web
             var asp = Settings.Instance.GetMasterInfo4().AspSiteRootUrl ?? string.Empty;
             asp = asp.ToLower();
 
-            var salt = Settings.Instance.GetMasterInfo4().rubysessionsalt ?? string.Empty;
+            var salt = System.Configuration.ConfigurationManager.AppSettings["LMSCallHashKey"] ?? string.Empty;
             string hmacsign = Gsmu.Api.Encryption.HmacSha1.Encode(DateTime.Now.ToShortDateString(), salt);
 
             var token = System.Web.HttpContext.Current.Request.Params["token"];
