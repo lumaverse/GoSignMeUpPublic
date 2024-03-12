@@ -2998,7 +2998,7 @@ namespace Gsmu.Api.Data.School.Student
                 if (roster != null)
                 {
 
-                    var waitlistRoster = (from wr in db.Course_Rosters where wr.IsWaiting == true && wr.COURSEID == roster.COURSEID select wr).FirstOrDefault();
+                    var waitlistRoster = (from wr in db.Course_Rosters where (wr.WAITING == 1 ||wr.WAITING==-1) && wr.COURSEID == roster.COURSEID select wr).FirstOrDefault();
                     if (waitlistRoster != null)
                     {
                         waitlistRoster.WAITING = 0;
