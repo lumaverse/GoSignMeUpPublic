@@ -384,13 +384,13 @@ namespace Gsmu.Api.Data.School.Student
                             {
                                 BlackboardAPIRequestHandler handelr = new BlackboardAPIRequestHandler();
                                 var jsonToken = AuthorizationHelper.getCurrentBBAccessToken();
-                                var user = handelr.GetUserDetails(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl, student.USERNAME, "", "", jsonToken);
+                                var user = handelr.GetUserDetails(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl, student.USERNAME.ToLower(), "username", "", jsonToken);
 
                                 if (user.userName != null)
                                 {
                                     BBUser user_update = new BBUser();
                                     user_update.password = firstpassword;
-                                    BBRespUserProfile updateduser = handelr.UpdateExisitingUser(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl, user_update, user.userName, "", "", jsonToken, "");
+                                    BBRespUserProfile updateduser = handelr.UpdateExisitingUser(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl, user_update, user.userName.ToLower(), "", "", jsonToken, "");
                                     if (updateduser.responseMessage.IndexOf("True") >= 0)
                                     {
                                         return "successupdate";
@@ -398,6 +398,25 @@ namespace Gsmu.Api.Data.School.Student
                                     else
                                     {
                                         return "successupdatepartial";
+                                    }
+                                }
+
+                                else
+                                {
+                                    user = handelr.GetUserDetails(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl, student.Blackboard_user_UUID, "uuid", "", jsonToken);
+                                    if (user.uuid != null)
+                                    {
+                                        BBUser user_update = new BBUser();
+                                        user_update.password = firstpassword;
+                                        BBRespUserProfile updateduser = handelr.UpdateExisitingUser(Configuration.Instance.BlackBoardSecretKey, Configuration.Instance.BlackBoardSecurityKey, "", Configuration.Instance.BlackboardConnectionUrl, user_update, user.uuid, "uuid", "", jsonToken, "");
+                                        if (updateduser.responseMessage.IndexOf("True") >= 0)
+                                        {
+                                            return "successupdate";
+                                        }
+                                        else
+                                        {
+                                            return "successupdatepartial";
+                                        }
                                     }
                                 }
                             }
